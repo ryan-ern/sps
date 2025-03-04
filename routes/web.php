@@ -20,10 +20,10 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 */
 
 Route::get('/', function () {
-    return redirect('/dashboard');
+    return redirect('/apps/dashboard');
 })->middleware('auth');
 
-Route::get('/dashboard', function () {
+Route::get('/apps/dashboard', function () {
     return view('dashboard');
 })->name('dashboard')->middleware('auth');
 

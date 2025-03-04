@@ -1,0 +1,20 @@
+@import './corporate-ui-dashboard/bootstrap/bootstrap.scss';
+@import './corporate-ui-dashboard/_variables.scss';
+@import './corporate-ui-dashboard/_buttons.scss';
+// Bootstrap Functions
+@import "corporate-ui-dashboard/bootstrap/functions";
+
+// Custom Variables
+@import "corporate-ui-dashboard/custom/variables";
+
+// Theme Variables
+@import "corporate-ui-dashboard/variables";
+
+// Bootstrap Core
+@import "corporate-ui-dashboard/bootstrap/bootstrap";
+
+// Theme Core
+@import "corporate-ui-dashboard/theme";
+
+// Custom Variables
+@import "corporate-ui-dashboard/custom/styles";
