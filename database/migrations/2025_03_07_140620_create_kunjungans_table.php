@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id('nisn')->primary();
+        Schema::create('kunjungans', function (Blueprint $table) {
+            $table->id()->primary();
+            $table->unsignedBigInteger('nisn');
+            $table->foreign('nisn')->references('nisn')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('fullname');
-            $table->string('username')->unique();
             $table->string('kelas');
-            $table->string('password');
-            $table->enum('role', ['admin', 'guru', 'siswa']);
-            $table->enum('status', ['aktif', 'tidak aktif']);
-            $table->string('email')->nullable();
+            $table->text('keterangan');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('kunjungans');
     }
 };
