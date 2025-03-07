@@ -16,18 +16,6 @@
                                     <img src="{{ asset('assets/img/logo.png') }}" alt="logo" class="w-30">
                                     <div class="text-muted mt-2">di Sistem Perpustakaan Sekolah</div>
                                 </div>
-                                <div class="text-center">
-                                    @if (session('status'))
-                                        <div class="mb-4 font-medium text-sm text-green-600">
-                                            {{ session('status') }}
-                                        </div>
-                                    @endif
-                                    @error('message')
-                                        <div class="alert alert-danger text-sm" role="alert">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
                                 <div class="card-body">
                                     <form role="form" class="text-start" method="POST" action="sign-in">
                                         @csrf

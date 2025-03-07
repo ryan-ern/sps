@@ -33,30 +33,35 @@ class LoginController extends Controller
 
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password'], 'status' => 'aktif'])) {
             $request->session()->regenerate();
-            if (Auth::user()->role == 'siswa') {
-                return redirect()->intended('/apps/siswa');
-            } elseif (Auth::user()->role == 'guru') {
-                return redirect()->intended('/apps/guru');
-            } elseif (Auth::user()->role == 'admin') {
-                return redirect()->intended('/apps/dashboard');
-            } else {
-                return redirect()->intended('/sign-in');
-            }
+            flash()->flash(
+                'success',
+                'Selamat Datang ' . Auth::user()->fullname,
+                ['timeout' => 1500],
+                'Login Sukses'
+            );
+            return redirect()->intended('/apps/dashboard');
         }
 
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password'], 'status' => 'tidak aktif'])) {
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return back()->withErrors([
-                'message' => 'Akun anda tidak aktif',
-            ])->withInput($request->only('username'));
+            flash()->flash(
+                'warning',
+                'Akun Anda Sudah Tidak Aktif, Hubungi Admin atau Petugas',
+                [/*options */],
+                'Login Gagal'
+            );
+
+            return back()->withInput($request->only('username'));
         }
 
-
-
-        return back()->withErrors([
-            'message' => 'Username atau password anda salah',
-        ])->withInput($request->only('username'));
+        flash()->flash(
+            'error',
+            'Username atau Password Salah',
+            [/*options */],
+            'Login Gagal'
+        );
+        return back()->withInput($request->only('username'));
     }
 
 
@@ -70,10 +75,15 @@ class LoginController extends Controller
     public function destroy(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
+
+        flash()->flash(
+            'info',
+            'Akun Anda Berhasil Dikeluarkan',
+            [/*options */],
+            'Logout Sukses'
+        );
 
         return redirect('/sign-in');
     }

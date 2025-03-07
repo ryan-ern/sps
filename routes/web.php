@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,9 +33,7 @@ Route::middleware(['auth'])->group(function () {
         return redirect('/apps/dashboard');
     });
 
-    Route::get('/apps/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard')->middleware(['role:siswa,guru,admin']);
+    Route::get('/apps/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['role:siswa,guru,admin']);
 
     Route::get('/apps/siswa', function () {
         return view('example');

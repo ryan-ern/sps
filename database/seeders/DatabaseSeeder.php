@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'nisn' => 4,
-            'username' => 'blocked',
+            'username' => 'block',
             'fullname' => 'Block',
             'password' => bcrypt('123'),
             'role' => 'siswa',
