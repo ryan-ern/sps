@@ -33,8 +33,15 @@ class LoginController extends Controller
 
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password'], 'status' => 'aktif'])) {
             $request->session()->regenerate();
-
-            return redirect()->intended('/apps/dashboard');
+            if (Auth::user()->role == 'siswa') {
+                return redirect()->intended('/apps/siswa');
+            } elseif (Auth::user()->role == 'guru') {
+                return redirect()->intended('/apps/guru');
+            } elseif (Auth::user()->role == 'admin') {
+                return redirect()->intended('/apps/dashboard');
+            } else {
+                return redirect()->intended('/sign-in');
+            }
         }
 
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password'], 'status' => 'tidak aktif'])) {

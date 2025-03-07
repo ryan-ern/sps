@@ -20,13 +20,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     @if (config('app.is_demo'))
         <title itemprop="name">
-            Corporate UI Dashboard Laravel by Creative Tim & UPDIVISION
+            SPS - Sistem Perpustakaan Sekolah
         </title>
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:site" content="@CreativeTim" />
         <meta name="twitter:creator" content="@CreativeTim" />
-        <meta name="twitter:title" content="Corporate UI Dashboard Laravel by Creative Tim & UPDIVISION" />
+        <meta name="twitter:title" content="SPS - Sistem Perpustakaan Sekolah" />
         <meta name="twitter:description" content="Fullstack tool for building Laravel apps with hundreds of UI components and
             ready-made CRUDs" />
         <meta name="twitter:image"
@@ -38,7 +38,7 @@
             content="creative tim, updivision, html dashboard, laravel, api, html css dashboard laravel,  Corporate UI Dashboard Laravel,  Corporate UI Laravel,  Corporate Dashboard Laravel, UI Dashboard Laravel, Laravel admin, laravel dashboard, Laravel dashboard, laravel admin, web dashboard, bootstrap 5 dashboard laravel, bootstrap 5, css3 dashboard, bootstrap 5 admin laravel, frontend, responsive bootstrap 5 dashboard, corporate dashboard laravel,  Corporate UI Dashboard Laravel">
         <meta property="og:app_id" content="655968634437471">
         <meta property="og:type" content="product">
-        <meta property="og:title" content="Corporate UI Dashboard Laravel by Creative Tim & UPDIVISION">
+        <meta property="og:title" content="SPS - Sistem Perpustakaan Sekolah">
         <meta property="og:url" content="https://www.creative-tim.com/live/corporate-ui-dashboard-laravel">
         <meta property="og:image"
             content="https://s3.amazonaws.com/creativetim_bucket/products/737/original/corporate-ui-dashboard-laravel.jpg?1695288974">
@@ -50,9 +50,9 @@
         <meta name="data-turbolinks-track" content="false">
     @endif
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <title>
-        Corporate UI by Creative Tim & UPDIVISION
+        SPS - Sistem Perpustakaan Sekolah
     </title>
     <!--     Fonts and icons     -->
     <link
@@ -66,6 +66,7 @@
     <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="../assets/css/corporate-ui-dashboard.css?v=1.0.0" rel="stylesheet" />
+    @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
 
 <body class="">

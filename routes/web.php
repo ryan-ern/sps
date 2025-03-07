@@ -19,13 +19,27 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 |
 */
 
-Route::get('/', function () {
-    return redirect('/apps/dashboard');
-})->middleware('auth');
+Route::fallback(function () {
+    return redirect('/pages/not-found');
+});
 
-Route::get('/apps/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard')->middleware('auth');
+Route::get('/pages/not-found', function () {
+    return view('error.404');
+})->name('not-found');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return redirect('/apps/dashboard');
+    });
+
+    Route::get('/apps/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard')->middleware(['role:siswa,guru,admin']);
+
+    Route::get('/apps/siswa', function () {
+        return view('example');
+    })->name('siswa')->middleware(['role:siswa']);
+});
 
 Route::get('/tables', function () {
     return view('tables');
