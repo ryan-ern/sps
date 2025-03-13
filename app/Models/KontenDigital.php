@@ -8,4 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class KontenDigital extends Model
 {
     use HasFactory;
+
+    protected $table = 'konten_digitals';
+
+    protected $fillable = [
+        'id',
+        'nuptk',
+        'jenis',
+        'judul',
+        'url',
+        'file_path',
+        'pengarang',
+        'penerbit',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'nuptk', 'nisn');
+    }
 }

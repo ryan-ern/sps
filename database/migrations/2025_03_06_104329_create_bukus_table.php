@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('penerbit');
             $table->string('tahun');
             $table->string('stok');
-            $table->text('keterangan');
-            $table->string('file_buku');
-            $table->string('file_cover');
-            $table->enum('jenis', ['referensi', 'paket']);
-            $table->enum('status', ['tersedia', 'tidak tersedia']);
+            $table->text('keterangan')->default('-');
+            $table->string('file_buku')->default('-');
+            $table->string('file_cover')->default('-');
+            $table->enum('jenis', ['referensi', 'paket'])->default('referensi');
+            $table->enum('status', ['tersedia', 'tidak tersedia'])->default('tersedia');
             $table->timestamps();
         });
     }

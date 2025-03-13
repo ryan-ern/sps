@@ -1,0 +1,33 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Buku>
+ */
+class BukuFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'no_regis' => fake()->unique()->randomNumber(6),
+            'judul' => fake()->sentence(),
+            'pengarang' => fake()->name(),
+            'penerbit' => fake()->company(),
+            'tahun' => fake()->year(),
+            'stok' => fake()->randomNumber(2),
+            'keterangan' => fake()->sentence(),
+            'file_buku' => fake()->sentence(),
+            'file_cover' => fake()->sentence(),
+            'jenis' => fake()->randomElement(['referensi', 'paket']),
+            'status' => fake()->randomElement(['tersedia', 'tidak tersedia']),
+        ];
+    }
+}

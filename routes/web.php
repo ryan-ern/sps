@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
 
 /*
@@ -34,6 +35,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/apps/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['role:siswa,guru,admin']);
+
+    Route::get('/apps/data-buku', [BukuController::class, 'index'])->name('data-buku')->middleware(['role:admin']);
+    Route::post('/apps/data-buku/tambah', [BukuController::class, 'store'])->name('tambah-buku')->middleware(['role:admin']);
 
     Route::get('/apps/siswa', function () {
         return view('example');
