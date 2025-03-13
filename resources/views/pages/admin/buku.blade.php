@@ -158,16 +158,16 @@
                                         <!-- Kolom Kanan -->
                                         <div class="col-md-4">
                                             <div class="mb-3">
-                                                <label for="fileBuku" class="form-control" name="file_buku"
-                                                    id="fileBukuLabel">Pilih
+                                                <label for="fileBuku" class="form-control" id="fileBukuLabel">Pilih
                                                     File Buku</label>
-                                                <input type="file" class="form-control d-none" id="fileBuku">
+                                                <input type="file" class="form-control d-none" id="fileBuku"
+                                                    name="file_buku">
                                             </div>
                                             <div class="mb-3">
-                                                <label for="fileCover" class="form-control" name="file_cover"
-                                                    id="fileCoverLabel">Pilih
+                                                <label for="fileCover" class="form-control" id="fileCoverLabel">Pilih
                                                     File Cover</label>
-                                                <input type="file" class="form-control d-none" id="fileCover">
+                                                <input type="file" class="form-control d-none" id="fileCover"
+                                                    name="file_cover">
                                             </div>
 
                                             <input type="number" class="form-control mb-3" name="tahun"
