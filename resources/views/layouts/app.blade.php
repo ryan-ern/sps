@@ -110,24 +110,78 @@ $segments = request()->segments();
             document.addEventListener('DOMContentLoaded', function() {
                 $('.dataTable').each(function() {
                     let table = new DataTable(this, {
+                        paging: false,
+                        searching: true,
+                        info: false,
+                        ordering: true,
                         language: {
                             search: '',
                             searchPlaceholder: 'Cari Data',
                             emptyTable: 'Tidak Ada Data Yang Tersedia',
-                            info: 'Tampilan _START_ - _END_ Dari _TOTAL_ Data',
-                            infoEmpty: 'Tampilan 0 hingga 0 dari 0 data',
-                            infoFiltered: '(Pencarian dari _MAX_ total data)',
                             lengthMenu: 'Tampilan _MENU_ data',
                             loadingRecords: "Sedang Memuat...",
                             zeroRecords: "Data Tidak Ditemukan",
                         },
-                        lengthMenu: [
-                            [5, 10, 25, 50, -1],
-                            [5, 10, 25, 50, 'Semua Data']
-                        ],
                         layout: {
                             topStart: {
                                 buttons: [{
+                                        text: `<i class="fa-solid fa-filter me-2"></i>Filter <span id="filterText">{{ request('per_page') }}</span> Data`,
+                                        extend: 'collection',
+                                        className: 'btn btn-dark me-2',
+                                        attr: {
+                                            id: 'filterButton'
+                                        },
+                                        buttons: [{
+                                                text: '5 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(5);
+                                                }
+                                            },
+                                            {
+                                                text: '10 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(10);
+                                                }
+                                            },
+                                            {
+                                                text: '25 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(25);
+                                                }
+                                            },
+                                            {
+                                                text: '50 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(50);
+                                                }
+                                            },
+                                            {
+                                                text: '100 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(100);
+                                                }
+                                            },
+                                            {
+                                                text: '500 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(500);
+                                                }
+                                            },
+                                            {
+                                                text: '1000 Data',
+                                                className: 'dropdown-item',
+                                                action: function() {
+                                                    updatePerPage(1000);
+                                                }
+                                            }
+                                        ]
+                                    }, {
                                         text: 'Tambah Data',
                                         className: 'btn btn-dark me-2',
                                         action: function() {
@@ -138,14 +192,6 @@ $segments = request()->segments();
                                             'data-bs-target': '#dynamicModal',
                                             'data-modal-type': 'tambah'
                                         }
-                                    },
-                                    {
-                                        extend: 'pageLength',
-                                        text: function(dt) {
-                                            const pageLength = dt.page.len();
-                                            return `<i class="fa-solid fa-filter me-2"></i>${pageLength} Data`;
-                                        },
-                                        className: 'btn btn-dark dropdown-toggle me-2',
                                     },
                                     {
                                         text: '<i class="fa-solid fa-download me-2"></i>Aksi Data',
@@ -184,6 +230,21 @@ $segments = request()->segments();
                             }
                         }
                     });
+                    // Fungsi untuk mendapatkan nilai per_page dari URL
+                    function getPerPageFromURL() {
+                        let params = new URLSearchParams(window.location.search);
+                        return params.get('per_page') || 10; // Default 10 jika tidak ada parameter
+                    }
+
+                    // Fungsi untuk memperbarui jumlah data per halaman
+                    function updatePerPage(perPage) {
+                        let url = new URL(window.location.href);
+                        url.searchParams.set('per_page', perPage);
+                        window.location.href = url.toString();
+                    }
+
+                    // Update tampilan jumlah data saat halaman dimuat
+                    document.getElementById('filterText').textContent = getPerPageFromURL();
 
                     // Filter berdasarkan tanggal
                     $('#min, #max').on('change', function() {

@@ -9,7 +9,7 @@
                             {{-- Nav Tabs --}}
                             <ul class="nav nav-tabs" id="Tabs" role="tablist">
                                 <li class="nav-item me-2 my-2" role="presentation">
-                                    <button class="nav-link active" id="referensi-tab" data-bs-toggle="tab"
+                                    <button class="nav-link" id="referensi-tab" data-bs-toggle="tab"
                                         data-bs-target="#referensi" type="button" role="tab"
                                         aria-controls="referensi" aria-selected="false">Buku Referensi</button>
                                 </li>
@@ -24,10 +24,11 @@
                                         aria-selected="false">Konten Digital</button>
                                 </li>
                             </ul>
+
                             {{-- End Nav Tabs --}}
                             <div class="tab-content mt-4" id="TabsContent">
                                 <!-- Tab Buku Referensi -->
-                                <div class="tab-pane fade show active" id="referensi" role="tabpanel"
+                                <div class="tab-pane fade show" id="referensi" role="tabpanel"
                                     aria-labelledby="referensi-tab">
                                     <div class="table-responsive text-center">
                                         <table class="table table-sm table-bordered dataTable" id="table">
@@ -53,7 +54,8 @@
                                                         <td>{{ $BukuReferensi->tahun }}</td>
                                                         <td>{{ $BukuReferensi->stok }}</td>
                                                         <td class="text-uppercase">
-                                                            {{ $BukuReferensi->created_at->format('d-m-Y h:i a') }}</td>
+                                                            {{ $BukuReferensi->created_at->format('d-m-Y h:i a') }}
+                                                        </td>
                                                         <td>
                                                             <button class="mx-2 btn btn-primary">Edit</button>
                                                             <button class="mx-2 btn btn-danger">Hapus</button>
@@ -62,6 +64,10 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
+                                        {{-- Tambahkan Navigasi Pagination --}}
+                                        <div class="d-flex justify-content-end mt-3">
+                                            {{ $referensi->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- End Tab Buku Referensi -->
@@ -102,6 +108,10 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
+                                        {{-- Tambahkan Navigasi Pagination --}}
+                                        <div class="d-flex justify-content-end mt-3">
+                                            {{ $paket->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- End Tab Buku Paket -->
@@ -221,6 +231,30 @@
                 document.getElementById('fileCoverLabel').textContent = "Pilih File Cover";
             });
 
+            let tabs = document.querySelectorAll("#Tabs .nav-link");
+
+            let activeTab = localStorage.getItem("activeTab") || "#referensi";
+            if (activeTab) {
+                let activeButton = document.querySelector(`#Tabs .nav-link[data-bs-target="${activeTab}"]`);
+                if (activeButton) {
+                    tabs.forEach(tab => tab.classList.remove("active"));
+                    activeButton.classList.add("active");
+
+                    let activePane = document.querySelector(activeTab);
+                    if (activePane) {
+                        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("show",
+                            "active"));
+                        activePane.classList.add("show", "active");
+                    }
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function() {
+                    let target = this.getAttribute("data-bs-target");
+                    localStorage.setItem("activeTab", target);
+                });
+            });
         });
     </script>
 </x-app-layout>

@@ -10,13 +10,13 @@ class BukuController extends Controller
 {
     public function index(Request $request)
     {
-        $referensi = Buku::where('jenis', 'referensi')->get();
-        $paket = Buku::where('jenis', 'paket')->get();
-        return view('pages.admin.buku', [
-            'referensi' => $referensi,
-            'paket' => $paket
-        ]);
+        $perPage = $request->input('per_page', 5);
+        $referensi = Buku::where('jenis', 'referensi')->paginate($perPage);
+        $paket = Buku::where('jenis', 'paket')->paginate($perPage);
+
+        return view('pages.admin.buku', compact('referensi', 'paket', 'perPage'));
     }
+
 
     public function store(Request $request)
     {
