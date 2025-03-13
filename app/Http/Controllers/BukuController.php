@@ -10,6 +10,10 @@ class BukuController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'per_page' => 'integer|min:1|max:1000',
+            'page' => 'integer|min:1',
+        ]);
         $perPage = $request->input('per_page', 5);
         $referensi = Buku::where('jenis', 'referensi')->paginate($perPage);
         $paket = Buku::where('jenis', 'paket')->paginate($perPage);
