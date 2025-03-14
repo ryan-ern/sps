@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BukuController extends Controller
 {
@@ -21,9 +22,45 @@ class BukuController extends Controller
         return view('pages.admin.buku', compact('referensi', 'paket', 'perPage'));
     }
 
+    private function buatRentang($nomorRegistrasi)
+    {
+        $rentang = [];
+        $start = $nomorRegistrasi[0];
+        $end = $start;
+
+        for ($i = 1; $i < count($nomorRegistrasi); $i++) {
+            if ($nomorRegistrasi[$i] == $end + 1) {
+                $end = $nomorRegistrasi[$i];
+            } else {
+                $rentang[] = $start == $end ? $start : "$start-$end";
+                $start = $nomorRegistrasi[$i];
+                $end = $start;
+            }
+        }
+
+        $rentang[] = $start == $end ? $start : "$start-$end";
+
+        return $rentang;
+    }
 
     public function store(Request $request)
     {
+        $maxStok = Validator::make($request->all(), [
+            'stok' => 'required|integer|max:10000',
+        ], [
+            'stok.required' => 'Stok buku harus diisi',
+            'stok.integer' => 'Stok buku harus berupa angka',
+            'stok.max' => 'Stok buku tidak boleh lebih dari 10000',
+        ]);
+        if ($maxStok->fails()) {
+            flash()->flash(
+                'error',
+                'Stok buku tidak boleh lebih dari 10.000',
+                [],
+                'Tambah Data Gagal'
+            );
+            return redirect()->route('data-buku');
+        }
         $fileBukuPath = '-';
         $fileCoverPath = '-';
         $stok = (int) $request->stok;
@@ -48,12 +85,7 @@ class BukuController extends Controller
             // Cek apakah nomor registrasi sudah ada
             if (Buku::where('no_regis', $no_regis_baru)->exists()) {
                 $gagal++;
-                flash()->flash(
-                    'warning',
-                    'Nomor Registrasi ' . $no_regis_baru . ' Sudah digunakan!',
-                    [],
-                    'Tambah Data Dengan Nomor Regis ' . $no_regis_baru . ' Gagal Ditambahkan'
-                );
+                $gagalRegistrasi[] = $no_regis_baru;
                 continue; // Lewati iterasi jika nomor registrasi sudah ada
             }
 
@@ -73,6 +105,20 @@ class BukuController extends Controller
             $buku->save();
         }
 
+        if (!empty($gagalRegistrasi)) {
+            sort($gagalRegistrasi); // Urutkan array
+            $rentangGagal = $this->buatRentang($gagalRegistrasi); // Buat rentang dari array gagal
+        }
+
+        // Jika ada kegagalan, tampilkan pesan dengan rentang
+        if ($gagal > 0) {
+            flash()->priority(1)->flash(
+                'warning',
+                'Sebanyak ' . $gagal . ' buku gagal ditambahkan karena nomor registrasi sudah digunakan dalam  id: ' . implode(', ', $rentangGagal),
+                [],
+                'Tambah Data Sebagian Berhasil'
+            );
+        }
         // Tentukan pesan sukses dan gagal
         if ($gagal === $stok) {
             // Semua gagal
@@ -86,7 +132,7 @@ class BukuController extends Controller
             // Sebagian gagal
             flash()->priority(1)->flash(
                 'warning',
-                'Sebanyak ' . ($stok - $gagal) . ' buku berhasil ditambahkan, tetapi ' . $gagal . ' buku gagal karena nomor registrasi sudah digunakan.',
+                'Sebanyak ' . ($stok - $gagal) . ' buku berhasil ditambahkan, tetapi ' . $gagal . ' buku gagal karena nomor registrasi sudah digunakan dalam rentang id ' . implode(', ', $rentangGagal),
                 [],
                 'Tambah Data Sebagian Berhasil'
             );

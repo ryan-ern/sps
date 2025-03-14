@@ -125,9 +125,20 @@ $segments = request()->segments();
                         layout: {
                             topStart: {
                                 buttons: [{
+                                        text: 'Tambah Data',
+                                        className: 'btn btn-dark me-3',
+                                        action: function() {
+                                            $('#dynamicModal').modal('show');
+                                        },
+                                        attr: {
+                                            'data-bs-toggle': 'modal',
+                                            'data-bs-target': '#dynamicModal',
+                                            'data-modal-type': 'tambah'
+                                        }
+                                    }, {
                                         text: `<i class="fa-solid fa-filter me-2"></i>Filter <span id="filterText">{{ request('per_page') }}</span> Data`,
                                         extend: 'collection',
-                                        className: 'btn btn-dark me-2',
+                                        className: 'btn btn-dark me-3',
                                         attr: {
                                             id: 'filterButton'
                                         },
@@ -181,17 +192,6 @@ $segments = request()->segments();
                                                 }
                                             }
                                         ]
-                                    }, {
-                                        text: 'Tambah Data',
-                                        className: 'btn btn-dark me-2',
-                                        action: function() {
-                                            $('#dynamicModal').modal('show');
-                                        },
-                                        attr: {
-                                            'data-bs-toggle': 'modal',
-                                            'data-bs-target': '#dynamicModal',
-                                            'data-modal-type': 'tambah'
-                                        }
                                     },
                                     {
                                         text: '<i class="fa-solid fa-download me-2"></i>Aksi Data',
@@ -233,7 +233,7 @@ $segments = request()->segments();
                     // Fungsi untuk mendapatkan nilai per_page dari URL
                     function getPerPageFromURL() {
                         let params = new URLSearchParams(window.location.search);
-                        return params.get('per_page') || 10; // Default 10 jika tidak ada parameter
+                        return params.get('per_page') || 5; // Default 10 jika tidak ada parameter
                     }
 
                     // Fungsi untuk memperbarui jumlah data per halaman

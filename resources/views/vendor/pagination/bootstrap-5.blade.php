@@ -1,73 +1,82 @@
 @if ($paginator->hasPages())
+    <div class="d-none flex-sm-fill d-sm-flex align-items-sm-center">
+        <p class="small text-muted">
+            {!! __('Menampilkan') !!}
+            <span class="fw-semibold">{{ $paginator->firstItem() }}</span>
+            {!! __('-') !!}
+            <span class="fw-semibold">{{ $paginator->lastItem() }}</span>
+            {!! __('dari') !!}
+            <span class="fw-semibold">{{ $paginator->total() }}</span>
+            {!! __('data') !!}
+        </p>
+    </div>
     <nav class="d-flex justify-items-center justify-content-between">
         <div class="d-flex justify-content-between flex-fill d-sm-none">
             <ul class="pagination">
-                {{-- Previous Page Link --}}
+                {{-- Tombol "Awal" --}}
                 @if ($paginator->onFirstPage())
-                    <li class="page-item disabled" aria-disabled="true">
-                        <span class="page-link">&lsaquo;</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">Awal</span></li>
                 @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev">&lsaquo;</a>
+                    <li class="page-item"><a class="page-link" href="{{ $paginator->url(1) }}">Awal</a></li>
+                @endif
+
+                {{-- Tombol "Previous" --}}
+                @if ($paginator->onFirstPage())
+                    <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+                @else
+                    <li class="page-item"><a class="page-link" href="{{ $paginator->previousPageUrl() }}">&lsaquo;</a>
                     </li>
                 @endif
 
-                {{-- Next Page Link --}}
+                {{-- Tombol "Next" --}}
                 @if ($paginator->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">&rsaquo;</a>
-                    </li>
+                    <li class="page-item"><a class="page-link" href="{{ $paginator->nextPageUrl() }}">&rsaquo;</a></li>
                 @else
-                    <li class="page-item disabled" aria-disabled="true">
-                        <span class="page-link">&rsaquo;</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                @endif
+
+                {{-- Tombol "Akhir" --}}
+                @if ($paginator->currentPage() == $paginator->lastPage())
+                    <li class="page-item disabled"><span class="page-link">Akhir</span></li>
+                @else
+                    <li class="page-item"><a class="page-link"
+                            href="{{ $paginator->url($paginator->lastPage()) }}">Akhir</a></li>
                 @endif
             </ul>
         </div>
 
-        <div class="d-none flex-sm-fill d-sm-flex align-items-sm-center justify-content-sm-between">
-            <div>
-                <p class="small text-muted">
-                    {!! __('Menampilkan') !!}
-                    <span class="fw-semibold">{{ $paginator->firstItem() }}</span>
-                    {!! __('-') !!}
-                    <span class="fw-semibold">{{ $paginator->lastItem() }}</span>
-                    {!! __('dari') !!}
-                    <span class="fw-semibold">{{ $paginator->total() }}</span>
-                    {!! __('data') !!}
-                </p>
-            </div>
-
+        <div class="d-none flex-sm-fill d-sm-flex align-items-sm-center">
             <div>
                 <ul class="pagination">
-                    {{-- Previous Page Link --}}
+                    {{-- Tombol "Awal" --}}
                     @if ($paginator->onFirstPage())
-                        <li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.previous')">
-                            <span class="page-link" aria-hidden="true">&lsaquo;</span>
-                        </li>
+                        <li class="page-item disabled"><span class="page-link">Awal</span></li>
                     @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev"
-                                aria-label="@lang('pagination.previous')">&lsaquo;</a>
-                        </li>
+                        <li class="page-item"><a class="page-link" href="{{ $paginator->url(1) }}">Awal</a></li>
+                    @endif
+
+                    {{-- Tombol "Previous" --}}
+                    @if ($paginator->onFirstPage())
+                        <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+                    @else
+                        <li class="page-item"><a class="page-link"
+                                href="{{ $paginator->previousPageUrl() }}">&lsaquo;</a></li>
                     @endif
 
                     {{-- Pagination Elements --}}
                     @foreach ($elements as $element)
-                        {{-- "Three Dots" Separator --}}
-                        @if (is_string($element))
-                            <li class="page-item disabled" aria-disabled="true"><span
-                                    class="page-link">{{ $element }}</span></li>
-                        @endif
-
                         {{-- Array Of Links --}}
                         @if (is_array($element))
+                            @php
+                                $currentPage = $paginator->currentPage();
+                                $lastPage = $paginator->lastPage();
+                            @endphp
+
                             @foreach ($element as $page => $url)
-                                @if ($page == $paginator->currentPage())
-                                    <li class="page-item active" aria-current="page"><span
-                                            class="page-link">{{ $page }}</span></li>
-                                @else
+                                {{-- Tampilkan halaman saat ini dan beberapa di sekitarnya --}}
+                                @if ($page == $currentPage)
+                                    <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
+                                @elseif ($page >= $currentPage - 1 && $page <= $currentPage + 1)
                                     <li class="page-item"><a class="page-link"
                                             href="{{ $url }}">{{ $page }}</a></li>
                                 @endif
@@ -75,16 +84,20 @@
                         @endif
                     @endforeach
 
-                    {{-- Next Page Link --}}
+                    {{-- Tombol "Next" --}}
                     @if ($paginator->hasMorePages())
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next"
-                                aria-label="@lang('pagination.next')">&rsaquo;</a>
+                        <li class="page-item"><a class="page-link" href="{{ $paginator->nextPageUrl() }}">&rsaquo;</a>
                         </li>
                     @else
-                        <li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.next')">
-                            <span class="page-link" aria-hidden="true">&rsaquo;</span>
-                        </li>
+                        <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                    @endif
+
+                    {{-- Tombol "Akhir" --}}
+                    @if ($paginator->currentPage() == $paginator->lastPage())
+                        <li class="page-item disabled"><span class="page-link">Akhir</span></li>
+                    @else
+                        <li class="page-item"><a class="page-link"
+                                href="{{ $paginator->url($paginator->lastPage()) }}">Akhir</a></li>
                     @endif
                 </ul>
             </div>

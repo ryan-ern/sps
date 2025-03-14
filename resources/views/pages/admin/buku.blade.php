@@ -65,7 +65,7 @@
                                             </tbody>
                                         </table>
                                         {{-- Tambahkan Navigasi Pagination --}}
-                                        <div class="d-flex justify-content-end mt-3">
+                                        <div class="d-flex justify-content-between mt-3">
                                             {{ $referensi->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
                                         </div>
                                     </div>
@@ -109,7 +109,7 @@
                                             </tbody>
                                         </table>
                                         {{-- Tambahkan Navigasi Pagination --}}
-                                        <div class="d-flex justify-content-end mt-3">
+                                        <div class="d-flex justify-content-between mt-3">
                                             {{ $paket->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
                                         </div>
                                     </div>
