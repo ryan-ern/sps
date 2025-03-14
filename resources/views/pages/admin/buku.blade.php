@@ -59,8 +59,10 @@
                                                         <td>
                                                             <button class="mx-2 btn btn-primary editBtn"
                                                                 data-no_regis="{{ $BukuReferensi->no_regis }}"
+                                                                data-jenis="{{ $BukuReferensi->jenis }}"
                                                                 data-judul="{{ $BukuReferensi->judul }}"
                                                                 data-penerbit="{{ $BukuReferensi->penerbit }}"
+                                                                data-pengarang="{{ $BukuReferensi->pengarang }}"
                                                                 data-tahun="{{ $BukuReferensi->tahun }}"
                                                                 data-stok="{{ $BukuReferensi->stok }}"
                                                                 data-file_buku="{{ $BukuReferensi->file_buku }}"
@@ -72,7 +74,8 @@
                                                             </button>
 
                                                             <button class="mx-2 btn btn-danger deleteBtn"
-                                                                data-no_regis="{{ $BukuReferensi->no_regis }}"
+                                                                data-judul="{{ $BukuReferensi->judul }}"
+                                                                data-stok="{{ $BukuReferensi->stok }}"
                                                                 data-modal-type="delete" data-bs-toggle="modal"
                                                                 data-bs-target="#dynamicModal">
                                                                 Hapus
@@ -121,8 +124,10 @@
                                                         <td>
                                                             <button class="mx-2 btn btn-primary editBtn"
                                                                 data-no_regis="{{ $BukuPaket->no_regis }}"
+                                                                data-jenis="{{ $BukuPaket->jenis }}"
                                                                 data-judul="{{ $BukuPaket->judul }}"
                                                                 data-penerbit="{{ $BukuPaket->penerbit }}"
+                                                                data-pengarang="{{ $BukuPaket->pengarang }}"
                                                                 data-tahun="{{ $BukuPaket->tahun }}"
                                                                 data-stok="{{ $BukuPaket->stok }}"
                                                                 data-file_buku="{{ $BukuPaket->file_buku }}"
@@ -134,7 +139,8 @@
                                                             </button>
 
                                                             <button class="mx-2 btn btn-danger deleteBtn"
-                                                                data-no_regis="{{ $BukuPaket->no_regis }}"
+                                                                data-judul="{{ $BukuPaket->judul }}"
+                                                                data-stok="{{ $BukuPaket->stok }}"
                                                                 data-modal-type="delete" data-bs-toggle="modal"
                                                                 data-bs-target="#dynamicModal">
                                                                 Hapus
@@ -164,8 +170,10 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="ModalLabel"></h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
+                                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
                                 </div>
                                 <div class="modal-body">
                                     <div id="modalContent">
@@ -183,15 +191,6 @@
     </main>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var modal = document.getElementById('dynamicModal');
-            var inputAutofocus = modal.querySelector('input[autofocus]');
-
-            modal.addEventListener('shown.bs.modal', function() {
-                if (inputAutofocus) {
-                    inputAutofocus.focus();
-                }
-            });
-
             let tabs = document.querySelectorAll("#Tabs .nav-link");
 
             let activeTab = localStorage.getItem("activeTab") || "#referensi";
@@ -236,48 +235,100 @@
 
                 if (modalType === 'update') {
                     modalTitle.textContent = 'Edit Data';
-                    modalForm.action = `/pages/data-buku/update/${bukuId}`;
+                    modalForm.action = `/apps/data-buku/update/${bukuId}`;
                     modalForm.enctype = 'multipart/form-data';
+                    var modal = document.getElementById('dynamicModal');
+                    var inputAutofocus = modal.querySelector('input[autofocus]');
+
+                    modal.addEventListener('shown.bs.modal', function() {
+                        if (inputAutofocus) {
+                            inputAutofocus.focus();
+                        }
+                    });
+
+                    const bukuData = button.dataset;
 
                     modalBodyHTML = `
-                        @csrf
-                        @method('PUT')
-                        <div class="mb-3">
-                            <label for="nama" class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="nama" name="nama" value="${button.getAttribute('data-nama')}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="tujuan" class="form-label">Alamat</label>
-                            <input type="text" class="form-control" id="tujuan" name="tujuan" value="${button.getAttribute('data-tujuan')}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="jenis" class="form-label">Jenis</label>
-                            <select class="form-select" id="jenis" name="jenis" required>
-                                <option value="makanan" ${button.getAttribute('data-jenis') === 'makanan' ? 'selected' : ''}>Makanan</option>
-                                <option value="barang" ${button.getAttribute('data-jenis') === 'barang' ? 'selected' : ''}>Barang</option>
-                                <option value="lainnya" ${button.getAttribute('data-jenis') === 'lainnya' ? 'selected' : ''}>Lainnya</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" required>${button.getAttribute('data-keterangan')}</textarea>
-                        </div>
+                         @csrf
+                    @method('PUT')
+                     <div class="row">
+            <!-- Kolom Kiri -->
+            <div class="col-md-4">
+                <label for="jenis" class="form-label">Jenis</label>
+                <select class="form-select mb-3" name="jenis" required>
+                    <option value="" disabled>Pilih Jenis</option>
+                    <option value="referensi" ${bukuData.jenis === 'referensi' ? 'selected' : ''}>Buku Referensi</option>
+                    <option value="paket" ${bukuData.jenis === 'paket' ? 'selected' : ''}>Buku Paket</option>
+                </select>
+                <label for="no_regis" class="form-label">No Regis</label>
+                <input type="number" class="form-control mb-3" name="no_regis" placeholder="No Regis" value="${bukuData.no_regis}" readonly required>
+                <label for="judul" class="form-label">Judul</label>
+                <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" value="${bukuData.judul}" readonly required>
+                <label for="pengarang" class="form-label">Pengarang</label>
+                <input type="text" class="form-control mb-3" name="pengarang" placeholder="Pengarang" value="${bukuData.pengarang}" required>
+                <label for="penerbit" class="form-label">Penerbit</label>
+                <input type="text" class="form-control mb-3" name="penerbit" placeholder="Penerbit" value="${bukuData.penerbit}" required>
+            </div>
+
+            <!-- Kolom Tengah -->
+            <div class="col-md-4">
+                <label for="stok" class="form-label">Stok</label>
+                <input type="number" class="form-control mb-2" name="stok" placeholder="Stok" value="${bukuData.stok}" readonly required>
+                <div class="form-floating">
+                    <textarea class="form-control" name="keterangan" placeholder="Keterangan Tulis Disini" id="floatingTextarea2" style="height: 215px">${bukuData.keterangan}</textarea>
+                    <label for="floatingTextarea2">Keterangan</label>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan -->
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih File Buku</label>
+                    <input type="file" class="form-control" accept=".pdf"  id="fileBuku" name="file_buku">
+                    </div>
+                    <div class="mb-3">
+                    <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih File Cover</label>
+                    <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover" name="file_cover">
+                    </div>
+                    ${bukuData.file_cover ? `<a href="/storage/${bukuData.file_cover}" target="_blank" class="d-block mt-2 text-info">Lihat File Cover</a>` : ''}
+                    ${bukuData.file_buku ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
+
+                <input type="number" class="form-control mb-3" name="tahun" placeholder="Tahun" value="${bukuData.tahun}" required>
+                <button type="button" class="btn btn-success w-100 mb-2">Hasil Scan Barcode</button>
+            </div>
+        </div>
+
+        <!-- Tombol -->
+        <div class="d-flex justify-content-end mt-3">
+            <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
+            <button type="submit" class="btn btn-success">Simpan</button>
+        </div>
                     `;
                 } else if (modalType === 'delete') {
-                    modalTitle.textContent = 'Hapus Data';
-                    modalForm.action = `/apps/data-buku/delete/${bukuId}`;
+                    modalTitle.textContent = 'Konfirmasi Hapus Data';
+                    modalForm.action = `/apps/data-buku/delete/`;
                     modalForm.method = 'POST';
                     modalBodyHTML = `
                         @csrf
                         @method('DELETE')
-                        <p>Apakah Anda yakin ingin menghapus data buku dengan <strong>nomor registrasi ${button.getAttribute('data-no_regis')}</strong>?</p>
+                        <p class="text-center fs-5 text-capitalize">Apakah Anda yakin ingin menghapus <br/> data buku dengan <br/><strong>Judul ${button.getAttribute('data-judul')}</strong>?</p>
                                     <div class="d-flex justify-content-end mt-3">
+                                        <input type="hidden" name="judul" value="${button.getAttribute('data-judul')}">
+                                        <input type="hidden" name="stok" value="${button.getAttribute('data-stok')}">
                                         <button type="reset" class="btn btn-primary me-2" id="closeModal"
-                                            data-bs-dismiss="modal">Kembali</button>
+                                            data-bs-dismiss="modal">Tidak</button>
                                         <button type="submit" class="btn btn-danger">Hapus</button>
                                     </div>
                         `;
                 } else {
+                    var modal = document.getElementById('dynamicModal');
+                    var inputAutofocus = modal.querySelector('input[autofocus]');
+
+                    modal.addEventListener('shown.bs.modal', function() {
+                        if (inputAutofocus) {
+                            inputAutofocus.focus();
+                        }
+                    });
                     modalTitle.textContent = 'Tambah Data';
                     modalForm.action = '/apps/data-buku/create';
                     modalForm.enctype = 'multipart/form-data';
@@ -317,15 +368,15 @@
                                         <!-- Kolom Kanan -->
                                         <div class="col-md-4">
                                             <div class="mb-3">
-                                                <label for="fileBuku" class="form-control" id="fileBukuLabel">Pilih
-                                                    File Buku</label>
-                                                <input type="file" class="form-control d-none" id="fileBuku"
+                                                <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih
+                                                    File Buku (PDF)</label>
+                                                <input type="file" class="form-control" accept=".pdf" id="fileBuku"
                                                     name="file_buku">
                                             </div>
                                             <div class="mb-3">
-                                                <label for="fileCover" class="form-control" id="fileCoverLabel">Pilih
-                                                    File Cover</label>
-                                                <input type="file" class="form-control d-none" id="fileCover"
+                                                <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih
+                                                    File Cover (JPG, JPEG, PNG)</label>
+                                                    <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover"
                                                     name="file_cover">
                                             </div>
 

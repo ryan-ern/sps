@@ -149,37 +149,78 @@ class BukuController extends Controller
         return redirect()->back();
     }
 
-    public function destroy($buku)
+    public function destroy(Request $request)
     {
-        $buku = Buku::find($buku);
-        if (!$buku) {
+        $judul = $request->judul;
+        $stok = $request->stok;
+
+        // Cek apakah ada buku yang cocok
+        $buku = Buku::where('judul', $judul)->where('stok', $stok)->get();
+
+        if ($buku->isEmpty()) {
             flash()->flash(
-                'error',
-                'Buku tidak ditemukan.',
+                'danger',
+                'Data buku dengan judul ' . $judul . ' tidak ditemukan.',
                 [],
                 'Hapus Data Gagal'
             );
-            return redirect()->route('data-buku.read');
+            return redirect()->back();
         }
-        $buku->delete();
+
+        // Hapus semua buku yang sesuai
+        Buku::where('judul', $judul)->where('stok', $stok)->delete();
+
         flash()->flash(
             'success',
-            'Berhasil menghapus buku.',
+            'Semua buku dengan judul yang sama berhasil dihapus.',
             [],
             'Hapus Data Sukses'
         );
-        return redirect()->route('data-buku.read');
+
+        return redirect()->back();
     }
+
 
     public function update(Request $request, Buku $buku)
     {
-        $buku->update($request->all());
+        $bukuYangSama = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->get();
+
+        $fileBukuPath = '-';
+        $fileCoverPath = '-';
+
+        if ($request->hasFile('file_buku')) {
+            $fileBuku = $request->file('file_buku');
+            $fileBukuName = time() . '_buku_' . $fileBuku->getClientOriginalName();
+            $fileBukuPath = $fileBuku->storeAs('uploads/buku', $fileBukuName, 'public');
+        }
+
+        if ($request->hasFile('file_cover')) {
+            $fileCover = $request->file('file_cover');
+            $fileCoverName = time() . '_cover_' . $fileCover->getClientOriginalName();
+            $fileCoverPath = $fileCover->storeAs('uploads/cover', $fileCoverName, 'public');
+        }
+
+        foreach ($bukuYangSama as $b) {
+            $b->update([
+                'judul' => $request->judul,
+                'pengarang' => $request->pengarang,
+                'penerbit' => $request->penerbit,
+                'tahun' => $request->tahun,
+                'stok' => $request->stok,
+                'keterangan' => $request->keterangan,
+                'jenis' => $request->jenis,
+                'file_buku' => $fileBukuPath,
+                'file_cover' => $fileCoverPath
+            ]);
+        }
+
         flash()->flash(
             'success',
-            'Berhasil memperbarui buku.',
+            'Berhasil memperbarui semua buku dengan judul yang sama.',
             [],
             'Perbarui Data Sukses'
         );
+
         return redirect()->route('data-buku.read');
     }
 }
