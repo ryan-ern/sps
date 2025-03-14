@@ -59,7 +59,7 @@ class BukuController extends Controller
                 [],
                 'Tambah Data Gagal'
             );
-            return redirect()->route('data-buku');
+            return redirect()->route('data-buku.read');
         }
         $fileBukuPath = '-';
         $fileCoverPath = '-';
@@ -147,5 +147,39 @@ class BukuController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function destroy($buku)
+    {
+        $buku = Buku::find($buku);
+        if (!$buku) {
+            flash()->flash(
+                'error',
+                'Buku tidak ditemukan.',
+                [],
+                'Hapus Data Gagal'
+            );
+            return redirect()->route('data-buku.read');
+        }
+        $buku->delete();
+        flash()->flash(
+            'success',
+            'Berhasil menghapus buku.',
+            [],
+            'Hapus Data Sukses'
+        );
+        return redirect()->route('data-buku.read');
+    }
+
+    public function update(Request $request, Buku $buku)
+    {
+        $buku->update($request->all());
+        flash()->flash(
+            'success',
+            'Berhasil memperbarui buku.',
+            [],
+            'Perbarui Data Sukses'
+        );
+        return redirect()->route('data-buku.read');
     }
 }

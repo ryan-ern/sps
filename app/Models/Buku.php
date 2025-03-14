@@ -10,7 +10,9 @@ class Buku extends Model
     use HasFactory;
 
     protected $table = 'bukus';
-
+    protected $primaryKey = 'no_regis';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         'no_regis',
         'judul',

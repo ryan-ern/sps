@@ -57,8 +57,26 @@
                                                             {{ $BukuReferensi->created_at->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td>
-                                                            <button class="mx-2 btn btn-primary">Edit</button>
-                                                            <button class="mx-2 btn btn-danger">Hapus</button>
+                                                            <button class="mx-2 btn btn-primary editBtn"
+                                                                data-no_regis="{{ $BukuReferensi->no_regis }}"
+                                                                data-judul="{{ $BukuReferensi->judul }}"
+                                                                data-penerbit="{{ $BukuReferensi->penerbit }}"
+                                                                data-tahun="{{ $BukuReferensi->tahun }}"
+                                                                data-stok="{{ $BukuReferensi->stok }}"
+                                                                data-file_buku="{{ $BukuReferensi->file_buku }}"
+                                                                data-file_cover="{{ $BukuReferensi->file_cover }}"
+                                                                data-keterangan="{{ $BukuReferensi->keterangan }}"
+                                                                data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                data-modal-type="update">
+                                                                Edit
+                                                            </button>
+
+                                                            <button class="mx-2 btn btn-danger deleteBtn"
+                                                                data-no_regis="{{ $BukuReferensi->no_regis }}"
+                                                                data-modal-type="delete" data-bs-toggle="modal"
+                                                                data-bs-target="#dynamicModal">
+                                                                Hapus
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -101,8 +119,26 @@
                                                             {{ $BukuPaket->created_at->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td>
-                                                            <button class="mx-2 btn btn-primary">Edit</button>
-                                                            <button class="mx-2 btn btn-danger">Hapus</button>
+                                                            <button class="mx-2 btn btn-primary editBtn"
+                                                                data-no_regis="{{ $BukuPaket->no_regis }}"
+                                                                data-judul="{{ $BukuPaket->judul }}"
+                                                                data-penerbit="{{ $BukuPaket->penerbit }}"
+                                                                data-tahun="{{ $BukuPaket->tahun }}"
+                                                                data-stok="{{ $BukuPaket->stok }}"
+                                                                data-file_buku="{{ $BukuPaket->file_buku }}"
+                                                                data-file_cover="{{ $BukuPaket->file_cover }}"
+                                                                data-keterangan="{{ $BukuPaket->keterangan }}"
+                                                                data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                data-modal-type="update">
+                                                                Edit
+                                                            </button>
+
+                                                            <button class="mx-2 btn btn-danger deleteBtn"
+                                                                data-no_regis="{{ $BukuPaket->no_regis }}"
+                                                                data-modal-type="delete" data-bs-toggle="modal"
+                                                                data-bs-target="#dynamicModal">
+                                                                Hapus
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -119,24 +155,137 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="dynamicModal" data-bs-backdrop="static" data-bs-keyboard="false"
-                    tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                        @csrf
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="ModalLabel">Form Tambah Data</h5>
-                                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
-                                    aria-label="Close">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
+                <!-- Dynamic Modal -->
+                <div class="modal modal-lg fade" id="dynamicModal" data-bs-backdrop="static" tabindex="-1"
+                    aria-labelledby="ModalLabel">
+                    <div class="modal-dialog">
+                        <form id="dynamicModalForm" method="POST">
+                            @csrf
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="ModalLabel"></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="modalContent">
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                </div>
                             </div>
-                            <div class="modal-body">
-                                <form id="dynamicModalForm" action="{{ route('tambah-buku') }}" method="POST"
-                                    enctype="multipart/form-data">
-                                    @csrf
-                                    @method('POST')
-                                    <div class="row">
+                        </form>
+                    </div>
+                </div>
+                <x-app.footer />
+            </div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var modal = document.getElementById('dynamicModal');
+            var inputAutofocus = modal.querySelector('input[autofocus]');
+
+            modal.addEventListener('shown.bs.modal', function() {
+                if (inputAutofocus) {
+                    inputAutofocus.focus();
+                }
+            });
+
+            let tabs = document.querySelectorAll("#Tabs .nav-link");
+
+            let activeTab = localStorage.getItem("activeTab") || "#referensi";
+            if (activeTab) {
+                let activeButton = document.querySelector(`#Tabs .nav-link[data-bs-target="${activeTab}"]`);
+                if (activeButton) {
+                    tabs.forEach(tab => tab.classList.remove("active"));
+                    activeButton.classList.add("active");
+
+                    let activePane = document.querySelector(activeTab);
+                    if (activePane) {
+                        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("show",
+                            "active"));
+                        activePane.classList.add("show", "active");
+                    }
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function() {
+                    let target = this.getAttribute("data-bs-target");
+                    localStorage.setItem("activeTab", target);
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dynamicModal = document.getElementById('dynamicModal');
+            const modalTitle = dynamicModal.querySelector('.modal-title');
+            const modalContent = document.getElementById('modalContent');
+            const modalForm = document.getElementById('dynamicModalForm');
+
+            dynamicModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const modalType = button.getAttribute('data-modal-type');
+                const bukuId = button.getAttribute('data-no_regis');
+
+                let modalBodyHTML = "";
+                modalForm.enctype = "application/x-www-form-urlencoded";
+                modalForm.method = "POST";
+
+                if (modalType === 'update') {
+                    modalTitle.textContent = 'Edit Data';
+                    modalForm.action = `/pages/data-buku/update/${bukuId}`;
+                    modalForm.enctype = 'multipart/form-data';
+
+                    modalBodyHTML = `
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="nama" name="nama" value="${button.getAttribute('data-nama')}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tujuan" class="form-label">Alamat</label>
+                            <input type="text" class="form-control" id="tujuan" name="tujuan" value="${button.getAttribute('data-tujuan')}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="jenis" class="form-label">Jenis</label>
+                            <select class="form-select" id="jenis" name="jenis" required>
+                                <option value="makanan" ${button.getAttribute('data-jenis') === 'makanan' ? 'selected' : ''}>Makanan</option>
+                                <option value="barang" ${button.getAttribute('data-jenis') === 'barang' ? 'selected' : ''}>Barang</option>
+                                <option value="lainnya" ${button.getAttribute('data-jenis') === 'lainnya' ? 'selected' : ''}>Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <textarea class="form-control" id="keterangan" name="keterangan" required>${button.getAttribute('data-keterangan')}</textarea>
+                        </div>
+                    `;
+                } else if (modalType === 'delete') {
+                    modalTitle.textContent = 'Hapus Data';
+                    modalForm.action = `/apps/data-buku/delete/${bukuId}`;
+                    modalForm.method = 'POST';
+                    modalBodyHTML = `
+                        @csrf
+                        @method('DELETE')
+                        <p>Apakah Anda yakin ingin menghapus data buku dengan <strong>nomor registrasi ${button.getAttribute('data-no_regis')}</strong>?</p>
+                                    <div class="d-flex justify-content-end mt-3">
+                                        <button type="reset" class="btn btn-primary me-2" id="closeModal"
+                                            data-bs-dismiss="modal">Kembali</button>
+                                        <button type="submit" class="btn btn-danger">Hapus</button>
+                                    </div>
+                        `;
+                } else {
+                    modalTitle.textContent = 'Tambah Data';
+                    modalForm.action = '/apps/data-buku/create';
+                    modalForm.enctype = 'multipart/form-data';
+                    modalForm.method = 'POST';
+                    modalBodyHTML = `
+                        @csrf
+                    @method('POST')
+                    <div class="row">
                                         <!-- Kolom Kiri -->
                                         <div class="col-md-4">
                                             <select class="form-select mb-3" name="jenis" required>
@@ -193,67 +342,14 @@
                                             data-bs-dismiss="modal">Kembali</button>
                                         <button type="submit" class="btn btn-success">Simpan</button>
                                     </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <x-app.footer />
-            </div>
-    </main>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var modal = document.getElementById('dynamicModal');
-            var inputAutofocus = modal.querySelector('input[autofocus]');
-
-            modal.addEventListener('shown.bs.modal', function() {
-                if (inputAutofocus) {
-                    inputAutofocus.focus();
+                    `;
                 }
+
+                modalContent.innerHTML = modalBodyHTML;
             });
 
-            document.getElementById('fileBuku').addEventListener('change', function() {
-                document.getElementById('fileBukuLabel').textContent = this.files.length ? this.files[0]
-                    .name : 'Pilih File';
-            });
-            document.getElementById('fileCover').addEventListener('change', function() {
-                document.getElementById('fileCoverLabel').textContent = this.files.length ? this.files[0]
-                    .name : 'Pilih File';
-            });
-
-            document.getElementById('closeModal').addEventListener('click', function() {
-                document.getElementById('fileBuku').value = "";
-                document.getElementById('fileCover').value = "";
-
-                document.getElementById('fileBukuLabel').textContent = "Pilih File Buku";
-                document.getElementById('fileCoverLabel').textContent = "Pilih File Cover";
-            });
-
-            let tabs = document.querySelectorAll("#Tabs .nav-link");
-
-            let activeTab = localStorage.getItem("activeTab") || "#referensi";
-            if (activeTab) {
-                let activeButton = document.querySelector(`#Tabs .nav-link[data-bs-target="${activeTab}"]`);
-                if (activeButton) {
-                    tabs.forEach(tab => tab.classList.remove("active"));
-                    activeButton.classList.add("active");
-
-                    let activePane = document.querySelector(activeTab);
-                    if (activePane) {
-                        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("show",
-                            "active"));
-                        activePane.classList.add("show", "active");
-                    }
-                }
-            }
-
-            tabs.forEach(tab => {
-                tab.addEventListener("click", function() {
-                    let target = this.getAttribute("data-bs-target");
-                    localStorage.setItem("activeTab", target);
-                });
+            dynamicModal.addEventListener('hidden.bs.modal', function() {
+                modalContent.innerHTML = '';
             });
         });
     </script>

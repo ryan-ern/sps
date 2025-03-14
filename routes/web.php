@@ -36,8 +36,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/apps/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['role:siswa,guru,admin']);
 
-    Route::get('/apps/data-buku', [BukuController::class, 'index'])->name('data-buku')->middleware(['role:admin']);
-    Route::post('/apps/data-buku/tambah', [BukuController::class, 'store'])->name('tambah-buku')->middleware(['role:admin']);
+    Route::post('/apps/data-buku/create', [BukuController::class, 'store'])->name('data-buku.create')->middleware(['role:admin']);
+    Route::get('/apps/data-buku', [BukuController::class, 'index'])->name('data-buku.read')->middleware(['role:admin']);
+    Route::put('/apps/data-buku/update/{buku}', [BukuController::class, 'update'])->name('data-buku.update')->middleware(['role:admin']);
+    Route::delete('/apps/data-buku/delete/{buku}', [BukuController::class, 'destroy'])->name('data-buku.delete')->middleware(['role:admin']);
 
     Route::get('/apps/siswa', function () {
         return view('example');
