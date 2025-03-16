@@ -158,7 +158,7 @@
 
                 if (modalType === 'update') {
                     modalTitle.textContent = 'Form Edit Data';
-                    modalForm.action = `/apps/data-anggota/update/${userId}`;
+                    modalForm.action = `/apps/anggota/update/${userId}`;
                     modalForm.enctype = 'multipart/form-data';
                     var modal = document.getElementById('dynamicModal');
                     var inputAutofocus = modal.querySelector('input[autofocus]');
@@ -222,7 +222,7 @@
                     `;
                 } else if (modalType === 'delete') {
                     modalTitle.textContent = 'Konfirmasi Penghapusan Data';
-                    modalForm.action = `/apps/data-anggota/delete/${userId}`;
+                    modalForm.action = `/apps/anggota/delete/${userId}`;
                     modalForm.method = 'POST';
                     modalBodyHTML = `
                         @csrf
@@ -244,7 +244,7 @@
                         }
                     });
                     modalTitle.textContent = 'Form Tambah Data';
-                    modalForm.action = '/apps/data-anggota/create';
+                    modalForm.action = '/apps/anggota/create';
                     modalForm.enctype = 'multipart/form-data';
                     modalForm.method = 'POST';
                     modalBodyHTML = `

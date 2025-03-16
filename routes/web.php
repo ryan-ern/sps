@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KunjunganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,12 +42,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/apps/data-buku/update/{buku}', [BukuController::class, 'update'])->name('data-buku.update')->middleware(['role:admin']);
     Route::delete('/apps/data-buku/delete', [BukuController::class, 'destroy'])->name('data-buku.delete')->middleware(['role:admin']);
 
-    Route::post('/apps/data-anggota/create', [UserController::class, 'store'])->name('anggota.create')->middleware(['role:admin']);
-    Route::get('/apps/data-anggota', [UserController::class, 'index'])->name('anggota.read')->middleware(['role:admin']);
-    Route::put('/apps/data-anggota/update/{anggota}', [UserController::class, 'update'])->name('anggota.update')->middleware(['role:admin']);
-    Route::delete('/apps/data-anggota/delete/{anggota}', [UserController::class, 'destroy'])->name('anggota.delete')->middleware(['role:admin']);
+    Route::post('/apps/anggota/create', [UserController::class, 'store'])->name('anggota.create')->middleware(['role:admin']);
+    Route::get('/apps/anggota', [UserController::class, 'index'])->name('anggota.read')->middleware(['role:admin']);
+    Route::put('/apps/anggota/update/{anggota}', [UserController::class, 'update'])->name('anggota.update')->middleware(['role:admin']);
+    Route::delete('/apps/anggota/delete/{anggota}', [UserController::class, 'destroy'])->name('anggota.delete')->middleware(['role:admin']);
     Route::post('/anggota/import', [UserController::class, 'import'])->name('anggota.import');
     Route::get('/anggota/export-sample', [UserController::class, 'exportSample'])->name('anggota.exportSample');
+
+    Route::get('/apps/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.read')->middleware(['role:admin']);
 
     Route::get('/apps/siswa', function () {
         return view('example');

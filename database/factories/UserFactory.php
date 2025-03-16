@@ -21,7 +21,7 @@ class UserFactory extends Factory
             'nisn' => fake()->unique()->randomNumber(6),
             'fullname' => fake()->name(),
             'username' => fake()->unique()->userName(),
-            'kelas' => fake()->randomNumber(2),
+            'kelas' => fake()->randomElement(['7A', '7B', '8A', '8B', '9A', '9B']),
             'password' => bcrypt('123'),
             'role' => fake()->randomElement(['admin', 'guru', 'siswa']),
             'status' => fake()->randomElement(['aktif', 'tidak aktif']),

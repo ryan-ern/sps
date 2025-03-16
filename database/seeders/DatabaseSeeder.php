@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Buku;
+use App\Models\Kunjungan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -39,7 +40,6 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('123'),
             'role' => 'siswa',
             'status' => 'aktif',
-            'kelas' => 'siswa',
         ]);
 
         User::factory()->create([
@@ -49,11 +49,12 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('123'),
             'role' => 'siswa',
             'status' => 'tidak aktif',
-            'kelas' => 'block',
         ]);
 
         User::factory(10)->create();
 
         Buku::factory(10)->create();
+
+        Kunjungan::factory(10)->create();
     }
 }
