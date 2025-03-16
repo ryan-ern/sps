@@ -11,22 +11,22 @@
                                 <form action="{{ route('anggota.import') }}" method="POST" enctype="multipart/form-data"
                                     class="d-inline">
                                     @csrf
-                                    <div class="row d-flex justify-content-between mb-3">
-                                        <div class="col col-lg-4 col-md-6 col-sm-12">
-                                            <input type="file" name="file" accept=".xls, .xlsx"
-                                                class="form-control mb-3 " required>
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-12 col-lg-6">
+                                            <div class="input-group">
+                                                <input type="file" name="file" accept=".xls, .xlsx"
+                                                    class="form-control mb-3" required>
+                                                <button class="btn btn-primary" type="submit">Import</button>
+                                            </div>
                                         </div>
-                                        <div class="col col-lg-4 col-md-6 col-sm-12">
-                                            <button type="submit" class="btn btn-primary w-100">Import Data</button>
-                                        </div>
-                                        <div class="col col-lg-4 col-md-6 col-sm-12">
+
+                                        <div class="col-12 col-lg-6">
                                             <a href="{{ route('anggota.exportSample') }}"
-                                                class="btn btn-success w-100">Unduh
-                                                Contoh
-                                                Data</a>
+                                                class="btn btn-success w-100">Unduh Contoh Data</a>
                                         </div>
                                     </div>
                                 </form>
+
                                 <hr>
                                 {{-- Filter --}}
                                 <form method="GET" action="{{ route('anggota.read') }}" class="mb-3">
