@@ -24,6 +24,7 @@ $segments = request()->segments();
         <link
             href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Noto+Sans:300,400,500,600,700,800|PT+Mono:300,400,500,600,700"
             rel="stylesheet" />
+        <link href="https://cdn.datatables.net/datetime/1.5.5/css/dataTables.dateTime.min.css" rel="stylesheet" />
         <!-- Nucleo Icons -->
         <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
         <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -31,6 +32,13 @@ $segments = request()->segments();
         <script src="https://kit.fontawesome.com/4c9b7484fe.js" crossorigin="anonymous"></script>
         <!-- CSS Files -->
         <link id="pagestyle" href="../assets/css/corporate-ui-dashboard.css?v=1.0.0" rel="stylesheet" />
+
+        <link rel="stylesheet" type="text/css"
+            href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        {{-- date range --}}
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
         <style>
             .truncate {
@@ -85,8 +93,7 @@ $segments = request()->segments();
         {{-- Datatable --}}
         <script type="text/javascript" src="https://buttons.github.io/buttons.js" async defer crossorigin="anonymous"
             referrerpolicy="no-referrer"></script>
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js" defer crossorigin="anonymous"
-            referrerpolicy="no-referrer"></script>
+
         <script type="text/javascript" src="https://cdn.datatables.net/2.1.8/js/dataTables.js" defer
             referrerpolicy="no-referrer" crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js" defer
@@ -102,16 +109,12 @@ $segments = request()->segments();
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" defer></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" defer></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.min.js" defer
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 $('.dataTable').each(function() {
                     let table = new DataTable(this, {
                         paging: false,
-                        searching: true,
+                        searching: false,
                         info: false,
                         ordering: true,
                         language: {
@@ -185,10 +188,10 @@ $segments = request()->segments();
                                                 }
                                             },
                                             {
-                                                text: '1000 Data',
+                                                text: 'Semua Data',
                                                 className: 'dropdown-item',
                                                 action: function() {
-                                                    updatePerPage(1000);
+                                                    updatePerPage('Semua');
                                                 }
                                             }
                                         ]
@@ -225,7 +228,7 @@ $segments = request()->segments();
                                                 }
                                             }
                                         ]
-                                    }
+                                    },
                                 ]
                             }
                         }
@@ -245,15 +248,57 @@ $segments = request()->segments();
 
                     // Update tampilan jumlah data saat halaman dimuat
                     document.getElementById('filterText').textContent = getPerPageFromURL();
-
-                    // Filter berdasarkan tanggal
-                    $('#min, #max').on('change', function() {
-                        table.draw();
-                    });
                 });
             });
         </script>
         {{-- end Datatable --}}
+
+        {{-- date range --}}
+        <script>
+            $(document).ready(function() {
+                function getParameterByName(name) {
+                    let url = new URL(window.location.href);
+                    return url.searchParams.get(name);
+                }
+                let dateRange = getParameterByName("dates") || moment().format("MM/DD/YYYY") + " - " + moment().format(
+                    "MM/DD/YYYY");
+                let dates = dateRange.split(" - ");
+                $('.dates').each(function() {
+                    $(this).daterangepicker({
+                        "showDropdowns": true,
+                        ranges: {
+                            'Hari Ini': [moment(), moment()],
+                            'Kemarin': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            '7 Hari Terakhir': [moment().subtract(6, 'days'), moment()],
+                            'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                            'Bulan Kemarin': [moment().subtract(1, 'month').startOf('month'), moment()
+                                .subtract(1,
+                                    'month').endOf('month')
+                            ]
+                        },
+                        "locale": {
+                            "format": "MM/DD/YYYY",
+                            "separator": " - ",
+                            "applyLabel": "Terapkan",
+                            "cancelLabel": "Batal",
+                            "fromLabel": "Dari",
+                            "toLabel": "Sampai",
+                            "customRangeLabel": "Pilih Rentang",
+                            "weekLabel": "W",
+                            "daysOfWeek": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
+                            "monthNames": [
+                                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                            ],
+                            "firstDay": 1
+                        },
+                        "startDate": moment(dates[0], "MM/DD/YYYY"),
+                        "endDate": moment(dates[1], "MM/DD/YYYY"),
+                        "maxDate": moment()
+                    });
+                });
+            });
+        </script>
 
         <script>
             var win = navigator.platform.indexOf('Win') > -1;

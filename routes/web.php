@@ -39,10 +39,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/apps/data-buku/create', [BukuController::class, 'store'])->name('data-buku.create')->middleware(['role:admin']);
     Route::get('/apps/data-buku', [BukuController::class, 'index'])->name('data-buku.read')->middleware(['role:admin']);
     Route::put('/apps/data-buku/update/{buku}', [BukuController::class, 'update'])->name('data-buku.update')->middleware(['role:admin']);
-    Route::delete('/apps/data-buku/delete', [BukuController::class, 'destroy'])
-        ->name('data-buku.delete')
-        ->middleware(['role:admin']);
+    Route::delete('/apps/data-buku/delete', [BukuController::class, 'destroy'])->name('data-buku.delete')->middleware(['role:admin']);
 
+    Route::post('/apps/data-anggota/create', [UserController::class, 'store'])->name('anggota.create')->middleware(['role:admin']);
+    Route::get('/apps/data-anggota', [UserController::class, 'index'])->name('anggota.read')->middleware(['role:admin']);
+    Route::put('/apps/data-anggota/update/{anggota}', [UserController::class, 'update'])->name('anggota.update')->middleware(['role:admin']);
+    Route::delete('/apps/data-anggota/delete/{anggota}', [UserController::class, 'destroy'])->name('anggota.delete')->middleware(['role:admin']);
+    Route::post('/anggota/import', [UserController::class, 'import'])->name('anggota.import');
+    Route::get('/anggota/export-sample', [UserController::class, 'exportSample'])->name('anggota.exportSample');
 
     Route::get('/apps/siswa', function () {
         return view('example');

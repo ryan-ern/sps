@@ -11,16 +11,67 @@ class BukuController extends Controller
 {
     public function index(Request $request)
     {
+        // Validasi input request
         $request->validate([
-            'per_page' => 'integer|min:1|max:1000',
+            'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
             'page' => 'integer|min:1',
+            'search' => 'nullable|string|max:255',
+            'dates' => 'nullable|string',
         ]);
-        $perPage = $request->input('per_page', 5);
-        $referensi = Buku::where('jenis', 'referensi')->paginate($perPage);
-        $paket = Buku::where('jenis', 'paket')->paginate($perPage);
 
-        return view('pages.admin.buku', compact('referensi', 'paket', 'perPage'));
+        // Ambil jumlah data per halaman (default: 10)
+        $perPage = $request->input('per_page', 10);
+
+        // Ambil nilai pencarian
+        $search = $request->input('search');
+
+        // Ambil tanggal range
+        $dateRange = $request->input('dates');
+
+        // Query dasar untuk Buku Referensi
+        $referensiQuery = Buku::where('jenis', 'referensi');
+        $paketQuery = Buku::where('jenis', 'paket');
+
+        // Filter berdasarkan pencarian
+        if ($search) {
+            $referensiQuery
+                ->where('judul', 'like', "%{$search}%")
+                ->orWhere('no_regis', 'like', "%{$search}%")
+                ->orWhere('pengarang', 'like', "%{$search}%")
+                ->orWhere('penerbit', 'like', "%{$search}%")
+                ->orWhere('tahun', 'like', "%{$search}%");
+            $paketQuery
+                ->where('judul', 'like', "%{$search}%")
+                ->orWhere('no_regis', 'like', "%{$search}%")
+                ->orWhere('pengarang', 'like', "%{$search}%")
+                ->orWhere('penerbit', 'like', "%{$search}%")
+                ->orWhere('tahun', 'like', "%{$search}%");
+        }
+
+        // Filter berdasarkan rentang tanggal
+        if ($dateRange) {
+            $dates = explode(" - ", $dateRange);
+            if (count($dates) === 2) {
+                $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->startOfDay();
+                $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[1]))->endOfDay();
+
+                $referensiQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $paketQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+        }
+
+        // Jika per_page adalah "Semua", tampilkan semua data
+        if ($request->per_page == 'Semua') {
+            $referensi = $referensiQuery->paginate(1000000);
+            $paket = $paketQuery->paginate(1000000);
+        } else {
+            $referensi = $referensiQuery->paginate($perPage);
+            $paket = $paketQuery->paginate($perPage);
+        }
+
+        return view('pages.admin.buku', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
     }
+
 
     private function buatRentang($nomorRegistrasi)
     {
@@ -172,7 +223,7 @@ class BukuController extends Controller
 
         flash()->flash(
             'success',
-            'Semua buku dengan judul yang sama berhasil dihapus.',
+            'Semua buku dengan judul ' . $judul . ' berhasil dihapus.',
             [],
             'Hapus Data Sukses'
         );
@@ -185,8 +236,8 @@ class BukuController extends Controller
     {
         $bukuYangSama = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->get();
 
-        $fileBukuPath = '-';
-        $fileCoverPath = '-';
+        $fileBukuPath = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->first()->file_buku ?? '-';
+        $fileCoverPath = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->first()->file_cover ?? '-';
 
         if ($request->hasFile('file_buku')) {
             $fileBuku = $request->file('file_buku');
@@ -199,6 +250,7 @@ class BukuController extends Controller
             $fileCoverName = time() . '_cover_' . $fileCover->getClientOriginalName();
             $fileCoverPath = $fileCover->storeAs('uploads/cover', $fileCoverName, 'public');
         }
+
 
         foreach ($bukuYangSama as $b) {
             $b->update([
@@ -216,7 +268,7 @@ class BukuController extends Controller
 
         flash()->flash(
             'success',
-            'Berhasil memperbarui semua buku dengan judul yang sama.',
+            'Berhasil memperbarui semua buku dengan judul ' . $buku->judul,
             [],
             'Perbarui Data Sukses'
         );

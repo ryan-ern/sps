@@ -83,7 +83,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link  {{ is_current_route('RTL') ? 'active' : '' }}" href="{{ route('RTL') }}">
+                <a class="nav-link  {{ is_current_route('anggota.read') ? 'active' : '' }}"
+                    href="{{ route('anggota.read') }}">
                     <div
                         class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
                         <svg xmlns="http://www.w3.org/2000/svg" height="14" width="17.5"

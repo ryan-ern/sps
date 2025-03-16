@@ -31,6 +31,33 @@
                                 <div class="tab-pane fade show" id="referensi" role="tabpanel"
                                     aria-labelledby="referensi-tab">
                                     <div class="table-responsive text-center">
+                                        {{-- Filter --}}
+                                        <form method="GET" action="{{ route('data-buku.read') }}" class="mb-3">
+                                            <div class="row d-flex justify-content-between">
+                                                <!-- Date Range Picker -->
+                                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                                    <input type="text" name="dates" value="{{ request('dates') }}"
+                                                        class="dates form-control mb-2" />
+                                                </div>
+
+                                                <!-- Search Input -->
+                                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                                    <input type="search" id="search" name="search"
+                                                        class="form-control mb-2" placeholder="Cari Buku Referensi"
+                                                        value="{{ request('search') }}">
+                                                </div>
+
+                                                <!-- Submit Button -->
+                                                <div class="col-lg-4 d-inline-flex gap-2 col-md-4 col-sm-12">
+                                                    <a href="{{ route('data-buku.read') }}"
+                                                        class="btn btn-warning w-100">Reset</a>
+                                                    <button type="submit"
+                                                        class="btn btn-primary w-100">Terapkan</button>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </form>
+
                                         <table class="table table-sm table-bordered dataTable" id="table">
                                             <thead class="bg-dark text-white">
                                                 <tr>
@@ -96,6 +123,33 @@
                                 <div class="tab-pane fade show" id="paket" role="tabpanel"
                                     aria-labelledby="paket-tab">
                                     <div class="table-responsive text-center">
+                                        {{-- Filter --}}
+                                        <form method="GET" action="{{ route('data-buku.read') }}" class="mb-3">
+                                            <div class="row d-flex justify-content-between">
+                                                <!-- Date Range Picker -->
+                                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                                    <input type="text" name="dates"
+                                                        value="{{ request('dates') }}"
+                                                        class="dates form-control mb-2" />
+                                                </div>
+
+                                                <!-- Search Input -->
+                                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                                    <input type="search" id="search" name="search"
+                                                        class="form-control mb-2" placeholder="Cari Buku Paket"
+                                                        value="{{ request('search') }}">
+                                                </div>
+
+                                                <!-- Submit Button -->
+                                                <div class="col-lg-4 d-inline-flex gap-2 col-md-4 col-sm-12">
+                                                    <a href="{{ route('data-buku.read') }}"
+                                                        class="btn btn-warning w-100">Reset</a>
+                                                    <button type="submit"
+                                                        class="btn btn-primary w-100">Terapkan</button>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </form>
                                         <table class="table table-sm table-bordered dataTable" id="table">
                                             <thead class="bg-dark text-white">
                                                 <tr>
@@ -234,7 +288,7 @@
                 modalForm.method = "POST";
 
                 if (modalType === 'update') {
-                    modalTitle.textContent = 'Edit Data';
+                    modalTitle.textContent = 'Form Edit Data';
                     modalForm.action = `/apps/data-buku/update/${bukuId}`;
                     modalForm.enctype = 'multipart/form-data';
                     var modal = document.getElementById('dynamicModal');
@@ -274,6 +328,8 @@
             <div class="col-md-4">
                 <label for="stok" class="form-label">Stok</label>
                 <input type="number" class="form-control mb-2" name="stok" placeholder="Stok" value="${bukuData.stok}" readonly required>
+                <label for="tahun" class="form-label">Tahun</label>
+                <input type="number" class="form-control mb-3" name="tahun" placeholder="Tahun" value="${bukuData.tahun}" required>
                 <div class="form-floating">
                     <textarea class="form-control" name="keterangan" placeholder="Keterangan Tulis Disini" id="floatingTextarea2" style="height: 215px">${bukuData.keterangan}</textarea>
                     <label for="floatingTextarea2">Keterangan</label>
@@ -285,16 +341,17 @@
                 <div class="mb-3">
                     <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih File Buku</label>
                     <input type="file" class="form-control" accept=".pdf"  id="fileBuku" name="file_buku">
+                    ${bukuData.file_buku ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
                     </div>
                     <div class="mb-3">
                     <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih File Cover</label>
                     <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover" name="file_cover">
                     </div>
-                    ${bukuData.file_cover ? `<a href="/storage/${bukuData.file_cover}" target="_blank" class="d-block mt-2 text-info">Lihat File Cover</a>` : ''}
-                    ${bukuData.file_buku ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
-
-                <input type="number" class="form-control mb-3" name="tahun" placeholder="Tahun" value="${bukuData.tahun}" required>
-                <button type="button" class="btn btn-success w-100 mb-2">Hasil Scan Barcode</button>
+                    ${bukuData.file_cover ?
+                        `<a href="/storage/${bukuData.file_cover}" target="_blank">
+                                                                                                                                                                                                                                                                                                                        <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+                                                                                                                                                                                                                                                                                                                    </a>`
+                    : ''}
             </div>
         </div>
 
@@ -329,7 +386,7 @@
                             inputAutofocus.focus();
                         }
                     });
-                    modalTitle.textContent = 'Tambah Data';
+                    modalTitle.textContent = 'Form Tambah Data';
                     modalForm.action = '/apps/data-buku/create';
                     modalForm.enctype = 'multipart/form-data';
                     modalForm.method = 'POST';
