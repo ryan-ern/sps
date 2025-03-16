@@ -29,8 +29,8 @@ class BukuController extends Controller
         $dateRange = $request->input('dates');
 
         // Query dasar untuk Buku Referensi
-        $referensiQuery = Buku::where('jenis', 'referensi');
-        $paketQuery = Buku::where('jenis', 'paket');
+        $referensiQuery = Buku::where('jenis', 'referensi')->orderBy('created_at', 'desc');
+        $paketQuery = Buku::where('jenis', 'paket')->orderBy('created_at', 'desc');
 
         // Filter berdasarkan pencarian
         if ($search) {

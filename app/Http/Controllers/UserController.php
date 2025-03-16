@@ -31,7 +31,7 @@ class UserController extends Controller
         $dateRange = $request->input('dates');
 
         // Query dasar untuk User
-        $DataQuery = User::where('role', '!=', 'admin');
+        $DataQuery = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc');
 
         // Filter berdasarkan pencarian
         if ($search) {
