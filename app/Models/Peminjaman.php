@@ -20,6 +20,13 @@ class Peminjaman extends Model
         'tgl_pinjam',
         'tgl_kembali',
         'denda',
+        'tahap',
+        'status'
+    ];
+
+    protected $casts = [
+        'tgl_pinjam' => 'datetime',
+        'tgl_kembali' => 'datetime',
     ];
 
     public function hitungDenda($tgl_pinjam)

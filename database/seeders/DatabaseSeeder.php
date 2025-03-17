@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Buku;
 use App\Models\Kunjungan;
+use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -54,6 +55,8 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create();
 
         Buku::factory(10)->create();
+
+        Peminjaman::factory(30)->create();
 
         Kunjungan::factory(10)->create();
     }

@@ -19,9 +19,11 @@ return new class extends Migration
             $table->foreign('no_regis')->references('no_regis')->on('bukus')->onDelete('cascade')->onUpdate('cascade');
             $table->string('fullname');
             $table->text('judul');
-            $table->string('tgl_pinjam');
-            $table->string('tgl_kembali');
-            $table->string('denda');
+            $table->dateTime('tgl_pinjam');
+            $table->dateTime('tgl_kembali');
+            $table->double('denda');
+            $table->enum('tahap', ['pinjam', 'kembali'])->default('pinjam');
+            $table->enum('status', ['terima', 'tolak', 'verifikasi', '-'])->default('-');
             $table->timestamps();
         });
     }

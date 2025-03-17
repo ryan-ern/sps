@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KunjunganController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +52,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/anggota/export-sample', [UserController::class, 'exportSample'])->name('anggota.exportSample');
 
     Route::get('/apps/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.read')->middleware(['role:admin']);
+
+    Route::get('/apps/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.read')->middleware(['role:admin']);
+
+    Route::get('/apps/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.read')->middleware(['role:admin']);
 
     Route::get('/apps/siswa', function () {
         return view('example');
