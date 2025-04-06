@@ -79,10 +79,10 @@
                                                             {{ $BukuReferensi->tgl_pinjam->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-uppercase">
-                                                            {{ $BukuReferensi->est_kembali->format('d-m-Y h:i a') }}
+                                                            {{ $BukuReferensi->est_kembali == null ? '-' : $BukuReferensi->est_kembali->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-uppercase">
-                                                            {{ $BukuReferensi->tgl_kembali->format('d-m-Y h:i a') }}
+                                                            {{ $BukuReferensi->tgl_kembali == null ? '-' : $BukuReferensi->tgl_kembali->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-capitalize">
                                                             Rp. {{ number_format($BukuReferensi->denda, 0, ',', '.') }}
@@ -101,7 +101,7 @@
                                                                 @if($BukuReferensi->kembali == 'selesai')
                                                                     <span class="btn btn-primary w-100">Selesai</span>
                                                                     @else
-                                                                    <span class="btn btn-info w-100">-</span>
+                                                                    <span class="btn btn-info w-100">Dipinjam</span>
                                                                 @endif
                                                             @endif
                                                         </td>
@@ -174,10 +174,10 @@
                                                             {{ $BukuPaket->tgl_pinjam->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-uppercase">
-                                                            {{ $BukuPaket->est_kembali->format('d-m-Y h:i a') }}
+                                                            {{ $BukuPaket->est_kembali == null ? '-' : $BukuPaket->est_kembali->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-uppercase">
-                                                            {{ $BukuPaket->tgl_kembali->format('d-m-Y h:i a') }}
+                                                            {{ $BukuPaket->tgl_kembali == null ? '-' : $BukuPaket->tgl_kembali->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-capitalize">
                                                             Rp. {{ number_format($BukuPaket->denda, 0, ',', '.') }}

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\HitungDendaPeminjaman;
 
 class Kernel extends ConsoleKernel
 {
@@ -12,12 +13,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $hour = config('app.hour');
-        $min = config('app.min');
-        $scheduledInterval = $hour !== '' ? (($min !== '' && $min != 0) ?  $min . ' */' . $hour . ' * * *' : '0 */' . $hour . ' * * *') : '*/' . $min . ' * * * *';
-        if (config('app.is_demo')) {
-            $schedule->command('migrate:fresh --seed')->cron($scheduledInterval);
-        }
+        $schedule->job(new HitungDendaPeminjaman)->daily();
     }
 
     /**

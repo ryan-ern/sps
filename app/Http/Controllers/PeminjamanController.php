@@ -93,6 +93,8 @@ class PeminjamanController extends Controller
 
         $peminjaman->pinjam = 'terima';
         $peminjaman->kembali = '-';
+        $peminjaman->tgl_pinjam = now();
+        $peminjaman->est_kembali = now()->addDays(3);
         $peminjaman->save();
 
         flash()->flash(

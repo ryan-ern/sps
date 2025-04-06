@@ -33,12 +33,12 @@ class Peminjaman extends Model
 
     public function hitungDenda()
     {
-        if (!$this->tgl_kembali || !$this->tgl_pinjam) {
+        if (!$this->tgl_pinjam) {
             return;
         }
 
         $estKembali = Carbon::parse($this->tgl_pinjam)->addDays(3);
-        $tglKembali = Carbon::parse($this->tgl_kembali);
+        $tglKembali = $this->tgl_kembali != null ? Carbon::parse($this->tgl_kembali) : now();
 
         // Cek apakah telat
         if ($tglKembali->greaterThan($estKembali)) {

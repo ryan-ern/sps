@@ -28,34 +28,38 @@ class PengembalianController extends Controller
         // Query dasar untuk Buku Referensi
         $referensiQuery = Peminjaman::whereHas('buku', function ($query) {
             $query->where('jenis', 'referensi')
-                ->where('est_kembali', '!=', null);
+                ->where('pinjam', 'terima');
         })->orderByRaw("CASE WHEN kembali = 'verifikasi' THEN 0 ELSE 1 END")
             ->orderBy('tgl_kembali', 'desc');
 
         // Query dasar untuk Buku Paket
         $paketQuery = Peminjaman::whereHas('buku', function ($query) {
             $query->where('jenis', 'paket')
-                ->where('est_kembali', '!=', null);
+                ->where('pinjam', 'terima');
         })->orderByRaw("CASE WHEN kembali = 'verifikasi' THEN 0 ELSE 1 END")
             ->orderBy('tgl_kembali', 'desc');
 
 
         // Filter berdasarkan pencarian
         if ($search) {
-            $referensiQuery
-                ->where('nisn', 'like', "%{$search}%")
-                ->orWhere('fullname', 'like', "%{$search}%")
-                ->orWhere('judul', 'like', "%{$search}%")
-                ->orWhere('tgl_pinjam', 'like', "%{$search}%")
-                ->orWhere('tgl_kembali', 'like', "%{$search}%")
-                ->orWhere('denda', 'like', "%{$search}%");
-            $paketQuery
-                ->where('nisn', 'like', "%{$search}%")
-                ->orWhere('fullname', 'like', "%{$search}%")
-                ->orWhere('judul', 'like', "%{$search}%")
-                ->orWhere('tgl_pinjam', 'like', "%{$search}%")
-                ->orWhere('tgl_kembali', 'like', "%{$search}%")
-                ->orWhere('denda', 'like', "%{$search}%");
+            $referensiQuery->where('pinjam', 'terima')
+                ->where(function ($query) use ($search) {
+                    $query->where('nisn', 'like', "%{$search}%")
+                        ->orWhere('fullname', 'like', "%{$search}%")
+                        ->orWhere('judul', 'like', "%{$search}%")
+                        ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                        ->orWhere('tgl_kembali', 'like', "%{$search}%")
+                        ->orWhere('denda', 'like', "%{$search}%");
+                });
+            $paketQuery->where('pinjam', 'terima')
+                ->where(function ($query) use ($search) {
+                    $query->where('nisn', 'like', "%{$search}%")
+                        ->orWhere('fullname', 'like', "%{$search}%")
+                        ->orWhere('judul', 'like', "%{$search}%")
+                        ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                        ->orWhere('tgl_kembali', 'like', "%{$search}%")
+                        ->orWhere('denda', 'like', "%{$search}%");
+                });
         }
 
         // Filter berdasarkan rentang tanggal
@@ -97,6 +101,7 @@ class PengembalianController extends Controller
         }
 
         $peminjaman->kembali = 'selesai';
+        $peminjaman->tgl_kembali = now();
         $peminjaman->save();
 
         flash()->flash(
