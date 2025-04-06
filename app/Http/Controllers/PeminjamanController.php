@@ -28,10 +28,14 @@ class PeminjamanController extends Controller
         // Query dasar untuk Buku Referensi
         $referensiQuery = Peminjaman::whereHas('buku', function ($query) {
             $query->where('jenis', 'referensi');
-        })->orderBy('created_at', 'desc');
+        })->orderByRaw("CASE WHEN pinjam = 'verifikasi' THEN 0 ELSE 1 END")
+            ->orderBy('tgl_pinjam', 'desc');
+
+        // Query dasar untuk Buku Paket
         $paketQuery = Peminjaman::whereHas('buku', function ($query) {
             $query->where('jenis', 'paket');
-        })->orderBy('created_at', 'desc');
+        })->orderByRaw("CASE WHEN pinjam = 'verifikasi' THEN 0 ELSE 1 END")
+            ->orderBy('tgl_pinjam', 'desc');
 
         // Filter berdasarkan pencarian
         if ($search) {
@@ -50,14 +54,14 @@ class PeminjamanController extends Controller
         }
 
         // Filter berdasarkan rentang tanggal
-        if ($dateRange) {
+        if ($dateRange  && $dateRange !== '01/01/0001 - 01/01/0001') {
             $dates = explode(" - ", $dateRange);
             if (count($dates) === 2) {
                 $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->startOfDay();
                 $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[1]))->endOfDay();
 
-                $referensiQuery->whereBetween('created_at', [$startDate, $endDate]);
-                $paketQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $referensiQuery->whereBetween('tgl_pinjam', [$startDate, $endDate]);
+                $paketQuery->whereBetween('tgl_pinjam', [$startDate, $endDate]);
             }
         }
 
@@ -71,5 +75,60 @@ class PeminjamanController extends Controller
         }
 
         return view('pages.admin.peminjaman', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
+    }
+
+    public function accept(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::where('id', $id)
+            ->first();
+        if (!$peminjaman) {
+            flash()->flash(
+                'danger',
+                'Data peminjaman ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' tidak ditemukan.',
+                [],
+                'Terima Peminjaman Gagal'
+            );
+            return redirect()->route('peminjaman.read');
+        }
+
+        $peminjaman->pinjam = 'terima';
+        $peminjaman->kembali = '-';
+        $peminjaman->save();
+
+        flash()->flash(
+            'success',
+            'Data peminjaman ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' berhasil diterima.',
+            [],
+            'Terima Peminjaman Sukses'
+        );
+
+        return redirect()->route('peminjaman.read');
+    }
+
+    public function decline(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::where('id', $id)
+            ->first();
+
+        if (!$peminjaman) {
+            flash()->flash(
+                'danger',
+                'Data peminjaman ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' tidak ditemukan.',
+                [],
+                'Terima Peminjaman Gagal'
+            );
+            return redirect()->route('peminjaman.read');
+        }
+        $peminjaman->pinjam = 'tolak';
+        $peminjaman->save();
+
+        flash()->flash(
+            'success',
+            'Data peminjaman ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' berhasil ditolak.',
+            [],
+            'Tolak Peminjaman Sukses'
+        );
+
+        return redirect()->route('peminjaman.read');
     }
 }

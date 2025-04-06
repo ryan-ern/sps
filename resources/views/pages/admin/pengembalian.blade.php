@@ -62,6 +62,7 @@
                                                     <th scope="col">Judul Buku</th>
                                                     <th scope="col">No Regis</th>
                                                     <th scope="col">Tanggal Peminjaman</th>
+                                                    <th scope="col">Estimasi Kembali</th>
                                                     <th scope="col">Tanggal Kembali</th>
                                                     <th scope="col">Denda</th>
                                                     <th scope="col">Aksi</th>
@@ -78,35 +79,31 @@
                                                             {{ $BukuReferensi->tgl_pinjam->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-uppercase">
+                                                            {{ $BukuReferensi->est_kembali->format('d-m-Y h:i a') }}
+                                                        </td>
+                                                        <td class="text-uppercase">
                                                             {{ $BukuReferensi->tgl_kembali->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-capitalize">
                                                             Rp. {{ number_format($BukuReferensi->denda, 0, ',', '.') }}
                                                         </td>
                                                         <td>
-                                                            <button class="mx-2 btn btn-primary editBtn"
-                                                                data-no_regis="{{ $BukuReferensi->no_regis }}"
-                                                                data-jenis="{{ $BukuReferensi->jenis }}"
-                                                                data-judul="{{ $BukuReferensi->judul }}"
-                                                                data-penerbit="{{ $BukuReferensi->penerbit }}"
-                                                                data-pengarang="{{ $BukuReferensi->pengarang }}"
-                                                                data-tahun="{{ $BukuReferensi->tahun }}"
-                                                                data-stok="{{ $BukuReferensi->stok }}"
-                                                                data-file_buku="{{ $BukuReferensi->file_buku }}"
-                                                                data-file_cover="{{ $BukuReferensi->file_cover }}"
-                                                                data-keterangan="{{ $BukuReferensi->keterangan }}"
-                                                                data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                                                                data-modal-type="update">
-                                                                Edit
-                                                            </button>
-
-                                                            <button class="mx-2 btn btn-danger deleteBtn"
-                                                                data-judul="{{ $BukuReferensi->judul }}"
-                                                                data-stok="{{ $BukuReferensi->stok }}"
-                                                                data-modal-type="delete" data-bs-toggle="modal"
-                                                                data-bs-target="#dynamicModal">
-                                                                Hapus
-                                                            </button>
+                                                            @if($BukuReferensi->kembali == 'verifikasi')
+                                                                <button class="btn btn-warning w-100 accBtn"
+                                                                    data-id="{{ $BukuReferensi->id }}"
+                                                                    data-no_regis="{{ $BukuReferensi->no_regis }}"
+                                                                    data-fullname="{{ $BukuReferensi->fullname }}"
+                                                                    data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                    data-modal-type="accept">
+                                                                    Verifikasi
+                                                                </button>
+                                                            @else
+                                                                @if($BukuReferensi->kembali == 'selesai')
+                                                                    <span class="btn btn-primary w-100">Selesai</span>
+                                                                    @else
+                                                                    <span class="btn btn-info w-100">-</span>
+                                                                @endif
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -160,6 +157,7 @@
                                                     <th scope="col">Judul Buku</th>
                                                     <th scope="col">No Regis</th>
                                                     <th scope="col">Tanggal Peminjaman</th>
+                                                    <th scope="col">Estimasi Kembali</th>
                                                     <th scope="col">Tanggal Kembali</th>
                                                     <th scope="col">Denda</th>
                                                     <th scope="col">Aksi</th>
@@ -176,35 +174,31 @@
                                                             {{ $BukuPaket->tgl_pinjam->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-uppercase">
+                                                            {{ $BukuPaket->est_kembali->format('d-m-Y h:i a') }}
+                                                        </td>
+                                                        <td class="text-uppercase">
                                                             {{ $BukuPaket->tgl_kembali->format('d-m-Y h:i a') }}
                                                         </td>
                                                         <td class="text-capitalize">
                                                             Rp. {{ number_format($BukuPaket->denda, 0, ',', '.') }}
                                                         </td>
                                                         <td>
-                                                            <button class="mx-2 btn btn-primary editBtn"
-                                                                data-no_regis="{{ $BukuPaket->no_regis }}"
-                                                                data-jenis="{{ $BukuPaket->jenis }}"
-                                                                data-judul="{{ $BukuPaket->judul }}"
-                                                                data-penerbit="{{ $BukuPaket->penerbit }}"
-                                                                data-pengarang="{{ $BukuPaket->pengarang }}"
-                                                                data-tahun="{{ $BukuPaket->tahun }}"
-                                                                data-stok="{{ $BukuPaket->stok }}"
-                                                                data-file_buku="{{ $BukuPaket->file_buku }}"
-                                                                data-file_cover="{{ $BukuPaket->file_cover }}"
-                                                                data-keterangan="{{ $BukuPaket->keterangan }}"
-                                                                data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                                                                data-modal-type="update">
-                                                                Edit
-                                                            </button>
-
-                                                            <button class="mx-2 btn btn-danger deleteBtn"
-                                                                data-judul="{{ $BukuPaket->judul }}"
-                                                                data-stok="{{ $BukuPaket->stok }}"
-                                                                data-modal-type="delete" data-bs-toggle="modal"
-                                                                data-bs-target="#dynamicModal">
-                                                                Hapus
-                                                            </button>
+                                                            @if($BukuReferensi->kembali == 'verifikasi')
+                                                                <button class="btn btn-warning w-100 accBtn"
+                                                                    data-id="{{ $BukuReferensi->id }}"
+                                                                    data-no_regis="{{ $BukuReferensi->no_regis }}"
+                                                                    data-fullname="{{ $BukuReferensi->fullname }}"
+                                                                    data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                    data-modal-type="accept">
+                                                                    Verifikasi
+                                                                </button>
+                                                            @else
+                                                                @if($BukuReferensi->kembali == 'selesai')
+                                                                    <span class="btn btn-primary w-100">Selesai</span>
+                                                                    @else
+                                                                    <span class="btn btn-info w-100">-</span>
+                                                                @endif
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -277,7 +271,7 @@
             });
         });
     </script>
-    <script>
+     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const dynamicModal = document.getElementById('dynamicModal');
             const modalTitle = dynamicModal.querySelector('.modal-title');
@@ -287,176 +281,32 @@
             dynamicModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
                 const modalType = button.getAttribute('data-modal-type');
-                const bukuId = button.getAttribute('data-no_regis');
-
+                const id = button.getAttribute('data-id');
                 let modalBodyHTML = "";
                 modalForm.enctype = "application/x-www-form-urlencoded";
                 modalForm.method = "POST";
-
-                if (modalType === 'update') {
-                    modalTitle.textContent = 'Form Edit Data';
-                    modalForm.action = `/apps/pengembalian/update/${bukuId}`;
+                if (modalType === 'accept') {
                     modalForm.enctype = 'multipart/form-data';
+                    modalTitle.textContent = 'Konfirmasi Pengembalian Buku';
+                    modalForm.action = `/apps/pengembalian/accept/${id}`;
                     var modal = document.getElementById('dynamicModal');
-                    var inputAutofocus = modal.querySelector('input[autofocus]');
-
-                    modal.addEventListener('shown.bs.modal', function() {
-                        if (inputAutofocus) {
-                            inputAutofocus.focus();
-                        }
-                    });
 
                     const bukuData = button.dataset;
 
                     modalBodyHTML = `
                          @csrf
                     @method('PUT')
-                     <div class="row">
-            <!-- Kolom Kiri -->
-            <div class="col-md-4">
-                <label for="jenis" class="form-label">Jenis</label>
-                <select class="form-select mb-3" name="jenis" required>
-                    <option value="" disabled>Pilih Jenis</option>
-                    <option value="referensi" ${bukuData.jenis === 'referensi' ? 'selected' : ''}>Buku Referensi</option>
-                    <option value="paket" ${bukuData.jenis === 'paket' ? 'selected' : ''}>Buku Paket</option>
-                </select>
-                <label for="no_regis" class="form-label">No Regis</label>
-                <input type="number" class="form-control mb-3" name="no_regis" placeholder="No Regis" value="${bukuData.no_regis}" readonly required>
-                <label for="judul" class="form-label">Judul</label>
-                <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" value="${bukuData.judul}" readonly required>
-                <label for="pengarang" class="form-label">Pengarang</label>
-                <input type="text" class="form-control mb-3" name="pengarang" placeholder="Pengarang" value="${bukuData.pengarang}" required>
-                <label for="penerbit" class="form-label">Penerbit</label>
-                <input type="text" class="form-control mb-3" name="penerbit" placeholder="Penerbit" value="${bukuData.penerbit}" required>
-            </div>
-
-            <!-- Kolom Tengah -->
-            <div class="col-md-4">
-                <label for="stok" class="form-label">Stok</label>
-                <input type="number" class="form-control mb-2" name="stok" placeholder="Stok" value="${bukuData.stok}" readonly required>
-                <label for="tahun" class="form-label">Tahun</label>
-                <input type="number" class="form-control mb-3" name="tahun" placeholder="Tahun" value="${bukuData.tahun}" required>
-                <div class="form-floating">
-                    <textarea class="form-control" name="keterangan" placeholder="Keterangan Tulis Disini" id="floatingTextarea2" style="height: 215px">${bukuData.keterangan}</textarea>
-                    <label for="floatingTextarea2">Keterangan</label>
-                </div>
-            </div>
-
-            <!-- Kolom Kanan -->
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih File Buku</label>
-                    <input type="file" class="form-control" accept=".pdf"  id="fileBuku" name="file_buku">
-                    ${bukuData.file_buku ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
-                    </div>
-                    <div class="mb-3">
-                    <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih File Cover</label>
-                    <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover" name="file_cover">
-                    </div>
-                    ${bukuData.file_cover ?
-                        `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                                                                                                        <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                                                                                                    </a>`
-                    : ''}
-            </div>
-        </div>
-
-        <!-- Tombol -->
-        <div class="d-flex justify-content-end mt-3">
-            <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
-            <button type="submit" class="btn btn-success">Simpan</button>
-        </div>
-                    `;
-                } else if (modalType === 'delete') {
-                    modalTitle.textContent = 'Konfirmasi Hapus Data';
-                    modalForm.action = `/apps/pengembalian/delete/`;
-                    modalForm.method = 'POST';
-                    modalBodyHTML = `
-                        @csrf
-                        @method('DELETE')
-                        <p class="text-center fs-5 text-capitalize">Apakah Anda yakin ingin menghapus <br/> data buku dengan <br/><strong>Judul ${button.getAttribute('data-judul')}</strong>?</p>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="PUT">
+                    <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menerima <strong>${button.getAttribute('data-fullname')}</strong> <br/> untuk meminjam buku dengan <br/><strong>nomor registrasi <br/> ${button.getAttribute('data-no_regis')}</strong>?</p>
                                     <div class="d-flex justify-content-end mt-3">
-                                        <input type="hidden" name="judul" value="${button.getAttribute('data-judul')}">
-                                        <input type="hidden" name="stok" value="${button.getAttribute('data-stok')}">
+                                        <input type="hidden" name="fullname" value="${button.getAttribute('data-fullname')}">
+                                        <input type="hidden" name="no_regis" value="${button.getAttribute('data-no_regis')}">
                                         <button type="reset" class="btn btn-primary me-2" id="closeModal"
                                             data-bs-dismiss="modal">Tidak</button>
-                                        <button type="submit" class="btn btn-danger">Hapus</button>
+                                        <button type="submit" class="btn btn-success">Ya</button>
                                     </div>
                         `;
-                } else {
-                    var modal = document.getElementById('dynamicModal');
-                    var inputAutofocus = modal.querySelector('input[autofocus]');
-
-                    modal.addEventListener('shown.bs.modal', function() {
-                        if (inputAutofocus) {
-                            inputAutofocus.focus();
-                        }
-                    });
-                    modalTitle.textContent = 'Form Tambah Data';
-                    modalForm.action = '/apps/pengembalian/create';
-                    modalForm.enctype = 'multipart/form-data';
-                    modalForm.method = 'POST';
-                    modalBodyHTML = `
-                        @csrf
-                    @method('POST')
-                    <div class="row">
-                                        <!-- Kolom Kiri -->
-                                        <div class="col-md-4">
-                                            <select class="form-select mb-3" name="jenis" required>
-                                                <option value="" selected disabled>Pilih Jenis</option>
-                                                <option value="referensi">Buku Referensi</option>
-                                                <option value="paket">Buku Paket</option>
-                                            </select>
-                                            <input type="number" class="form-control mb-3" name="no_regis"
-                                                placeholder="No Regis" required>
-                                            <input type="text" class="form-control mb-3" name="judul"
-                                                placeholder="Judul" autofocus required>
-                                            <input type="text" class="form-control mb-3" name="pengarang"
-                                                placeholder="Pengarang" required>
-                                            <input type="text" class="form-control mb-3" name="penerbit"
-                                                placeholder="Penerbit" required>
-                                        </div>
-
-                                        <!-- Kolom Tengah -->
-                                        <div class="col-md-4">
-                                            <input type="number" class="form-control mb-2" name="stok"
-                                                placeholder="Stok" required>
-                                            <div class="form-floating">
-                                                <textarea class="form-control" name="keterangan" required placeholder="Keterangan Tulis Disini"
-                                                    id="floatingTextarea2" style="height: 215px"></textarea>
-                                                <label for="floatingTextarea2">Keterangan</label>
-                                            </div>
-                                        </div>
-
-                                        <!-- Kolom Kanan -->
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih
-                                                    File Buku (PDF)</label>
-                                                <input type="file" class="form-control" accept=".pdf" id="fileBuku"
-                                                    name="file_buku">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih
-                                                    File Cover (JPG, JPEG, PNG)</label>
-                                                    <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover"
-                                                    name="file_cover">
-                                            </div>
-
-                                            <input type="number" class="form-control mb-3" name="tahun"
-                                                placeholder="Tahun" required>
-                                            <button type="button" class="btn btn-success w-100 mb-2">Hasil Scan
-                                                Barcode</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tombol -->
-                                    <div class="d-flex justify-content-end mt-3">
-                                        <button type="reset" class="btn btn-primary me-2" id="closeModal"
-                                            data-bs-dismiss="modal">Kembali</button>
-                                        <button type="submit" class="btn btn-success">Simpan</button>
-                                    </div>
-                    `;
                 }
 
                 modalContent.innerHTML = modalBodyHTML;

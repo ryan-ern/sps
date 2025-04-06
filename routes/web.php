@@ -54,8 +54,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.read')->middleware(['role:admin']);
 
     Route::get('/apps/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.read')->middleware(['role:admin']);
+    Route::put('/apps/peminjaman/accept/{id}', [PeminjamanController::class, 'accept'])->name('peminjaman.accept')->middleware(['role:admin']);
+    Route::put('/apps/peminjaman/decline/{id}', [PeminjamanController::class, 'decline'])->name('peminjaman.decline')->middleware(['role:admin']);
 
     Route::get('/apps/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.read')->middleware(['role:admin']);
+    Route::put('/apps/pengembalian/accept/{id}', [PengembalianController::class, 'accept'])->name('pengembalian.accept')->middleware(['role:admin']);
 
     Route::get('/apps/siswa', function () {
         return view('example');

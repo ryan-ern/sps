@@ -20,10 +20,11 @@ return new class extends Migration
             $table->string('fullname');
             $table->text('judul');
             $table->dateTime('tgl_pinjam');
-            $table->dateTime('tgl_kembali');
+            $table->dateTime('est_kembali');
+            $table->dateTime('tgl_kembali')->nullable()->default(null);
             $table->double('denda');
-            $table->enum('tahap', ['pinjam', 'kembali'])->default('pinjam');
-            $table->enum('status', ['terima', 'tolak', 'verifikasi', '-'])->default('-');
+            $table->enum('pinjam', ['terima', 'tolak', 'verifikasi'])->default('verifikasi');
+            $table->enum('kembali', ['selesai', 'verifikasi', '-', null])->nullable()->default(null);
             $table->timestamps();
         });
     }

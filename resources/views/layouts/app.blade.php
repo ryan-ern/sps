@@ -134,6 +134,7 @@ $segments = request()->segments();
                                             $('#dynamicModal').modal('show');
                                         },
                                         attr: {
+                                            'id': 'tambahButton',
                                             'data-bs-toggle': 'modal',
                                             'data-bs-target': '#dynamicModal',
                                             'data-modal-type': 'tambah'
@@ -274,7 +275,8 @@ $segments = request()->segments();
                             'Bulan Kemarin': [moment().subtract(1, 'month').startOf('month'), moment()
                                 .subtract(1,
                                     'month').endOf('month')
-                            ]
+                            ],
+                            'Semua Data': ['01/01/0001','01/01/0001']
                         },
                         "locale": {
                             "format": "MM/DD/YYYY",

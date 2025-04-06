@@ -18,26 +18,37 @@ class Peminjaman extends Model
         'fullname',
         'judul',
         'tgl_pinjam',
+        'est_kembali',
         'tgl_kembali',
         'denda',
-        'tahap',
-        'status'
+        'pinjam',
+        'kembali'
     ];
 
     protected $casts = [
         'tgl_pinjam' => 'datetime',
+        'est_kembali' => 'datetime',
         'tgl_kembali' => 'datetime',
     ];
 
-    public function hitungDenda($tgl_pinjam)
+    public function hitungDenda()
     {
-        $tglBatas = Carbon::parse($tgl_pinjam)->addDays(3);
-        $hariTelat = now()->diffInDays($tglBatas, false);
-
-        if ($hariTelat > 0) {
-            $this->denda = $hariTelat * 500;
-            $this->save();
+        if (!$this->tgl_kembali || !$this->tgl_pinjam) {
+            return;
         }
+
+        $estKembali = Carbon::parse($this->tgl_pinjam)->addDays(3);
+        $tglKembali = Carbon::parse($this->tgl_kembali);
+
+        // Cek apakah telat
+        if ($tglKembali->greaterThan($estKembali)) {
+            $hariTelat = abs($tglKembali->diffInDays($estKembali, false));
+            $this->denda = $hariTelat * 500;
+        } else {
+            $this->denda = 0;
+        }
+
+        $this->save();
     }
 
     public function user()

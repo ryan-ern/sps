@@ -27,11 +27,18 @@ class PengembalianController extends Controller
 
         // Query dasar untuk Buku Referensi
         $referensiQuery = Peminjaman::whereHas('buku', function ($query) {
-            $query->where('jenis', 'referensi')->where('tahap', 'kembali');
-        })->orderBy('created_at', 'desc');
+            $query->where('jenis', 'referensi')
+                ->where('est_kembali', '!=', null);
+        })->orderByRaw("CASE WHEN kembali = 'verifikasi' THEN 0 ELSE 1 END")
+            ->orderBy('tgl_kembali', 'desc');
+
+        // Query dasar untuk Buku Paket
         $paketQuery = Peminjaman::whereHas('buku', function ($query) {
-            $query->where('jenis', 'paket')->where('tahap', 'kembali');
-        })->orderBy('created_at', 'desc');
+            $query->where('jenis', 'paket')
+                ->where('est_kembali', '!=', null);
+        })->orderByRaw("CASE WHEN kembali = 'verifikasi' THEN 0 ELSE 1 END")
+            ->orderBy('tgl_kembali', 'desc');
+
 
         // Filter berdasarkan pencarian
         if ($search) {
@@ -40,12 +47,14 @@ class PengembalianController extends Controller
                 ->orWhere('fullname', 'like', "%{$search}%")
                 ->orWhere('judul', 'like', "%{$search}%")
                 ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                ->orWhere('tgl_kembali', 'like', "%{$search}%")
                 ->orWhere('denda', 'like', "%{$search}%");
             $paketQuery
                 ->where('nisn', 'like', "%{$search}%")
                 ->orWhere('fullname', 'like', "%{$search}%")
                 ->orWhere('judul', 'like', "%{$search}%")
                 ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                ->orWhere('tgl_kembali', 'like', "%{$search}%")
                 ->orWhere('denda', 'like', "%{$search}%");
         }
 
@@ -71,5 +80,32 @@ class PengembalianController extends Controller
         }
 
         return view('pages.admin.pengembalian', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
+    }
+
+    public function accept(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::where('id', $id)
+            ->first();
+        if (!$peminjaman) {
+            flash()->flash(
+                'danger',
+                'Data pengembalian ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' tidak ditemukan.',
+                [],
+                'Terima pengembalian Gagal'
+            );
+            return redirect()->route('pengembalian.read');
+        }
+
+        $peminjaman->kembali = 'selesai';
+        $peminjaman->save();
+
+        flash()->flash(
+            'success',
+            'Data pengembalian ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' berhasil diverifikasi.',
+            [],
+            'Terima pengembalian Sukses'
+        );
+
+        return redirect()->route('pengembalian.read');
     }
 }

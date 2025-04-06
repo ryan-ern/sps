@@ -18,16 +18,29 @@ class PeminjamanFactory extends Factory
      */
     public function definition(): array
     {
+        $tglPinjam = now()->subDays(rand(1, 10));
+        $estKembali = $tglPinjam->copy()->addDays(3);
+
+        // Acak apakah telat atau tidak
+        $tglKembali = (clone $estKembali)->addDays(rand(-2, 5));
+
+        $hariTelat = $tglKembali->greaterThan($estKembali)
+            ? abs($tglKembali->diffInDays($estKembali, false))
+            : 0;
+
+        $denda = $hariTelat * 500;
+
         return [
             'nisn' => User::inRandomOrder()->value('nisn') ?? User::factory()->create()->nisn,
             'no_regis' => Buku::inRandomOrder()->value('no_regis') ?? Buku::factory()->create()->no_regis,
             'fullname' => fake()->name(),
-            'judul' => fake()->sentence(),
-            'tgl_pinjam' => fake()->dateTime(),
-            'tgl_kembali' => fake()->dateTime(),
-            'denda' => fake()->randomNumber(2),
-            'tahap' => fake()->randomElement(['pinjam', 'kembali']),
-            'status' => fake()->randomElement(['terima', 'tolak', 'verifikasi']),
+            'judul' => Buku::inRandomOrder()->value('judul') ?? Buku::factory()->create()->judul,
+            'tgl_pinjam' => $tglPinjam,
+            'est_kembali' => $estKembali,
+            'tgl_kembali' => $tglKembali,
+            'denda' => $denda,
+            'pinjam' => fake()->randomElement(['terima', 'tolak', 'verifikasi']),
+            'kembali' => fake()->randomElement(['selesai', 'verifikasi', '-', null]),
         ];
     }
 }

@@ -101,6 +101,7 @@
                                                             </button>
 
                                                             <button class="mx-2 btn btn-danger deleteBtn"
+                                                                data-no_regis="{{ $BukuReferensi->no_regis }}"
                                                                 data-judul="{{ $BukuReferensi->judul }}"
                                                                 data-stok="{{ $BukuReferensi->stok }}"
                                                                 data-modal-type="delete" data-bs-toggle="modal"
@@ -193,6 +194,7 @@
                                                             </button>
 
                                                             <button class="mx-2 btn btn-danger deleteBtn"
+                                                                data-no_regis="{{ $BukuPaket->no_regis }}"
                                                                 data-judul="{{ $BukuPaket->judul }}"
                                                                 data-stok="{{ $BukuPaket->stok }}"
                                                                 data-modal-type="delete" data-bs-toggle="modal"
@@ -341,13 +343,13 @@
                 <div class="mb-3">
                     <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih File Buku</label>
                     <input type="file" class="form-control" accept=".pdf"  id="fileBuku" name="file_buku">
-                    ${bukuData.file_buku ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
+                    ${bukuData.file_buku != '-' ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
                     </div>
                     <div class="mb-3">
                     <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih File Cover</label>
                     <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover" name="file_cover">
                     </div>
-                    ${bukuData.file_cover ?
+                    ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
                                                                                                                                                                                                                                                                                                                         <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
                                                                                                                                                                                                                                                                                                                     </a>`
@@ -368,7 +370,7 @@
                     modalBodyHTML = `
                         @csrf
                         @method('DELETE')
-                        <p class="text-center fs-5 text-capitalize">Apakah Anda yakin ingin menghapus <br/> data buku dengan <br/><strong>Judul ${button.getAttribute('data-judul')}</strong>?</p>
+                        <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menghapus <br/> data buku dengan <br/><strong>nomor registrasi <br/>${button.getAttribute('data-no_regis')}</strong></p>
                                     <div class="d-flex justify-content-end mt-3">
                                         <input type="hidden" name="judul" value="${button.getAttribute('data-judul')}">
                                         <input type="hidden" name="stok" value="${button.getAttribute('data-stok')}">
