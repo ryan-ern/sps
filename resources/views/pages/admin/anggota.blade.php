@@ -12,7 +12,7 @@
                                     class="d-inline">
                                     @csrf
                                     <div class="row g-2 mb-3">
-                                        <div class="col-12 col-lg-6">
+                                        <div class="col-12 col-lg-6 col-md-12">
                                             <div class="input-group">
                                                 <input type="file" name="file" accept=".xls, .xlsx"
                                                     class="form-control mb-3" required>
@@ -20,9 +20,14 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-12 col-lg-6">
+                                        <div class="col-12 col-lg-3 col-md-6">
                                             <a href="{{ route('anggota.exportSample') }}"
-                                                class="btn btn-success w-100">Unduh Contoh Data</a>
+                                                class="btn btn-info w-100">Unduh Contoh Import</a>
+                                        </div>
+
+                                        <div class="col-12 col-lg-3 col-md-6">
+                                            <a href="{{ route('kartu-anggota', ['search' => request('search'), 'dates' => request('dates')]) }}"
+                                                class="btn btn-primary w-100">Unduh Kartu Anggota</a>
                                         </div>
                                     </div>
                                 </form>
@@ -178,8 +183,8 @@
                                         <!-- Kolom Kiri -->
                                         <div class="col-md-6">
                                             <label for="nisn" class="form-label">NISN/NUPTK:</label>
-                                            <input type="number" class="form-control mb-3" name="nisn"
-                                                placeholder="NISN/NUPTK" value="${userData.nisn}" required>
+                                            <input type="text" class="form-control mb-3" name="nisn"
+                                                placeholder="NISN/NUPTK" value="${userData.nisn}" readonly required>
                                             <label for="fullname" class="form-label">Nama Lengkap:</label>
                                             <input type="text" class="form-control mb-3" name="fullname"
                                                 placeholder="Nama Lengkap" value="${userData.fullname}" required>
@@ -203,7 +208,7 @@
                                         <div class="col-md-6">
                                             <label for="Email" class="form-label">Email:</label>
                                             <input type="email" class="form-control mb-3" name="email"
-                                                placeholder="Email" value="${userData.email || '-'}" readonly required>
+                                                placeholder="Email" value="${userData.email || '-'}" required>
                                             <label for="username" class="form-label">Username:</label>
                                             <input type="text" class="form-control mb-3" name="username"
                                                 placeholder="Username" value="${userData.username}" readonly required>
@@ -253,7 +258,7 @@
                     <div class="row">
                                         <!-- Kolom Kiri -->
                                         <div class="col-md-6">
-                                            <input type="number" class="form-control mb-3" name="nisn"
+                                            <input type="text" class="form-control mb-3" name="nisn"
                                                 placeholder="NISN/NUPTK" required>
                                             <input type="text" class="form-control mb-3" name="fullname"
                                                 placeholder="Nama Lengkap" required>

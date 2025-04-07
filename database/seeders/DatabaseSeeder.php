@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'tidak aktif',
         ]);
 
-        User::factory(10)->create();
+        User::factory(30)->create();
 
         Buku::factory(10)->create();
 

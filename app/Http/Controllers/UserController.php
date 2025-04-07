@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Imports\UsersImport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
@@ -66,8 +67,16 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'nisn' => preg_replace('/\s+/', '', $request->nisn)
+        ]);
+
         $validasi = Validator::make($request->all(), [
-            'nisn' => 'required|unique:users,nisn',
+            'nisn' => [
+                'required',
+                'unique:users,nisn',
+                'regex:/^[0-9\/]+$/'
+            ],
             'fullname' => 'required',
             'username' => 'required|unique:users,username',
             'email' => 'nullable|email|unique:users,email',
@@ -77,6 +86,7 @@ class UserController extends Controller
             'status' => 'required',
         ], [
             'nisn.unique' => 'NISN sudah terdaftar',
+            'nisn.regex' => 'Format NISN tidak valid (Harus berupa angka dan opsional tanda /)',
             'nisn.required' => 'NISN harus diisi',
             'fullname.required' => 'Nama lengkap harus diisi',
             'username.required' => 'Username harus diisi',
@@ -100,6 +110,7 @@ class UserController extends Controller
             );
             return redirect()->route('anggota.read')->withErrors($validasi)->withInput();
         }
+
 
         // Simpan data ke dalam database
         User::create([
@@ -142,16 +153,20 @@ class UserController extends Controller
 
         // Validasi data input
         $validasi = Validator::make($request->all(), [
-            'nisn' => 'required',
+            'nisn' => [
+                'required',
+                'regex:/^[0-9\/]+$/'
+            ],
             'fullname' => 'required',
             'username' => 'required',
             'kelas' => 'required',
             'password' => 'nullable|min:6',
             'role' => 'required',
             'status' => 'required',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'nullable',
         ], [
             'nisn.required' => 'NISN harus diisi',
+            'nisn.regex' => 'Format NISN tidak valid (Harus berupa angka dan opsional tanda /)',
             'fullname.required' => 'Nama lengkap harus diisi',
             'username.required' => 'Username harus diisi',
             'username.unique' => 'Username sudah digunakan, silakan pilih yang lain.',
@@ -228,5 +243,47 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('anggota.read')->with('error', 'Gagal mengexport data: ' . $e->getMessage());
         }
+    }
+
+
+    public function cardDownload(Request $request)
+    {
+        // Ambil nilai pencarian dan tanggal
+        $search = $request->input('search');
+        $dateRange = $request->input('dates');
+
+        // Query dasar
+        $anggotaQuery = User::where('status', 'aktif')->where('role', '!=', 'admin');
+
+        // Filter pencarian
+        if ($search) {
+            $anggotaQuery->where(function ($query) use ($search) {
+                $query->where('fullname', 'like', "%{$search}%")
+                    ->orWhere('nisn', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter tanggal
+        if ($dateRange) {
+            $dates = explode(" - ", $dateRange);
+            if (count($dates) === 2) {
+                $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->startOfDay();
+                $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[1]))->endOfDay();
+
+                $anggotaQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+        }
+
+        // Ambil data hasil filter
+        $anggota = $anggotaQuery->orderBy('created_at', 'desc')->get();
+
+        // Buat PDF
+        $pdf = Pdf::loadView('pages.admin.kartu-anggota', compact('anggota'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('kartu_anggota_aktif.pdf');
     }
 }

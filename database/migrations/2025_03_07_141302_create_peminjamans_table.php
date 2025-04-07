@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('peminjamans', function (Blueprint $table) {
             $table->id()->primary();
-            $table->unsignedBigInteger('nisn');
+            $table->string('nisn');
             $table->foreign('nisn')->references('nisn')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('no_regis');
             $table->foreign('no_regis')->references('no_regis')->on('bukus')->onDelete('cascade')->onUpdate('cascade');

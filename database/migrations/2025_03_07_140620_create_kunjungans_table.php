@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('kunjungans', function (Blueprint $table) {
             $table->id()->primary();
-            $table->unsignedBigInteger('nisn');
+            $table->string('nisn');
             $table->foreign('nisn')->references('nisn')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('fullname');
             $table->string('kelas');

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('konten_digitals', function (Blueprint $table) {
             $table->id()->primary();
-            $table->unsignedBigInteger('nuptk');
+            $table->string('nuptk');
             $table->foreign('nuptk')->references('nisn')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->enum('jenis', ['buku digital', 'youtube']);
             $table->text('judul');

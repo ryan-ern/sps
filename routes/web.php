@@ -48,8 +48,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/anggota', [UserController::class, 'index'])->name('anggota.read')->middleware(['role:admin']);
     Route::put('/apps/anggota/update/{anggota}', [UserController::class, 'update'])->name('anggota.update')->middleware(['role:admin']);
     Route::delete('/apps/anggota/delete/{anggota}', [UserController::class, 'destroy'])->name('anggota.delete')->middleware(['role:admin']);
-    Route::post('/anggota/import', [UserController::class, 'import'])->name('anggota.import');
-    Route::get('/anggota/export-sample', [UserController::class, 'exportSample'])->name('anggota.exportSample');
+    Route::post('/anggota/import', [UserController::class, 'import'])->name('anggota.import')->middleware(['role:admin']);
+    Route::get('/anggota/export-sample', [UserController::class, 'exportSample'])->name('anggota.exportSample')->middleware(['role:admin']);
+    Route::get('/apps/anggota/kartu', [UserController::class, 'cardDownload'])->name('kartu-anggota')->middleware(['role:admin']);
 
     Route::get('/apps/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.read')->middleware(['role:admin']);
 
