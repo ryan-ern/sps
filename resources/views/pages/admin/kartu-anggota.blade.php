@@ -104,7 +104,7 @@
                                 <div class="double-line"></div>
                                 <div class="title">
                                     KARTU ANGGOTA PERPUSTAKAAN<br>
-                                    T.A. {{ date('Y') }}/{{ date('Y') + 1 }}
+                                    T.A. {{ date('Y') }}-{{ date('Y') + 1 }}
                                 </div>
                                 <div class="info">
                                     <table class="inner">

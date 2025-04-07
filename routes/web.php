@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\BebasPustakaController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KunjunganController;
@@ -53,6 +54,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/anggota/kartu', [UserController::class, 'cardDownload'])->name('kartu-anggota')->middleware(['role:admin']);
 
     Route::get('/apps/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.read')->middleware(['role:admin']);
+
+    Route::get('/apps/pustaka', [BebasPustakaController::class, 'index'])->name('pustaka.read')->middleware(['role:admin']);
+    Route::get('/apps/pustaka/kartu/{nisn}', [BebasPustakaController::class, 'cardDownload'])->name('bebas-pustaka');
 
     Route::get('/apps/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.read')->middleware(['role:admin']);
     Route::put('/apps/peminjaman/accept/{id}', [PeminjamanController::class, 'accept'])->name('peminjaman.accept')->middleware(['role:admin']);

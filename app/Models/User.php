@@ -43,4 +43,14 @@ class User extends Authenticatable
     {
         return 'username';
     }
+
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'nisn', 'nisn')->where('pinjam', 'terima');
+    }
+
+    public function pengembalian()
+    {
+        return $this->hasMany(Peminjaman::class, 'nisn', 'nisn')->where('kembali', 'selesai');
+    }
 }

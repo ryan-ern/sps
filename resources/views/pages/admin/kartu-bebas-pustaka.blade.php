@@ -62,7 +62,6 @@
 
         table.outer {
             width: 100%;
-            page-break-after: always;
         }
 
         table.inner {
@@ -79,11 +78,8 @@
     </style>
 </head>
 <body>
-    @foreach($anggota->chunk(6) as $chunk)
         <table class="outer">
-            @foreach($chunk->chunk(2) as $row)
                 <tr>
-                    @foreach($row as $item)
                         <td>
                             <div class="card">
                                 <div class="header">
@@ -101,29 +97,26 @@
                                 <div class="double-line"></div>
                                 <div class="title">
                                     KARTU BEBAS PERPUSTAKAAN<br>
-                                    T.A. {{ date('Y') }}/{{ date('Y') + 1 }}
+                                    T.A. {{ date('Y') }}-{{ date('Y') + 1 }}
                                 </div>
                                 <div class="info">
                                     <table class="inner">
                                         <tr>
                                             <td width="90">Nama</td>
-                                            <td>: {{ $item->fullname }}</td>
+                                            <td>: {{ $anggota->fullname }}</td>
                                         </tr>
                                         <tr>
                                             <td>NISN/NIS</td>
-                                            <td>: {{ $item->nisn }}</td>
+                                            <td>: {{ $anggota->nisn }}</td>
                                         </tr>
                                         <tr>
                                             <td>Kelas</td>
-                                            <td>: {{ $item->kelas }}</td>
+                                            <td>: {{ $anggota->kelas }}</td>
                                         </tr>
                                     </table>
                                 </div>
                                 <table class="inner" style="margin-top: 15px;">
                                     <tr>
-                                        <td class="barcode">
-                                            {!! DNS1D::getBarcodeHTML($item->nisn, 'C128', 1.1, 35) !!}
-                                        </td>
                                         <td class="footer">
                                             Sidomulyo, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
                                             Kepala Perpustakaan
@@ -136,13 +129,7 @@
                                 </table>
                             </div>
                         </td>
-                    @endforeach
-                    @if($row->count() < 2)
-                        <td></td> {{-- kosongkan jika hanya 1 data di baris terakhir --}}
-                    @endif
                 </tr>
-            @endforeach
         </table>
-    @endforeach
 </body>
 </html>
