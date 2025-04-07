@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BukuController extends Controller
@@ -122,12 +123,16 @@ class BukuController extends Controller
             $fileBuku = $request->file('file_buku');
             $fileBukuName = time() . '_buku_' . $fileBuku->getClientOriginalName();
             $fileBukuPath = $fileBuku->storeAs('uploads/buku', $fileBukuName, 'public');
+        } else {
+            $fileBukuPath = 'default/default-book.png';
         }
 
         if ($request->hasFile('file_cover')) {
             $fileCover = $request->file('file_cover');
             $fileCoverName = time() . '_cover_' . $fileCover->getClientOriginalName();
             $fileCoverPath = $fileCover->storeAs('uploads/cover', $fileCoverName, 'public');
+        } else {
+            $fileCoverPath = 'default/default-book.png';
         }
 
         for ($i = 0; $i < $stok; $i++) {

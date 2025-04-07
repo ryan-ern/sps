@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('tahun');
             $table->string('stok');
             $table->text('keterangan')->default('-');
-            $table->string('file_buku')->default('-');
-            $table->string('file_cover')->default('-');
+            $table->string('file_buku')->default('default/default-book.png');
+            $table->string('file_cover')->default('default/default-book.png');
             $table->enum('jenis', ['referensi', 'paket'])->default('referensi');
             $table->enum('status', ['tersedia', 'tidak tersedia'])->default('tersedia');
             $table->timestamps();

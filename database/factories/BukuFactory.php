@@ -24,8 +24,8 @@ class BukuFactory extends Factory
             'tahun' => fake()->year(),
             'stok' => fake()->randomNumber(2),
             'keterangan' => fake()->sentence(),
-            'file_buku' => fake()->sentence(),
-            'file_cover' => fake()->sentence(),
+            'file_buku' => 'default/default-book.png',
+            'file_cover' => 'default/default-book.png',
             'jenis' => fake()->randomElement(['referensi', 'paket']),
             'status' => fake()->randomElement(['tersedia', 'tidak tersedia']),
         ];

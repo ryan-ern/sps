@@ -26,4 +26,9 @@ class Buku extends Model
         'jenis',
         'status',
     ];
+
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'no_regis', 'no_regis');
+    }
 }
