@@ -5,43 +5,56 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
     public function index()
     {
-        $user = User::find(Auth::id());
+        $user = User::find(auth()->user()->nisn);
 
-        return view('laravel-examples.user-profile', compact('user'));
+        return view('pages.siswa.profil', compact('user'));
     }
 
     public function update(Request $request)
     {
-        if (config('app.is_demo') && in_array(Auth::id(), [1])) {
-            return back()->with('error', "You are in a demo version. You are not allowed to change the email for default users.");
-        }
+        $user = User::find(auth()->user()->nisn);
 
         $request->validate([
-            'name' => 'required|min:3|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
-            'location' => 'max:255',
-            'phone' => 'numeric|digits:10',
-            'about' => 'max:255',
-        ], [
-            'name.required' => 'Name is required',
-            'email.required' => 'Email is required',
+            'email' => 'required|email|unique:users,email,' . $user->nisn . ',nisn',
+            'fullname' => 'required|string',
+            'kelas' => 'required|string',
+            'old_password' => 'nullable|string',
+            'new_password' => 'nullable|string|min:6',
         ]);
 
-        $user = User::find(Auth::id());
+        $user->email = $request->email;
+        $user->kelas = $request->kelas;
+        $user->fullname = $request->fullname;
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'location' => $request->location,
-            'phone' => $request->phone,
-            'about' => $request->about,
-        ]);
+        if ($request->filled('old_password') && $request->filled('new_password')) {
+            if (!Hash::check($request->input('old_password'), $user->password)) {
+                flash()->flash(
+                    'error',
+                    'Password Lama Tidak Sesuai',
+                    [],
+                    'Pembaruan Data Gagal'
+                );
+                return redirect()->route('profil.read');
+            }
 
-        return back()->with('success', 'Profile updated successfully.');
+            $user->password = bcrypt($request->input('new_password'));
+        }
+
+        $user->save();
+
+        flash()->flash(
+            'success',
+            'Profil berhasil diperbarui',
+            [],
+            'Pembaruan Data Sukses'
+        );
+
+        return redirect()->route('profil.read');
     }
 }
