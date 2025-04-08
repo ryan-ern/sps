@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\KontenDigital;
 use App\Models\Peminjaman;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +35,7 @@ class BukuController extends Controller
         // Query dasar untuk Buku Referensi
         $referensiQuery = Buku::where('jenis', 'referensi')->orderBy('created_at', 'desc');
         $paketQuery = Buku::where('jenis', 'paket')->orderBy('created_at', 'desc');
+        $kontenQuery = KontenDigital::orderBy('created_at', 'desc');
 
         // Filter berdasarkan pencarian
         if ($search) {
@@ -48,6 +51,10 @@ class BukuController extends Controller
                 ->orWhere('pengarang', 'like', "%{$search}%")
                 ->orWhere('penerbit', 'like', "%{$search}%")
                 ->orWhere('tahun', 'like', "%{$search}%");
+            $kontenQuery
+                ->where('judul', 'like', "%{$search}%")
+                ->orWhere('pembuat', 'like', "%{$search}%")
+                ->orWhere('jenis', 'like', "%{$search}%");
         }
 
         // Filter berdasarkan rentang tanggal
@@ -59,6 +66,7 @@ class BukuController extends Controller
 
                 $referensiQuery->whereBetween('created_at', [$startDate, $endDate]);
                 $paketQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $kontenQuery->whereBetween('created_at', [$startDate, $endDate]);
             }
         }
 
@@ -66,12 +74,16 @@ class BukuController extends Controller
         if ($request->per_page == 'Semua') {
             $referensi = $referensiQuery->paginate(1000000);
             $paket = $paketQuery->paginate(1000000);
+            $konten = $kontenQuery->paginate(1000000);
         } else {
             $referensi = $referensiQuery->paginate($perPage);
             $paket = $paketQuery->paginate($perPage);
+            $konten = $kontenQuery->paginate($perPage);
         }
 
-        return view('pages.admin.buku', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
+        $guru = User::where('role', 'guru')->get();
+
+        return view('pages.admin.buku', compact('referensi', 'guru', 'paket', 'konten', 'perPage', 'search', 'dateRange'));
     }
 
 

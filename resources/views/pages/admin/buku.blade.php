@@ -213,6 +213,92 @@
                                     </div>
                                 </div>
                                 <!-- End Tab Buku Paket -->
+                                {{-- Tab Konten Digital --}}
+                                <div class="tab-pane fade show" id="digital" role="tabpanel"
+                                    aria-labelledby="digital-tab">
+                                    <div class="table-responsive text-center">
+                                        {{-- Filter --}}
+                                        <form method="GET" action="{{ route('data-buku.read') }}" class="mb-3">
+                                            <div class="row d-flex justify-content-between">
+                                                <!-- Date Range Picker -->
+                                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                                    <input type="text" name="dates"
+                                                        value="{{ request('dates') }}"
+                                                        class="dates form-control mb-2" />
+                                                </div>
+
+                                                <!-- Search Input -->
+                                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                                    <input type="search" id="search" name="search"
+                                                        class="form-control mb-2" placeholder="Cari Konten Digital"
+                                                        value="{{ request('search') }}">
+                                                </div>
+
+                                                <!-- Submit Button -->
+                                                <div class="col-lg-4 d-inline-flex gap-2 col-md-4 col-sm-12">
+                                                    <a href="{{ route('data-buku.read') }}"
+                                                        class="btn btn-warning w-100">Reset</a>
+                                                    <button type="submit"
+                                                        class="btn btn-primary w-100">Terapkan</button>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </form>
+                                        <table class="table table-sm table-bordered dataTable" id="table">
+                                            <thead class="bg-dark text-white">
+                                                <tr>
+                                                    <th scope="col">No</th>
+                                                    <th scope="col">Nama</th>
+                                                    <th scope="col">Nama Konten</th>
+                                                    <th scope="col">Jenis Konten</th>
+                                                    <th scope="col">Tanggal</th>
+                                                    <th scope="col">Dilihat</th>
+                                                    <th scope="col">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($konten as $data)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td class="text-capitalize">{{ $data->pembuat }}</td>
+                                                        <td class="truncate">{{ $data->judul }}</td>
+                                                        <td class="truncate text-capitalize">{{ $data->jenis }}</td>
+                                                        <td class="text-uppercase">
+                                                            {{ $data->created_at->format('d-m-Y h:i a') }}
+                                                        </td>
+                                                        <td>{{ $data->dilihat }}</td>
+                                                        <td>
+                                                            <button class="mx-2 btn btn-primary editBtn"
+                                                                data-id="{{ $data->id }}"
+                                                                data-judul="{{ $data->judul }}"
+                                                                data-pembuat="{{ $data->pembuat }}"
+                                                                data-jenis="{{ $data->jenis }}"
+                                                                data-url="{{ $data->url }}"
+                                                                data-file_path="{{ $data->file_path }}"
+                                                                data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                data-modal-type="update">
+                                                                Edit
+                                                            </button>
+
+                                                            <button class="mx-2 btn btn-danger deleteBtn"
+                                                                data-id="{{ $data->id }}"
+                                                                data-judul="{{ $data->judul }}"
+                                                                data-modal-type="delete" data-bs-toggle="modal"
+                                                                data-bs-target="#dynamicModal">
+                                                                Hapus
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        {{-- Tambahkan Navigasi Pagination --}}
+                                        <div class="d-flex justify-content-between mt-3">
+                                            {{ $paket->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Tab Konten Digital -->
                             </div>
                         </div>
                     </div>
@@ -274,6 +360,10 @@
         });
     </script>
     <script>
+        const guruOptions = @json($guru);
+    </script>
+
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             const dynamicModal = document.getElementById('dynamicModal');
             const modalTitle = dynamicModal.querySelector('.modal-title');
@@ -289,7 +379,115 @@
                 modalForm.enctype = "application/x-www-form-urlencoded";
                 modalForm.method = "POST";
 
-                if (modalType === 'update') {
+                if (localStorage.getItem('activeTab') == '#digital') {
+                    if (modalType === 'update') {
+                        modalTitle.textContent = 'Form Edit Data';
+                        modalForm.action = `/apps/konten-digital/update/${bukuId}`;
+                        modalForm.enctype = 'multipart/form-data';
+                        var modal = document.getElementById('dynamicModal');
+                        var inputAutofocus = modal.querySelector('input[autofocus]');
+
+                        modal.addEventListener('shown.bs.modal', function() {
+                            if (inputAutofocus) {
+                                inputAutofocus.focus();
+                            }
+                        });
+                        modalBodyHTML = `
+                            @csrf
+                        @method('PUT')
+                        <div class="row">
+                                        <div class="col-md-6">
+                                            <select name="jenis" required class="form-select mb-3">
+                                                <option value="" disabled selected>Pilih Jenis Konten</option>
+                                                <option value="video">Video</option>
+                                                <option value="buku digital">Buku Digital</option>
+                                            </select>
+                                          <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
+                                          <input type="text" class="form-control mb-3" name="pembuat" placeholder="Pembuat" required>
+                                        </div>
+                                         <div class="col-md-6">
+                                          <input type="text" class="form-control mb-3" name="url" placeholder="URL Youtube" required>
+                                          <input type="file" class="form-control mb-3" name="file_path" placeholder="Buku Digital" required>
+                                          </div>
+                        </div>`;
+                    } else if (modalType === 'delete') {
+
+                        modalTitle.textContent = 'Form Hapus Data';
+                        modalForm.action = `/apps/konten-digital/delete/${button.getAttribute('data-id')}`;
+                        modalForm.enctype = 'multipart/form-data';
+                        var modal = document.getElementById('dynamicModal');
+                        var inputAutofocus = modal.querySelector('input[autofocus]');
+
+                        modal.addEventListener('shown.bs.modal', function() {
+                            if (inputAutofocus) {
+                                inputAutofocus.focus();
+                            }
+                        });
+                        modalBodyHTML = `
+                            @csrf
+                        @method('DELETE')
+                           <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menghapus <br/> data konten dengan <br/><strong>judul ${button.getAttribute('data-judul')}</strong></p>
+                                    <div class="d-flex justify-content-end mt-3">
+                                        <button type="reset" class="btn btn-primary me-2" id="closeModal"
+                                            data-bs-dismiss="modal">Tidak</button>
+                                        <button type="submit" class="btn btn-danger">Hapus</button>
+                                    </div>
+                        `;
+                    } else {
+                        var modal = document.getElementById('dynamicModal');
+                        var inputAutofocus = modal.querySelector('input[autofocus]');
+
+                        modal.addEventListener('shown.bs.modal', function() {
+                            if (inputAutofocus) {
+                                inputAutofocus.focus();
+                            }
+                        });
+                        modalTitle.textContent = 'Form Tambah Data';
+                        modalForm.action = '/apps/konten-digital/create';
+                        modalForm.enctype = 'multipart/form-data';
+                        modalBodyHTML = `
+                        @csrf
+                    @method('POST')
+                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select name="jenis" required class="form-select mb-3">
+                                                <option value="" disabled selected>Pilih Jenis Konten</option>
+                                                <option value="video">Video</option>
+                                                <option value="buku digital">Buku Digital</option>
+                                            </select>
+                                          <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
+                                          <select name="nuptk" required class="form-select mb-3" id="guruSelect">
+                                               <option value="" disabled selected>Pilih Guru (NUPTK)</option>
+                                           </select>
+                                          <input type="text" class="form-control mb-3" name="pembuat" placeholder="Pembuat" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                        <label for="url" class="form-label">Link URL Youtube</label>
+                                          <input type="text" class="form-control mb-2" name="url" placeholder="Link URL Youtube">
+                                          <label for="file_path" class="form-label">Buku Digital</label>
+                                          <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                        </div>
+                                        <!-- Tombol -->
+                                        <div class="d-flex justify-content-end mt-3">
+                                            <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
+                                            <button type="submit" class="btn btn-success">Simpan</button>
+                                        </div>
+                    </div>
+                    `;
+                        setTimeout(() => {
+                            const guruSelect = document.getElementById('guruSelect');
+                            if (guruSelect && guruOptions.length > 0) {
+                                guruOptions.forEach(guru => {
+                                    const option = document.createElement('option');
+                                    option.value = guru.nisn;
+                                    option.textContent = `${guru.fullname} (${guru.nisn})`;
+                                    guruSelect.appendChild(option);
+                                });
+                            }
+                        }, 100);
+
+                    }
+                } else if (modalType === 'update') {
                     modalTitle.textContent = 'Form Edit Data';
                     modalForm.action = `/apps/data-buku/update/${bukuId}`;
                     modalForm.enctype = 'multipart/form-data';
@@ -351,8 +549,8 @@
                     </div>
                     ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                            <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                        </a>`
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </a>`
                     : ''}
             </div>
         </div>

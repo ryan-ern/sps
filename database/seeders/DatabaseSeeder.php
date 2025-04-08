@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Buku;
+use App\Models\KontenDigital;
 use App\Models\Kunjungan;
 use App\Models\Peminjaman;
 use App\Models\User;
@@ -59,5 +60,7 @@ class DatabaseSeeder extends Seeder
         Peminjaman::factory(30)->create();
 
         Kunjungan::factory(10)->create();
+
+        KontenDigital::factory(10)->create();
     }
 }

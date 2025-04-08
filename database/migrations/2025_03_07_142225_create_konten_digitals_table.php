@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('url')->nullable();
             $table->string('file_path')->nullable();
             $table->string('pembuat');
-            $table->integer('dilihat');
+            $table->integer('dilihat')->default(0);
             $table->timestamps();
         });
     }

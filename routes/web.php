@@ -80,6 +80,9 @@ Route::middleware(['auth'])->group(function () {
 
     // ROLE GURU
     Route::get('/apps/konten-digital', [KontenDigitalController::class, 'index'])->name('konten-digital.read')->middleware(['role:guru']);
+    Route::post('/apps/konten-digital/create', [KontenDigitalController::class, 'store'])->name('konten-digital.store')->middleware(['role:guru,admin']);
+    Route::put('/apps/konten-digital/update/{id}', [KontenDigitalController::class, 'update'])->name('konten-digital.update')->middleware(['role:guru,admin']);
+    Route::delete('/apps/konten-digital/delete/{id}', [KontenDigitalController::class, 'destroy'])->name('konten-digital.destroy')->middleware(['role:guru,admin']);
 });
 
 Route::get('/tables', function () {
