@@ -65,6 +65,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.read')->middleware(['role:admin']);
     Route::put('/apps/pengembalian/accept/{id}', [PengembalianController::class, 'accept'])->name('pengembalian.accept')->middleware(['role:admin']);
 
+    Route::get('/apps/peminjaman-siswa', [PeminjamanController::class, 'indexSiswa'])->name('peminjaman-siswa.read')->middleware(['role:siswa']);
+    Route::post('/apps/peminjaman-siswa/{id}', [PeminjamanController::class, 'pinjam'])->name('peminjaman-siswa.post')->middleware(['role:siswa']);
+    Route::get('/apps/pengembalian-siswa', [PengembalianController::class, 'indexSiswa'])->name('pengembalian-siswa.read')->middleware(['role:siswa']);
+
+    Route::get('/apps/profil-siswa', [PengembalianController::class, 'indexSiswa'])->name('profil.read')->middleware(['role:siswa']);
+
     Route::get('/apps/siswa', function () {
         return view('example');
     })->name('siswa')->middleware(['role:siswa']);

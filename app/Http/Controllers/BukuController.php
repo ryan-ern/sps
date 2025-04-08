@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -210,12 +211,12 @@ class BukuController extends Controller
         $judul = $request->judul;
         $stok = $request->stok;
 
-        // Cek apakah ada buku yang cocok
-        $buku = Buku::where('judul', $judul)->where('stok', $stok)->get();
+        // Ambil semua buku yang cocok
+        $bukuList = Buku::where('judul', $judul)->where('stok', $stok)->get();
 
-        if ($buku->isEmpty()) {
+        if ($bukuList->isEmpty()) {
             flash()->flash(
-                'danger',
+                'error',
                 'Data buku dengan judul ' . $judul . ' tidak ditemukan.',
                 [],
                 'Hapus Data Gagal'
@@ -223,8 +224,29 @@ class BukuController extends Controller
             return redirect()->back();
         }
 
-        // Hapus semua buku yang sesuai
-        Buku::where('judul', $judul)->where('stok', $stok)->delete();
+        // Ambil semua no_regis dari buku yang ditemukan
+        $noRegisList = $bukuList->pluck('no_regis');
+
+        // Cek apakah ada peminjaman aktif yang belum selesai
+        $peminjamanAktif = Peminjaman::whereIn('no_regis', $noRegisList)
+            ->where(function ($query) {
+                $query->whereNull('tgl_kembali')
+                    ->orWhere('kembali', '!=', 'selesai');
+            })
+            ->exists();
+
+        if ($peminjamanAktif) {
+            flash()->flash(
+                'error',
+                'Tidak dapat menghapus buku karena terdapat peminjaman aktif yang belum selesai.',
+                [],
+                'Hapus Data Gagal'
+            );
+            return redirect()->back();
+        }
+
+        // Jika aman, lanjutkan penghapusan
+        Buku::whereIn('no_regis', $noRegisList)->delete();
 
         flash()->flash(
             'success',
@@ -235,6 +257,7 @@ class BukuController extends Controller
 
         return redirect()->back();
     }
+
 
 
     public function update(Request $request, Buku $buku)

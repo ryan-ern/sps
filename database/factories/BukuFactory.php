@@ -22,7 +22,7 @@ class BukuFactory extends Factory
             'pengarang' => fake()->name(),
             'penerbit' => fake()->company(),
             'tahun' => fake()->year(),
-            'stok' => fake()->randomNumber(2),
+            'stok' => 1,
             'keterangan' => fake()->sentence(),
             'file_buku' => 'default/default-book.png',
             'file_cover' => 'default/default-book.png',

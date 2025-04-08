@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Imports\UsersImport;
+use App\Models\Peminjaman;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -213,7 +214,38 @@ class UserController extends Controller
     public function destroy($anggota)
     {
         $anggota = User::find($anggota);
+
+        if (!$anggota) {
+            flash()->flash(
+                'error',
+                'Data anggota tidak ditemukan.',
+                [],
+                'Hapus Data Gagal'
+            );
+            return redirect()->route('anggota.read');
+        }
+
+        // Cek apakah anggota masih punya peminjaman yang belum dikembalikan
+        $peminjamanAktif = Peminjaman::where('nisn', $anggota->nisn)
+            ->where(function ($query) {
+                $query->whereNull('tgl_kembali')
+                    ->orWhere('kembali', '!=', 'selesai');
+            })
+            ->exists();
+
+        if ($peminjamanAktif) {
+            flash()->flash(
+                'error',
+                'Tidak dapat menghapus anggota karena masih memiliki peminjaman aktif.',
+                [],
+                'Hapus Data Gagal'
+            );
+            return redirect()->route('anggota.read');
+        }
+
+        // Jika aman, lanjutkan penghapusan
         $anggota->delete();
+
         flash()->flash(
             'success',
             'Data anggota ' . $anggota->fullname . ' berhasil dihapus!',
@@ -222,6 +254,7 @@ class UserController extends Controller
         );
         return redirect()->route('anggota.read');
     }
+
 
     public function import(Request $request)
     {

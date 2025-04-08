@@ -30,11 +30,13 @@ class PeminjamanFactory extends Factory
 
         $denda = $hariTelat * 500;
 
+        $buku = Buku::inRandomOrder()->first() ?? Buku::factory()->create();
+
         return [
             'nisn' => User::inRandomOrder()->value('nisn') ?? User::factory()->create()->nisn,
-            'no_regis' => Buku::inRandomOrder()->value('no_regis') ?? Buku::factory()->create()->no_regis,
+            'no_regis' => $buku->no_regis,
+            'judul' => $buku->judul,
             'fullname' => fake()->name(),
-            'judul' => Buku::inRandomOrder()->value('judul') ?? Buku::factory()->create()->judul,
             'tgl_pinjam' => $tglPinjam,
             'est_kembali' => $estKembali,
             'tgl_kembali' => $tglKembali,

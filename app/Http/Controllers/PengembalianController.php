@@ -86,6 +86,43 @@ class PengembalianController extends Controller
         return view('pages.admin.pengembalian', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
     }
 
+    public function indexSiswa(Request $request)
+    {
+        $request->validate([
+            'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
+            'page' => 'integer|min:1',
+            'search' => 'nullable|string|max:255',
+        ]);
+
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+
+        $data = Peminjaman::with('buku')
+            ->whereHas('buku', function ($query) {
+                $query->where('nisn', auth()->user()->nisn)
+                    ->where('pinjam', 'terima');
+            });
+
+        if ($search) {
+            $data->where(function ($query) use ($search) {
+                $query->where('judul', 'like', "%{$search}%")
+                    ->orWhere('no_regis', 'like', "%{$search}%")
+                    ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                    ->orWhere('denda', 'like', "%{$search}%");
+            });
+        }
+
+        $data->orderBy('tgl_pinjam', 'desc');
+
+        if ($perPage == 'Semua') {
+            $data = $data->paginate(1000000);
+        } else {
+            $data = $data->paginate($perPage);
+        }
+
+        return view('pages.siswa.peminjaman', compact('data'));
+    }
+
     public function accept(Request $request, $id)
     {
         $peminjaman = Peminjaman::where('id', $id)
