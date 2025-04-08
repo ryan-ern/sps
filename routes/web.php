@@ -34,12 +34,13 @@ Route::get('/pages/not-found', function () {
 })->name('not-found');
 
 Route::middleware(['auth'])->group(function () {
+    // Semua Role
     Route::get('/', function () {
         return redirect('/apps/dashboard');
     });
-
     Route::get('/apps/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['role:siswa,guru,admin']);
 
+    // ROLE ADMIN
     Route::post('/apps/data-buku/create', [BukuController::class, 'store'])->name('data-buku.create')->middleware(['role:admin']);
     Route::get('/apps/data-buku', [BukuController::class, 'index'])->name('data-buku.read')->middleware(['role:admin']);
     Route::put('/apps/data-buku/update/{buku}', [BukuController::class, 'update'])->name('data-buku.update')->middleware(['role:admin']);
@@ -65,9 +66,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.read')->middleware(['role:admin']);
     Route::put('/apps/pengembalian/accept/{id}', [PengembalianController::class, 'accept'])->name('pengembalian.accept')->middleware(['role:admin']);
 
+    // ROLE SISWA
     Route::get('/apps/peminjaman-siswa', [PeminjamanController::class, 'indexSiswa'])->name('peminjaman-siswa.read')->middleware(['role:siswa']);
     Route::post('/apps/peminjaman-siswa/{id}', [PeminjamanController::class, 'pinjam'])->name('peminjaman-siswa.post')->middleware(['role:siswa']);
+
     Route::get('/apps/pengembalian-siswa', [PengembalianController::class, 'indexSiswa'])->name('pengembalian-siswa.read')->middleware(['role:siswa']);
+    Route::post('/apps/pengembalian-siswa/{id}', [PengembalianController::class, 'kembali'])->name('pengembalian-siswa.post')->middleware(['role:siswa']);
 
     Route::get('/apps/profil-siswa', [PengembalianController::class, 'indexSiswa'])->name('profil.read')->middleware(['role:siswa']);
 

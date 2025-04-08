@@ -192,7 +192,7 @@ class PeminjamanController extends Controller
 
         flash()->flash(
             'success',
-            'Buku ' . $bukuTerpilih->judul . ' dengan no_regis ' . $bukuTerpilih->no_regis . ' berhasil diajukan.',
+            'Buku ' . $bukuTerpilih->judul . ' dengan nomor registrasi ' . $bukuTerpilih->no_regis . ' berhasil diajukan.',
             [],
             'Tahap Peminjaman dilakukan'
         );
@@ -248,6 +248,10 @@ class PeminjamanController extends Controller
         }
         $peminjaman->pinjam = 'tolak';
         $peminjaman->save();
+
+        $buku = Buku::where('no_regis', $peminjaman->no_regis)->first();
+        $buku->status = 'tersedia';
+        $buku->save();
 
         flash()->flash(
             'success',

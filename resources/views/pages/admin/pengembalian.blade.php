@@ -88,19 +88,20 @@
                                                             Rp. {{ number_format($BukuReferensi->denda, 0, ',', '.') }}
                                                         </td>
                                                         <td>
-                                                            @if($BukuReferensi->kembali == 'verifikasi')
+                                                            @if ($BukuReferensi->kembali == 'verifikasi')
                                                                 <button class="btn btn-warning w-100 accBtn"
                                                                     data-id="{{ $BukuReferensi->id }}"
                                                                     data-no_regis="{{ $BukuReferensi->no_regis }}"
                                                                     data-fullname="{{ $BukuReferensi->fullname }}"
-                                                                    data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#dynamicModal"
                                                                     data-modal-type="accept">
                                                                     Verifikasi
                                                                 </button>
                                                             @else
-                                                                @if($BukuReferensi->kembali == 'selesai')
+                                                                @if ($BukuReferensi->kembali == 'selesai')
                                                                     <span class="btn btn-primary w-100">Selesai</span>
-                                                                    @else
+                                                                @else
                                                                     <span class="btn btn-info w-100">Dipinjam</span>
                                                                 @endif
                                                             @endif
@@ -121,13 +122,11 @@
                                     aria-labelledby="paket-tab">
                                     <div class="table-responsive text-center">
                                         {{-- Filter --}}
-                                        <form method="GET" action="{{ route('pengembalian.read') }}"
-                                            class="mb-3">
+                                        <form method="GET" action="{{ route('pengembalian.read') }}" class="mb-3">
                                             <div class="row d-flex justify-content-between">
                                                 <!-- Date Range Picker -->
                                                 <div class="col-lg-4 col-md-6 col-sm-12">
-                                                    <input type="text" name="dates"
-                                                        value="{{ request('dates') }}"
+                                                    <input type="text" name="dates" value="{{ request('dates') }}"
                                                         class="dates form-control mb-2" />
                                                 </div>
 
@@ -183,19 +182,20 @@
                                                             Rp. {{ number_format($BukuPaket->denda, 0, ',', '.') }}
                                                         </td>
                                                         <td>
-                                                            @if($BukuReferensi->kembali == 'verifikasi')
+                                                            @if ($BukuPaket->kembali == 'verifikasi')
                                                                 <button class="btn btn-warning w-100 accBtn"
-                                                                    data-id="{{ $BukuReferensi->id }}"
-                                                                    data-no_regis="{{ $BukuReferensi->no_regis }}"
-                                                                    data-fullname="{{ $BukuReferensi->fullname }}"
-                                                                    data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                                                                    data-id="{{ $BukuPaket->id }}"
+                                                                    data-no_regis="{{ $BukuPaket->no_regis }}"
+                                                                    data-fullname="{{ $BukuPaket->fullname }}"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#dynamicModal"
                                                                     data-modal-type="accept">
                                                                     Verifikasi
                                                                 </button>
                                                             @else
-                                                                @if($BukuReferensi->kembali == 'selesai')
+                                                                @if ($BukuPaket->kembali == 'selesai')
                                                                     <span class="btn btn-primary w-100">Selesai</span>
-                                                                    @else
+                                                                @else
                                                                     <span class="btn btn-info w-100">-</span>
                                                                 @endif
                                                             @endif
@@ -271,7 +271,7 @@
             });
         });
     </script>
-     <script>
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             const dynamicModal = document.getElementById('dynamicModal');
             const modalTitle = dynamicModal.querySelector('.modal-title');
@@ -298,7 +298,7 @@
                     @method('PUT')
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="_method" value="PUT">
-                    <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menerima <strong>${button.getAttribute('data-fullname')}</strong> <br/> untuk meminjam buku dengan <br/><strong>nomor registrasi <br/> ${button.getAttribute('data-no_regis')}</strong>?</p>
+                    <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menerima <strong>${button.getAttribute('data-fullname')}</strong> <br/> untuk mengembalikan buku dengan <br/><strong>nomor registrasi <br/> ${button.getAttribute('data-no_regis')}</strong>?</p>
                                     <div class="d-flex justify-content-end mt-3">
                                         <input type="hidden" name="fullname" value="${button.getAttribute('data-fullname')}">
                                         <input type="hidden" name="no_regis" value="${button.getAttribute('data-no_regis')}">

@@ -8,9 +8,11 @@
                         <div class="card-body p-5">
                             <div class="table-responsive text-center">
                                 {{-- Filter --}}
-                                <div class="w-20 d-flex justify-content-end">
-                                    <input type="search" id="search" name="search" class="form-control mb-2"
-                                        placeholder="Cari Data" value="{{ request('search') }}">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <div class="w-100" style="max-width: 300px;">
+                                        <input type="search" id="search" name="search" class="form-control"
+                                            placeholder="Cari Data" value="{{ request('search') }}">
+                                    </div>
                                 </div>
                                 <hr>
 
@@ -19,8 +21,10 @@
                                         <tr>
                                             <th scope="col">No</th>
                                             <th scope="col">Judul Buku</th>
-                                            <th scope="col">No Regis</th>
-                                            <th scope="col">Tanggal Pengajuan</th>
+                                            <th scope="col">Tanggal Pinjam</th>
+                                            <th scope="col">Estimasi Kembali</th>
+                                            <th scope="col">Tanggal Kembali</th>
+                                            <th scope="col">Denda</th>
                                             <th scope="col">Status</th>
                                         </tr>
                                     </thead>
@@ -29,17 +33,29 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="truncate">{{ $dataPengembalian->judul }}</td>
-                                                <td class="truncate">{{ $dataPengembalian->no_regis }}</td>
                                                 <td class="text-uppercase">
                                                     {{ $dataPengembalian->tgl_pinjam->format('d-m-Y h:i a') }}
                                                 </td>
+                                                <td class="text-uppercase">
+                                                    {{ $dataPengembalian->est_kembali->format('d-m-Y h:i a') }}
+                                                </td>
+                                                <td class="text-uppercase">
+                                                    {{ $dataPengembalian->tgl_kembali == null ? '-' : $dataPengembalian->tgl_kembali->format('d-m-Y h:i a') }}
+                                                </td>
+                                                <td class="truncate"> Rp.
+                                                    {{ number_format($dataPengembalian->denda, 0, ',', '.') }}</td>
                                                 <td>
-                                                    @if ($dataPengembalian->pinjam == 'terima')
-                                                        <span class="btn btn-primary">Diterima</span>
-                                                    @elseif ($dataPengembalian->pinjam == 'verifikasi')
+                                                    @if ($dataPengembalian->kembali == '-')
+                                                        <form id="form-pinjam" method="POST"
+                                                            action="{{ route('pengembalian-siswa.post', $dataPengembalian->id) }}">
+                                                            @csrf
+                                                            <button type="submit"
+                                                                class="btn btn-primary">Kembalikan</button>
+                                                        </form>
+                                                    @elseif ($dataPengembalian->kembali == 'verifikasi')
                                                         <span class="btn btn-warning">Diproses</span>
-                                                    @elseif ($dataPengembalian->pinjam == 'tolak')
-                                                        <span class="btn btn-danger">Ditolak</span>
+                                                    @elseif ($dataPengembalian->kembali == 'selesai')
+                                                        <span class="btn btn-success">Selesai</span>
                                                     @endif
                                                 </td>
                                             </tr>
@@ -57,30 +73,6 @@
                 </div>
             </div>
         </div>
-        <!-- Dynamic Modal -->
-        <div class="modal modal-lg fade" id="dynamicModal" tabindex="-1" aria-labelledby="ModalLabel">
-            <div class="modal-dialog">
-                <form id="dynamicModalForm" method="POST">
-                    @csrf
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="ModalLabel"></h5>
-                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
-                                aria-label="Close">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="modalContent">
-
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
         <x-app.footer />
         </div>
     </main>
@@ -93,7 +85,7 @@
             debounceTimer = setTimeout(function() {
                 const params = new URLSearchParams(window.location.search);
                 params.set('search', searchInput.value);
-                window.location.href = `{{ route('peminjaman-siswa.read') }}?${params.toString()}`;
+                window.location.href = `{{ route('pengembalian-siswa.read') }}?${params.toString()}`;
             }, 500);
         });
     </script>

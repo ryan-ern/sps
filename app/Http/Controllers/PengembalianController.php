@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Buku;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 
@@ -120,7 +121,7 @@ class PengembalianController extends Controller
             $data = $data->paginate($perPage);
         }
 
-        return view('pages.siswa.peminjaman', compact('data'));
+        return view('pages.siswa.pengembalian', compact('data'));
     }
 
     public function accept(Request $request, $id)
@@ -130,7 +131,7 @@ class PengembalianController extends Controller
         if (!$peminjaman) {
             flash()->flash(
                 'danger',
-                'Data pengembalian ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' tidak ditemukan.',
+                'Data pengembalian ' . $request->fullname . ' dengan Nomor Registrasi ' . $request->no_regis . ' tidak ditemukan.',
                 [],
                 'Terima pengembalian Gagal'
             );
@@ -141,13 +142,44 @@ class PengembalianController extends Controller
         $peminjaman->tgl_kembali = now();
         $peminjaman->save();
 
+        $buku = Buku::where('no_regis', $peminjaman->no_regis)->first();
+        $buku->status = 'tersedia';
+        $buku->save();
+
         flash()->flash(
             'success',
-            'Data pengembalian ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' berhasil diverifikasi.',
+            'Data pengembalian ' . $request->fullname . ' dengan  Nomor Registrasi ' . $request->no_regis . ' berhasil diverifikasi.',
             [],
             'Terima pengembalian Sukses'
         );
 
         return redirect()->route('pengembalian.read');
+    }
+
+    public function kembali(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::where('id', $id)
+            ->first();
+        if (!$peminjaman) {
+            flash()->flash(
+                'error',
+                'Data pengembalian ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' tidak ditemukan.',
+                [],
+                'Tahap pengembalian Gagal'
+            );
+            return redirect()->route('pengembalian-siswa.read');
+        }
+
+        $peminjaman->kembali = 'verifikasi';
+        $peminjaman->save();
+
+        flash()->flash(
+            'success',
+            'Data pengembalian ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' berhasil diajukan',
+            [],
+            'Tahap pengembalian diproses'
+        );
+
+        return redirect()->route('pengembalian-siswa.read');
     }
 }

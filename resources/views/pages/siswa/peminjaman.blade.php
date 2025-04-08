@@ -8,10 +8,13 @@
                         <div class="card-body p-5">
                             <div class="table-responsive text-center">
                                 {{-- Filter --}}
-                                <div class="w-20 d-flex justify-content-end">
-                                    <input type="search" id="search" name="search" class="form-control mb-2"
-                                        placeholder="Cari Data" value="{{ request('search') }}">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <div class="w-100" style="max-width: 300px;">
+                                        <input type="search" id="search" name="search" class="form-control"
+                                            placeholder="Cari Data" value="{{ request('search') }}">
+                                    </div>
                                 </div>
+
                                 <hr>
 
                                 <table class="table table-sm table-bordered dataTable" id="table">
@@ -57,30 +60,7 @@
                 </div>
             </div>
         </div>
-        <!-- Dynamic Modal -->
-        <div class="modal modal-lg fade" id="dynamicModal" tabindex="-1" aria-labelledby="ModalLabel">
-            <div class="modal-dialog">
-                <form id="dynamicModalForm" method="POST">
-                    @csrf
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="ModalLabel"></h5>
-                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
-                                aria-label="Close">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="modalContent">
 
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
         <x-app.footer />
         </div>
     </main>
