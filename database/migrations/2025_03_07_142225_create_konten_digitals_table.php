@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id()->primary();
             $table->string('nuptk');
             $table->foreign('nuptk')->references('nisn')->on('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->enum('jenis', ['buku digital', 'youtube']);
+            $table->enum('jenis', ['buku digital', 'video']);
             $table->text('judul');
             $table->text('url')->nullable();
             $table->string('file_path')->nullable();
-            $table->string('pengarang');
-            $table->string('penerbit');
+            $table->string('pembuat');
+            $table->integer('dilihat');
             $table->timestamps();
         });
     }

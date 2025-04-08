@@ -18,8 +18,8 @@ class KontenDigital extends Model
         'judul',
         'url',
         'file_path',
-        'pengarang',
-        'penerbit',
+        'pembuat',
+        'dilihat',
     ];
 
     public function user()

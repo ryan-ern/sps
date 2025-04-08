@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\BebasPustakaController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KontenDigitalController;
 use App\Http\Controllers\KunjunganController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PengembalianController;
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/pustaka/kartu/{nisn}', [BebasPustakaController::class, 'cardDownload'])->name('bebas-pustaka');
 
     Route::get('/apps/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.read')->middleware(['role:admin']);
+    Route::post('/apps/peminjaman-detail', [PeminjamanController::class, 'userPeminjaman'])->name('peminjaman.detail')->middleware(['role:admin']);
     Route::put('/apps/peminjaman/accept/{id}', [PeminjamanController::class, 'accept'])->name('peminjaman.accept')->middleware(['role:admin']);
     Route::put('/apps/peminjaman/decline/{id}', [PeminjamanController::class, 'decline'])->name('peminjaman.decline')->middleware(['role:admin']);
 
@@ -76,9 +78,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/profil-siswa', [ProfileController::class, 'index'])->name('profil.read')->middleware(['role:siswa']);
     Route::post('/apps/profil-siswa/update', [ProfileController::class, 'update'])->name('profil.update')->middleware(['role:siswa']);
 
-    Route::get('/apps/siswa', function () {
-        return view('example');
-    })->name('siswa')->middleware(['role:siswa']);
+    // ROLE GURU
+    Route::get('/apps/konten-digital', [KontenDigitalController::class, 'index'])->name('konten-digital.read')->middleware(['role:guru']);
 });
 
 Route::get('/tables', function () {
