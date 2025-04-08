@@ -66,12 +66,19 @@ class DashboardController extends Controller
                         ->where('pinjam', 'terima')
                         ->count();
 
-                    $cover = Buku::where('no_regis', $buku->regis_terendah)->first();
+                    $data = Buku::where('no_regis', $buku->regis_terendah)->first();
 
                     return (object) [
-                        'judul' => $buku->judul,
-                        'total_pinjam' => $totalPinjam,
-                        'file_cover' => $cover?->file_cover ?? '-',
+                        'no_regis' => $data->no_regis ?? '-',
+                        'judul' => $data->judul ?? '-',
+                        'total_pinjam' => $totalPinjam ?? 0,
+                        'file_cover' => $data?->file_cover ?? 'default/default-book.png',
+                        'file_buku' => $data?->file_buku ?? 'default/default-book.png',
+                        'stok' => $data->stok ?? 0,
+                        'pengarang' => $data->pengarang ?? '-',
+                        'penerbit' => $data->penerbit ?? '-',
+                        'keterangan' => $data->keterangan ?? '-',
+                        'tahun' => $data->tahun ?? '-',
                     ];
                 })
                 ->sortByDesc('total_pinjam')
@@ -83,8 +90,16 @@ class DashboardController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return (object) [
-                        'judul' => $item->judul,
-                        'file_cover' => $item->file_cover,
+                        'no_regis' => $item->regis_terendah ?? '-',
+                        'judul' => $item->judul ?? '-',
+                        'total_pinjam' => $totalPinjam ?? 0,
+                        'file_cover' => $item?->file_cover ?? 'default/default-book.png',
+                        'file_buku' => $item?->file_buku ?? 'default/default-book.png',
+                        'stok' => $item->stok ?? 0,
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
+                        'keterangan' => $item->keterangan ?? '-',
+                        'tahun' => $item->tahun ?? '-',
                         'view_count' => 1 // Ganti dengan field aslinya jika ada
                     ];
                 });
