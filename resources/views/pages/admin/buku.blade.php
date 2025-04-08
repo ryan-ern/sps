@@ -351,8 +351,8 @@
                     </div>
                     ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                        <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                    </a>`
+                                                                                                                                                                                                                                                                                                                            <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+                                                                                                                                                                                                                                                                                                                        </a>`
                     : ''}
             </div>
         </div>
@@ -441,8 +441,6 @@
 
                                             <input type="number" class="form-control mb-3" name="tahun"
                                                 placeholder="Tahun" required>
-                                            <button type="button" class="btn btn-success w-100 mb-2">Hasil Scan
-                                                Barcode</button>
                                         </div>
                                     </div>
 

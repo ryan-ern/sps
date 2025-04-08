@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use App\Models\Peminjaman;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
@@ -76,6 +77,89 @@ class PeminjamanController extends Controller
         }
 
         return view('pages.admin.peminjaman', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
+    }
+
+    public function userPeminjaman(Request $request)
+    {
+        $request->validate([
+            'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
+            'page' => 'integer|min:1',
+            'search' => 'nullable|string|max:255',
+            'dates' => 'nullable|string',
+            'nisn' => 'nullable|string',
+        ]);
+
+        // Ambil jumlah data per halaman (default: 10)
+        $perPage = $request->input('per_page', 10);
+
+        // Ambil nilai pencarian
+        $search = $request->input('search');
+
+        // Ambil tanggal range
+        $dateRange = $request->input('dates');
+
+        // Query dasar untuk Buku Referensi
+        $referensiQuery = Peminjaman::whereHas('buku', function ($query) {
+            $query->where('jenis', 'referensi');
+        })
+            ->orderByRaw("CASE WHEN pinjam = 'verifikasi' THEN 0 ELSE 1 END")
+            ->orderBy('tgl_pinjam', 'desc');
+
+        // Query dasar untuk Buku Paket
+        $paketQuery = Peminjaman::whereHas('buku', function ($query) {
+            $query->where('jenis', 'paket');
+        })
+            ->orderByRaw("CASE WHEN pinjam = 'verifikasi' THEN 0 ELSE 1 END")
+            ->orderBy('tgl_pinjam', 'desc');
+
+        // Filter berdasarkan pencarian
+        if ($search) {
+            $referensiQuery
+                ->where('nisn', 'like', "%{$search}%")
+                ->orWhere('fullname', 'like', "%{$search}%")
+                ->orWhere('judul', 'like', "%{$search}%")
+                ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                ->orWhere('denda', 'like', "%{$search}%");
+            $paketQuery
+                ->where('nisn', 'like', "%{$search}%")
+                ->orWhere('fullname', 'like', "%{$search}%")
+                ->orWhere('judul', 'like', "%{$search}%")
+                ->orWhere('tgl_pinjam', 'like', "%{$search}%")
+                ->orWhere('denda', 'like', "%{$search}%");
+        }
+
+        // Filter berdasarkan rentang tanggal
+        if ($dateRange  && $dateRange !== '01/01/0001 - 01/01/0001') {
+            $dates = explode(" - ", $dateRange);
+            if (count($dates) === 2) {
+                $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->startOfDay();
+                $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[1]))->endOfDay();
+
+                $referensiQuery->whereBetween('tgl_pinjam', [$startDate, $endDate]);
+                $paketQuery->whereBetween('tgl_pinjam', [$startDate, $endDate]);
+            }
+        }
+
+        // Jika per_page adalah "Semua", tampilkan semua data
+        if ($request->per_page == 'Semua') {
+            $referensi = $referensiQuery
+                ->where('nisn', $request->nisn)
+                ->paginate(1000000);
+            $paket = $paketQuery
+                ->where('nisn', $request->nisn)
+                ->paginate(1000000);
+        } else {
+            $referensi = $referensiQuery
+                ->where('nisn', $request->nisn)
+                ->paginate($perPage);
+            $paket = $paketQuery
+                ->where('nisn', $request->nisn)
+                ->paginate($perPage);
+        }
+
+        $user = User::find($request->nisn);
+
+        return view('pages.admin.peminjaman-detail', compact('referensi', 'paket', 'perPage', 'search', 'dateRange', 'user'));
     }
 
     public function indexSiswa(Request $request)

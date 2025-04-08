@@ -6,6 +6,14 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body p-5">
+                            <div class="row">
+                                <div class="col">
+                                    Riwayat Peminjaman {{ $user->fullname }}
+                                </div>
+                                <div class="col">
+                                    <a href="{{ route('peminjaman.read') }}" class="btn btn-dark float-end">Kembali</a>
+                                </div>
+                            </div>
                             {{-- Nav Tabs --}}
                             <ul class="nav nav-tabs" id="Tabs" role="tablist">
                                 <li class="nav-item me-2 my-2" role="presentation">
@@ -69,15 +77,7 @@
                                                 @foreach ($referensi as $BukuReferensi)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td class="text-capitalize">
-                                                            <form method="POST" onclick="this.submit()"
-                                                                action="{{ route('peminjaman.detail') }}">
-                                                                @csrf
-                                                                <input type="hidden" name="nisn"
-                                                                    value="{{ $BukuReferensi->nisn }}">
-                                                                {{ $BukuReferensi->fullname }}
-                                                            </form>
-                                                        </td>
+                                                        <td class="text-capitalize">{{ $BukuReferensi->fullname }}</td>
                                                         <td class="truncate">{{ $BukuReferensi->judul }}</td>
                                                         <td class="truncate">{{ $BukuReferensi->no_regis }}</td>
                                                         <td class="text-uppercase">
@@ -170,15 +170,7 @@
                                                 @foreach ($paket as $BukuPaket)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td class="text-capitalize">
-                                                            <form method="POST" onclick="this.submit()"
-                                                                action="{{ route('peminjaman.detail') }}">
-                                                                @csrf
-                                                                <input type="hidden" name="nisn"
-                                                                    value="{{ $BukuPaket->nisn }}">
-                                                                {{ $BukuPaket->fullname }}
-                                                            </form>
-                                                        </td>
+                                                        <td class="text-capitalize">{{ $BukuPaket->fullname }}</td>
                                                         <td class="truncate">{{ $BukuPaket->judul }}</td>
                                                         <td class="truncate">{{ $BukuPaket->no_regis }}</td>
                                                         <td class="text-uppercase">
