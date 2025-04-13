@@ -45,20 +45,21 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($users as $index => $user)
-                                        <tr>
-                                            <td>{{ $index + 1 }}.</td>
-                                            <td><strong>{{ $user->fullname }}</strong></td>
-                                            <td>{{ $user->dipinjam }}</td>
-                                            <td>{{ $user->dikembalikan }}</td>
-                                            <td>{{ $user->status }}</td>
-                                            <td>
-                                                @if($user->status == 'Sesuai')
-                                                <a href="{{ route('bebas-pustaka', $user->nisn) }}" class="btn btn-primary">Print</a>
-                                                @else
-                                                <button class="btn btn-danger" disabled>Ditahan</button>
-                                                @endif
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td>{{ $index + 1 }}.</td>
+                                                <td><strong>{{ $user->fullname }}</strong></td>
+                                                <td>{{ $user->dipinjam }}</td>
+                                                <td>{{ $user->dikembalikan }}</td>
+                                                <td>{{ $user->status }}</td>
+                                                <td>
+                                                    @if ($user->status == 'Sesuai')
+                                                        <a href="{{ route('bebas-pustaka', $user->nisn) }}"
+                                                            class="btn btn-primary">Print</a>
+                                                    @else
+                                                        <button class="btn btn-danger" disabled>Ditahan</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -74,4 +75,14 @@
             <x-app.footer />
         </div>
     </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                const tambahButtons = document.querySelectorAll('#tambahButton');
+                tambahButtons.forEach(button => {
+                    button.classList.add('d-none');
+                });
+            }, 1);
+        });
+    </script>
 </x-app-layout>

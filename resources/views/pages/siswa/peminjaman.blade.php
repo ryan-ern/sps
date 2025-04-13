@@ -17,7 +17,7 @@
 
                                 <hr>
 
-                                <table class="table table-sm table-bordered dataTable" id="table">
+                                <table class="table table-sm table-bordered" id="table">
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th scope="col">No</th>
@@ -75,16 +75,6 @@
                 params.set('search', searchInput.value);
                 window.location.href = `{{ route('peminjaman-siswa.read') }}?${params.toString()}`;
             }, 500);
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                const tambahButtons = document.querySelectorAll('#tambahButton');
-                tambahButtons.forEach(button => {
-                    button.classList.add('d-none');
-                });
-            }, 1);
         });
     </script>
 </x-app-layout>

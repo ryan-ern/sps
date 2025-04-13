@@ -7,6 +7,19 @@
                     <div class="card">
                         <div class="card-body p-5">
                             <div class="table-responsive text-center">
+                                {{-- Scan Barcode --}}
+                                <form id="scanForm" action="{{ route('kunjungan.store') }}" method="POST" class="mb-4">
+                                    @csrf
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-12">
+                                            <input type="text" id="barcodeInput" name="nisn"
+                                                class="form-control form-control-lg text-center"
+                                                placeholder="Scan Barcode Kartu Anggota di sini" autofocus
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                </form>
+
                                 {{-- Filter --}}
                                 <form method="GET" action="{{ route('kunjungan.read') }}" class="mb-3">
                                     <div class="row d-flex justify-content-between">
@@ -70,4 +83,53 @@
             <x-app.footer />
         </div>
     </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                const tambahButtons = document.querySelectorAll('#tambahButton');
+                tambahButtons.forEach(button => {
+                    button.classList.add('d-none');
+                });
+            }, 1);
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const barcodeInput = document.getElementById("barcodeInput");
+            const searchInput = document.getElementById("search");
+            const dateInput = document.querySelector("input[name='dates']");
+
+            let barcodeDebounce;
+
+            // Debounce untuk scanner barcode
+            barcodeInput.addEventListener("input", function() {
+                clearTimeout(barcodeDebounce);
+                barcodeDebounce = setTimeout(() => {
+                    if (barcodeInput.value.trim() !== "") {
+                        document.getElementById("scanForm").submit();
+                    }
+                }, 500);
+            });
+
+            // Tetap fokus ke input barcode jika tidak sedang fokus di input lainnya
+            function keepBarcodeFocused() {
+                const active = document.activeElement;
+                if (
+                    active !== barcodeInput &&
+                    active !== searchInput &&
+                    active !== dateInput
+                ) {
+                    barcodeInput.focus();
+                }
+            }
+
+            // Periksa fokus setiap 1 detik
+            setInterval(keepBarcodeFocused, 500);
+
+            // Fokus awal
+            barcodeInput.focus();
+        });
+    </script>
+
+
 </x-app-layout>

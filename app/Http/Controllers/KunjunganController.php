@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kunjungan;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class KunjunganController extends Controller
@@ -56,5 +57,27 @@ class KunjunganController extends Controller
         }
 
         return view('pages.admin.kunjungan', compact('kunjungans', 'perPage', 'search', 'dateRange'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nisn' => 'required|string'
+        ]);
+
+        $user = User::where('nisn', $request->nisn)->first();
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'NISN tidak ditemukan.');
+        }
+
+        Kunjungan::create([
+            'nisn' => $user->nisn,
+            'fullname' => $user->fullname,
+            'kelas' => $user->kelas,
+            'keterangan' => 'Diisi dengan scan barcode',
+        ]);
+
+        return redirect()->back()->with('success', 'Kunjungan berhasil dicatat.');
     }
 }
