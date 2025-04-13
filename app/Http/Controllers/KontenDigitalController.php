@@ -134,12 +134,14 @@ class KontenDigitalController extends Controller
             'jenis' => 'required|in:video,buku digital',
             'judul' => 'required|string|max:255',
             'pembuat' => 'required|string|max:255',
+            'nuptk' => 'required',
             'url' => 'nullable|url',
             'file_path' => 'nullable|file|mimes:pdf|max:10000',
         ]);
 
         $konten->jenis = $request->jenis;
         $konten->judul = $request->judul;
+        $konten->nuptk = $request->nuptk;
         $konten->pembuat = $request->pembuat;
         $konten->url = $request->url;
 

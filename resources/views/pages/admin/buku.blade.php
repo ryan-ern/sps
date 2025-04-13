@@ -274,6 +274,7 @@
                                                                 data-pembuat="{{ $data->pembuat }}"
                                                                 data-jenis="{{ $data->jenis }}"
                                                                 data-url="{{ $data->url }}"
+                                                                data-nuptk="{{ $data->nuptk }}"
                                                                 data-file_path="{{ $data->file_path }}"
                                                                 data-bs-toggle="modal" data-bs-target="#dynamicModal"
                                                                 data-modal-type="update">
@@ -335,14 +336,14 @@
         document.addEventListener("DOMContentLoaded", function() {
             let tabs = document.querySelectorAll("#Tabs .nav-link");
 
-            let activeTab = localStorage.getItem("activeTab") || "#referensi";
-            if (activeTab) {
-                let activeButton = document.querySelector(`#Tabs .nav-link[data-bs-target="${activeTab}"]`);
+            let bukuTab = localStorage.getItem("bukuTab") || "#referensi";
+            if (bukuTab) {
+                let activeButton = document.querySelector(`#Tabs .nav-link[data-bs-target="${bukuTab}"]`);
                 if (activeButton) {
                     tabs.forEach(tab => tab.classList.remove("active"));
                     activeButton.classList.add("active");
 
-                    let activePane = document.querySelector(activeTab);
+                    let activePane = document.querySelector(bukuTab);
                     if (activePane) {
                         document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("show",
                             "active"));
@@ -354,7 +355,7 @@
             tabs.forEach(tab => {
                 tab.addEventListener("click", function() {
                     let target = this.getAttribute("data-bs-target");
-                    localStorage.setItem("activeTab", target);
+                    localStorage.setItem("bukuTab", target);
                 });
             });
         });
@@ -379,37 +380,72 @@
                 modalForm.enctype = "application/x-www-form-urlencoded";
                 modalForm.method = "POST";
 
-                if (localStorage.getItem('activeTab') == '#digital') {
+                if (localStorage.getItem('bukuTab') == '#digital') {
                     if (modalType === 'update') {
                         modalTitle.textContent = 'Form Edit Data';
-                        modalForm.action = `/apps/konten-digital/update/${bukuId}`;
+                        modalForm.action = `/apps/konten-digital/update/${button.getAttribute('data-id')}`;
                         modalForm.enctype = 'multipart/form-data';
-                        var modal = document.getElementById('dynamicModal');
-                        var inputAutofocus = modal.querySelector('input[autofocus]');
 
-                        modal.addEventListener('shown.bs.modal', function() {
-                            if (inputAutofocus) {
-                                inputAutofocus.focus();
-                            }
-                        });
+                        const jenis = button.getAttribute('data-jenis');
+                        const judul = button.getAttribute('data-judul');
+                        const pembuat = button.getAttribute('data-pembuat');
+                        const nuptk = button.getAttribute('data-nuptk');
+                        const url = button.getAttribute('data-url');
+
                         modalBodyHTML = `
                             @csrf
-                        @method('PUT')
-                        <div class="row">
-                                        <div class="col-md-6">
-                                            <select name="jenis" required class="form-select mb-3">
-                                                <option value="" disabled selected>Pilih Jenis Konten</option>
-                                                <option value="video">Video</option>
-                                                <option value="buku digital">Buku Digital</option>
-                                            </select>
-                                          <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
-                                          <input type="text" class="form-control mb-3" name="pembuat" placeholder="Pembuat" required>
-                                        </div>
-                                         <div class="col-md-6">
-                                          <input type="text" class="form-control mb-3" name="url" placeholder="URL Youtube" required>
-                                          <input type="file" class="form-control mb-3" name="file_path" placeholder="Buku Digital" required>
-                                          </div>
-                        </div>`;
+                            @method('PUT')
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select name="jenis" required class="form-select mb-3">
+                                        <option value="" disabled>Pilih Jenis Konten</option>
+                                        <option value="video" ${jenis === 'video' ? 'selected' : ''}>Video</option>
+                                        <option value="buku digital" ${jenis === 'buku digital' ? 'selected' : ''}>Buku Digital</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" value="${judul}" required>
+                                    <select name="nuptk" required class="form-select mb-3" id="guruSelect">
+                                        <option value="" disabled>Pilih Guru (NUPTK)</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Link URL Youtube</label>
+                                    <input type="text" class="form-control mb-2" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
+                                    <label class="form-label">Buku Digital</label>
+                                    <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
+                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                </div>
+                            </div>
+                        `;
+
+                        setTimeout(() => {
+                            const guruSelect = document.getElementById('guruSelect');
+                            const pembuatInput = document.getElementById('pembuat');
+
+                            if (guruSelect && guruOptions.length > 0) {
+                                guruOptions.forEach(guru => {
+                                    const option = document.createElement('option');
+                                    option.value = guru.nisn;
+                                    option.textContent = `${guru.fullname} (${guru.nisn})`;
+                                    if (guru.nisn === nuptk) {
+                                        option.selected = true;
+                                        pembuatInput.value = guru.fullname;
+                                    }
+                                    guruSelect.appendChild(option);
+                                });
+
+                                guruSelect.addEventListener('change', function() {
+                                    const selectedGuru = guruOptions.find(g => g.nisn ===
+                                        this.value);
+                                    if (selectedGuru) {
+                                        pembuatInput.value = selectedGuru.fullname;
+                                    }
+                                });
+                            }
+                        }, 100);
                     } else if (modalType === 'delete') {
 
                         modalTitle.textContent = 'Form Hapus Data';
@@ -446,36 +482,38 @@
                         modalForm.action = '/apps/konten-digital/create';
                         modalForm.enctype = 'multipart/form-data';
                         modalBodyHTML = `
-                        @csrf
-                    @method('POST')
-                    <div class="row">
-                                        <div class="col-md-6">
-                                            <select name="jenis" required class="form-select mb-3">
-                                                <option value="" disabled selected>Pilih Jenis Konten</option>
-                                                <option value="video">Video</option>
-                                                <option value="buku digital">Buku Digital</option>
-                                            </select>
-                                          <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
-                                          <select name="nuptk" required class="form-select mb-3" id="guruSelect">
-                                               <option value="" disabled selected>Pilih Guru (NUPTK)</option>
-                                           </select>
-                                          <input type="text" class="form-control mb-3" name="pembuat" placeholder="Pembuat" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                        <label for="url" class="form-label">Link URL Youtube</label>
-                                          <input type="text" class="form-control mb-2" name="url" placeholder="Link URL Youtube">
-                                          <label for="file_path" class="form-label">Buku Digital</label>
-                                          <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
-                                        </div>
-                                        <!-- Tombol -->
-                                        <div class="d-flex justify-content-end mt-3">
-                                            <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
-                                            <button type="submit" class="btn btn-success">Simpan</button>
-                                        </div>
-                    </div>
-                    `;
+                            @csrf
+                            @method('POST')
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select name="jenis" required class="form-select mb-3">
+                                        <option value="" disabled selected>Pilih Jenis Konten</option>
+                                        <option value="video">Video</option>
+                                        <option value="buku digital">Buku Digital</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
+                                    <select name="nuptk" required class="form-select mb-3" id="guruSelect">
+                                        <option value="" disabled selected>Pilih Guru (NUPTK)</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="url" class="form-label">Link URL Youtube</label>
+                                    <input type="text" class="form-control mb-2" name="url" placeholder="Link URL Youtube">
+                                    <label for="file_path" class="form-label">Buku Digital</label>
+                                    <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
+                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                </div>
+                            </div>
+                        `;
+
                         setTimeout(() => {
                             const guruSelect = document.getElementById('guruSelect');
+                            const pembuatInput = document.getElementById('pembuat');
+
                             if (guruSelect && guruOptions.length > 0) {
                                 guruOptions.forEach(guru => {
                                     const option = document.createElement('option');
@@ -483,9 +521,16 @@
                                     option.textContent = `${guru.fullname} (${guru.nisn})`;
                                     guruSelect.appendChild(option);
                                 });
+
+                                guruSelect.addEventListener('change', function() {
+                                    const selectedGuru = guruOptions.find(g => g.nisn ===
+                                        this.value);
+                                    if (selectedGuru && pembuatInput) {
+                                        pembuatInput.value = selectedGuru.fullname;
+                                    }
+                                });
                             }
                         }, 100);
-
                     }
                 } else if (modalType === 'update') {
                     modalTitle.textContent = 'Form Edit Data';
@@ -549,8 +594,8 @@
                     </div>
                     ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </a>`
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </a>`
                     : ''}
             </div>
         </div>
