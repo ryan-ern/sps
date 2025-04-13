@@ -68,7 +68,13 @@ class KunjunganController extends Controller
         $user = User::where('nisn', $request->nisn)->first();
 
         if (!$user) {
-            return redirect()->back()->with('error', 'NISN tidak ditemukan.');
+            flash()->flash(
+                'error',
+                'Data tidak ditemukan',
+                [],
+                'Scan Kunjungan Gagal'
+            );
+            return redirect()->route('kunjungan.read');
         }
 
         Kunjungan::create([
@@ -78,6 +84,12 @@ class KunjunganController extends Controller
             'keterangan' => 'Diisi dengan scan barcode',
         ]);
 
-        return redirect()->back()->with('success', 'Kunjungan berhasil dicatat.');
+        flash()->flash(
+            'success',
+            'Kunjungan ' . $user->fullname . ' berhasil dicatat. ',
+            [],
+            'Scan Kunjungan Berhasil'
+        );
+        return redirect()->route('kunjungan.read');
     }
 }

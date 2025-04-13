@@ -37,49 +37,41 @@
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th scope="col">No</th>
-                                            <th scope="col">No Regis</th>
-                                            <th scope="col">Judul Buku</th>
-                                            <th scope="col">Penerbit</th>
-                                            <th scope="col">Tahun</th>
-                                            <th scope="col">Stok</th>
-                                            <th scope="col">Tanggal Masuk</th>
+                                            <th scope="col">Nama</th>
+                                            <th scope="col">Nama Konten</th>
+                                            <th scope="col">Jenis Konten</th>
+                                            <th scope="col">Tanggal</th>
+                                            <th scope="col">Dilihat</th>
                                             <th scope="col">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($data as $BukuReferensi)
+                                        @foreach ($datas as $data)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td class="text-capitalize">{{ $BukuReferensi->no_regis }}</td>
-                                                <td class="truncate">{{ $BukuReferensi->judul }}</td>
-                                                <td class="truncate">{{ $BukuReferensi->penerbit }}</td>
-                                                <td>{{ $BukuReferensi->tahun }}</td>
-                                                <td>{{ $BukuReferensi->stok }}</td>
+                                                <td class="text-capitalize">{{ $data->pembuat }}</td>
+                                                <td class="truncate">{{ $data->judul }}</td>
+                                                <td class="truncate">{{ $data->jenis }}</td>
                                                 <td class="text-uppercase">
-                                                    {{ $BukuReferensi->created_at->format('d-m-Y h:i a') }}
+                                                    {{ $data->created_at->format('d-m-Y h:i a') }}
                                                 </td>
+                                                <td>{{ $data->dilihat }}</td>
                                                 <td>
                                                     <button class="mx-2 btn btn-primary editBtn"
-                                                        data-no_regis="{{ $BukuReferensi->no_regis }}"
-                                                        data-jenis="{{ $BukuReferensi->jenis }}"
-                                                        data-judul="{{ $BukuReferensi->judul }}"
-                                                        data-penerbit="{{ $BukuReferensi->penerbit }}"
-                                                        data-pengarang="{{ $BukuReferensi->pengarang }}"
-                                                        data-tahun="{{ $BukuReferensi->tahun }}"
-                                                        data-stok="{{ $BukuReferensi->stok }}"
-                                                        data-file_buku="{{ $BukuReferensi->file_buku }}"
-                                                        data-file_cover="{{ $BukuReferensi->file_cover }}"
-                                                        data-keterangan="{{ $BukuReferensi->keterangan }}"
-                                                        data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                                                        data-modal-type="update">
+                                                        data-id="{{ $data->id }}" data-judul="{{ $data->judul }}"
+                                                        data-pembuat="{{ $data->pembuat }}"
+                                                        data-jenis="{{ $data->jenis }}"
+                                                        data-url="{{ $data->url }}"
+                                                        data-nuptk="{{ $data->nuptk }}"
+                                                        data-file_path="{{ $data->file_path }}" data-bs-toggle="modal"
+                                                        data-bs-target="#dynamicModal" data-modal-type="update">
                                                         Edit
                                                     </button>
 
                                                     <button class="mx-2 btn btn-danger deleteBtn"
-                                                        data-no_regis="{{ $BukuReferensi->no_regis }}"
-                                                        data-judul="{{ $BukuReferensi->judul }}"
-                                                        data-stok="{{ $BukuReferensi->stok }}" data-modal-type="delete"
-                                                        data-bs-toggle="modal" data-bs-target="#dynamicModal">
+                                                        data-id="{{ $data->id }}" data-judul="{{ $data->judul }}"
+                                                        data-modal-type="delete" data-bs-toggle="modal"
+                                                        data-bs-target="#dynamicModal">
                                                         Hapus
                                                     </button>
                                                 </td>
@@ -89,7 +81,7 @@
                                 </table>
                                 {{-- Tambahkan Navigasi Pagination --}}
                                 <div class="d-flex justify-content-between mt-3">
-                                    {{ $data->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
+                                    {{ $datas->appends(['per_page' => request('per_page')])->links('pagination::bootstrap-5') }}
                                 </div>
                             </div>
 
@@ -171,7 +163,67 @@
 
                 if (modalType === 'update') {
                     modalTitle.textContent = 'Form Edit Data';
-                    modalForm.action = `/apps/data-buku/update/${bukuId}`;
+                    modalForm.action = `/apps/konten-digital/update/${button.getAttribute('data-id')}`;
+                    modalForm.enctype = 'multipart/form-data';
+
+                    let jenis = button.getAttribute('data-jenis');
+                    const judul = button.getAttribute('data-judul');
+                    const pembuat = button.getAttribute('data-pembuat');
+                    const nuptk = button.getAttribute('data-nuptk');
+                    const url = button.getAttribute('data-url');
+                    const file = button.getAttribute('data-file_path');
+
+                    modalBodyHTML = `
+                            @csrf
+                            @method('PUT')
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select name="jenis" id="jenisSelect" required class="form-select mb-3">
+                                        <option value="" disabled>Pilih Jenis Konten</option>
+                                        <option value="video" ${jenis === 'video' ? 'selected' : ''}>Video</option>
+                                        <option value="buku digital" ${jenis === 'buku digital' ? 'selected' : ''}>Buku Digital</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" value="${judul}" required>
+                                    <input type="text" class="form-control mb-3" name="nuptk" placeholder="NUPTK" value="{{ auth()->user()->nisn }}" readonly>
+                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
+                                </div>
+                                 <div class="col-md-6">
+                                    <div id="urlGroup" class="mb-3 ${jenis === 'video' ? '' : 'd-none'}">
+                                        <label class="form-label">Link URL Youtube</label>
+                                        <input type="text" class="form-control" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
+                                    </div>
+                                    <div id="fileGroup" class="mb-3 ${jenis === 'buku digital' ? '' : 'd-none'}">
+                                        <label class="form-label">Buku Digital</label>
+                                        <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                        ${file ? `<a href="/storage/${file}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
+                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                </div>
+                            </div>
+                        `;
+                    setTimeout(() => {
+                        const jenisSelect = document.getElementById('jenisSelect');
+                        const urlGroup = document.getElementById('urlGroup');
+                        const fileGroup = document.getElementById('fileGroup');
+
+                        // Toggle field berdasarkan jenis konten
+                        if (jenisSelect) {
+                            jenisSelect.addEventListener('change', function() {
+                                const isVideo = this.value === 'video';
+                                const isBook = this.value === 'buku digital';
+
+                                urlGroup.classList.toggle('d-none', !isVideo);
+                                fileGroup.classList.toggle('d-none', !isBook);
+                            });
+                        }
+                    }, 100);
+                } else if (modalType === 'delete') {
+
+                    modalTitle.textContent = 'Form Hapus Data';
+                    modalForm.action = `/apps/konten-digital/delete/${button.getAttribute('data-id')}`;
                     modalForm.enctype = 'multipart/form-data';
                     var modal = document.getElementById('dynamicModal');
                     var inputAutofocus = modal.querySelector('input[autofocus]');
@@ -181,79 +233,11 @@
                             inputAutofocus.focus();
                         }
                     });
-
-                    const bukuData = button.dataset;
-
                     modalBodyHTML = `
-                         @csrf
-                    @method('PUT')
-                     <div class="row">
-            <!-- Kolom Kiri -->
-            <div class="col-md-4">
-                <label for="jenis" class="form-label">Jenis</label>
-                <select class="form-select mb-3" name="jenis" required>
-                    <option value="" disabled>Pilih Jenis</option>
-                    <option value="referensi" ${bukuData.jenis === 'referensi' ? 'selected' : ''}>Buku Referensi</option>
-                    <option value="paket" ${bukuData.jenis === 'paket' ? 'selected' : ''}>Buku Paket</option>
-                </select>
-                <label for="no_regis" class="form-label">No Regis</label>
-                <input type="number" class="form-control mb-3" name="no_regis" placeholder="No Regis" value="${bukuData.no_regis}" readonly required>
-                <label for="judul" class="form-label">Judul</label>
-                <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" value="${bukuData.judul}" readonly required>
-                <label for="pengarang" class="form-label">Pengarang</label>
-                <input type="text" class="form-control mb-3" name="pengarang" placeholder="Pengarang" value="${bukuData.pengarang}" required>
-                <label for="penerbit" class="form-label">Penerbit</label>
-                <input type="text" class="form-control mb-3" name="penerbit" placeholder="Penerbit" value="${bukuData.penerbit}" required>
-            </div>
-
-            <!-- Kolom Tengah -->
-            <div class="col-md-4">
-                <label for="stok" class="form-label">Stok</label>
-                <input type="number" class="form-control mb-2" name="stok" placeholder="Stok" value="${bukuData.stok}" readonly required>
-                <label for="tahun" class="form-label">Tahun</label>
-                <input type="number" class="form-control mb-3" name="tahun" placeholder="Tahun" value="${bukuData.tahun}" required>
-                <div class="form-floating">
-                    <textarea class="form-control" name="keterangan" placeholder="Keterangan Tulis Disini" id="floatingTextarea2" style="height: 215px">${bukuData.keterangan}</textarea>
-                    <label for="floatingTextarea2">Keterangan</label>
-                </div>
-            </div>
-
-            <!-- Kolom Kanan -->
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih File Buku</label>
-                    <input type="file" class="form-control" accept=".pdf"  id="fileBuku" name="file_buku">
-                    ${bukuData.file_buku != '-' ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
-                    </div>
-                    <div class="mb-3">
-                    <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih File Cover</label>
-                    <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover" name="file_cover">
-                    </div>
-                    ${bukuData.file_cover != '-' ?
-                        `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                                        <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                                    </a>`
-                    : ''}
-            </div>
-        </div>
-
-        <!-- Tombol -->
-        <div class="d-flex justify-content-end mt-3">
-            <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
-            <button type="submit" class="btn btn-success">Simpan</button>
-        </div>
-                    `;
-                } else if (modalType === 'delete') {
-                    modalTitle.textContent = 'Konfirmasi Hapus Data';
-                    modalForm.action = `/apps/data-buku/delete/`;
-                    modalForm.method = 'POST';
-                    modalBodyHTML = `
-                        @csrf
+                            @csrf
                         @method('DELETE')
-                        <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menghapus <br/> data buku dengan <br/><strong>nomor registrasi <br/>${button.getAttribute('data-no_regis')}</strong></p>
+                           <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menghapus <br/> data konten dengan <br/><strong>judul ${button.getAttribute('data-judul')}</strong></p>
                                     <div class="d-flex justify-content-end mt-3">
-                                        <input type="hidden" name="judul" value="${button.getAttribute('data-judul')}">
-                                        <input type="hidden" name="stok" value="${button.getAttribute('data-stok')}">
                                         <button type="reset" class="btn btn-primary me-2" id="closeModal"
                                             data-bs-dismiss="modal">Tidak</button>
                                         <button type="submit" class="btn btn-danger">Hapus</button>
@@ -269,68 +253,58 @@
                         }
                     });
                     modalTitle.textContent = 'Form Tambah Data';
-                    modalForm.action = '/apps/data-buku/create';
+                    modalForm.action = '/apps/konten-digital/create';
                     modalForm.enctype = 'multipart/form-data';
-                    modalForm.method = 'POST';
                     modalBodyHTML = `
-                        @csrf
-                    @method('POST')
-                    <div class="row">
-                                        <!-- Kolom Kiri -->
-                                        <div class="col-md-4">
-                                            <select class="form-select mb-3" name="jenis" required>
-                                                <option value="" selected disabled>Pilih Jenis</option>
-                                                <option value="referensi">Buku Referensi</option>
-                                                <option value="paket">Buku Paket</option>
-                                            </select>
-                                            <input type="number" class="form-control mb-3" name="no_regis"
-                                                placeholder="No Regis" required>
-                                            <input type="text" class="form-control mb-3" name="judul"
-                                                placeholder="Judul" autofocus required>
-                                            <input type="text" class="form-control mb-3" name="pengarang"
-                                                placeholder="Pengarang" required>
-                                            <input type="text" class="form-control mb-3" name="penerbit"
-                                                placeholder="Penerbit" required>
-                                        </div>
-
-                                        <!-- Kolom Tengah -->
-                                        <div class="col-md-4">
-                                            <input type="number" class="form-control mb-2" name="stok"
-                                                placeholder="Stok" required>
-                                            <div class="form-floating">
-                                                <textarea class="form-control" name="keterangan" required placeholder="Keterangan Tulis Disini"
-                                                    id="floatingTextarea2" style="height: 215px"></textarea>
-                                                <label for="floatingTextarea2">Keterangan</label>
-                                            </div>
-                                        </div>
-
-                                        <!-- Kolom Kanan -->
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih
-                                                    File Buku (PDF)</label>
-                                                <input type="file" class="form-control" accept=".pdf" id="fileBuku"
-                                                    name="file_buku">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih
-                                                    File Cover (JPG, JPEG, PNG)</label>
-                                                    <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover"
-                                                    name="file_cover">
-                                            </div>
-
-                                            <input type="number" class="form-control mb-3" name="tahun"
-                                                placeholder="Tahun" required>
-                                        </div>
+                            @csrf
+                            @method('POST')
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select name="jenis" id="jenisSelect" required class="form-select mb-3">
+                                        <option value="" disabled selected>Pilih Jenis Konten</option>
+                                        <option value="video">Video</option>
+                                        <option value="buku digital">Buku Digital</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
+                                    <input type="text" class="form-control mb-3" name="nuptk" placeholder="NUPTK" value="{{ auth()->user()->nisn }}" readonly>
+                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="{{ auth()->user()->fullname }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="urlGroup" class="mb-3 d-none">
+                                        <label for="url" class="form-label">Link URL Youtube</label>
+                                        <input type="text" class="form-control" name="url" placeholder="Link URL Youtube">
                                     </div>
-
-                                    <!-- Tombol -->
-                                    <div class="d-flex justify-content-end mt-3">
-                                        <button type="reset" class="btn btn-primary me-2" id="closeModal"
-                                            data-bs-dismiss="modal">Kembali</button>
-                                        <button type="submit" class="btn btn-success">Simpan</button>
+                                    <div id="fileGroup" class="mb-3 d-none">
+                                        <label for="file_path" class="form-label">Buku Digital</label>
+                                        <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
                                     </div>
-                    `;
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
+                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                </div>
+                            </div>
+                        `;
+                    setTimeout(() => {
+                        const jenisSelect = document.getElementById('jenisSelect');
+                        const urlGroup = document.getElementById('urlGroup');
+                        const fileGroup = document.getElementById('fileGroup');
+
+                        if (jenisSelect) {
+                            jenisSelect.addEventListener('change', function() {
+                                if (this.value === 'video') {
+                                    urlGroup.classList.remove('d-none');
+                                    fileGroup.classList.add('d-none');
+                                } else if (this.value === 'buku digital') {
+                                    fileGroup.classList.remove('d-none');
+                                    urlGroup.classList.add('d-none');
+                                } else {
+                                    urlGroup.classList.add('d-none');
+                                    fileGroup.classList.add('d-none');
+                                }
+                            });
+                        }
+                    }, 100);
                 }
 
                 modalContent.innerHTML = modalBodyHTML;

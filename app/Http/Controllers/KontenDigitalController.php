@@ -52,12 +52,12 @@ class KontenDigitalController extends Controller
 
         // Jika per_page adalah "Semua", tampilkan semua data
         if ($request->per_page == 'Semua') {
-            $data = $kontenQuery->paginate(1000000);
+            $datas = $kontenQuery->paginate(1000000);
         } else {
-            $data = $kontenQuery->paginate($perPage);
+            $datas = $kontenQuery->paginate($perPage);
         }
 
-        return view('pages.guru.konten', compact('data', 'perPage', 'search', 'dateRange'));
+        return view('pages.guru.konten', compact('datas', 'perPage', 'search', 'dateRange'));
     }
 
 
@@ -162,8 +162,13 @@ class KontenDigitalController extends Controller
         }
 
         $konten->save();
-
-        return redirect()->back()->with('success', 'Konten digital berhasil diperbarui.');
+        flash()->flash(
+            'success',
+            'Konten digital ' . $konten->judul . ' berhasil diperbarui',
+            [],
+            'Perbarui Data Sukses'
+        );
+        return redirect()->back();
     }
 
     public function destroy($id)
