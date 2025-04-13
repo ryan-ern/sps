@@ -198,7 +198,7 @@ class PeminjamanController extends Controller
         return view('pages.siswa.peminjaman', compact('data'));
     }
 
-    public function pinjam(Request $request, $id)
+    public function pinjam($id)
     {
         $buku = Buku::where('no_regis', $id)->first();
 
@@ -303,7 +303,12 @@ class PeminjamanController extends Controller
         $peminjaman->pinjam = 'terima';
         $peminjaman->kembali = '-';
         $peminjaman->tgl_pinjam = now();
-        $peminjaman->est_kembali = now()->addDays(3);
+        if ($peminjaman->buku && strtolower($peminjaman->buku->jenis) === 'paket') {
+            $peminjaman->est_kembali = now()->addDays(180); // 1 semester
+        } else {
+            $peminjaman->est_kembali = now()->addDays(3);
+        }
+
         $peminjaman->save();
 
         flash()->flash(

@@ -37,7 +37,7 @@ class Peminjaman extends Model
             return;
         }
 
-        $estKembali = Carbon::parse($this->tgl_pinjam)->addDays(3);
+        $estKembali = Carbon::parse($this->est_kembali);
         $tglKembali = $this->tgl_kembali != null ? Carbon::parse($this->tgl_kembali) : now();
 
         // Cek apakah telat
