@@ -101,7 +101,6 @@ class KontenDigitalController extends Controller
         $konten->jenis = $request->jenis;
         $konten->judul = $request->judul;
         $konten->pembuat = $request->pembuat;
-        $konten->url = $request->url ?? null;
         $konten->nuptk = $request->nuptk;
 
         if ($request->hasFile('file_path')) {
@@ -109,8 +108,10 @@ class KontenDigitalController extends Controller
             $fileName = time() . '_konten_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('uploads/konten_digital', $fileName, 'public');
             $konten->file_path = $filePath;
+            $konten->url = null;
         } else {
-            $konten->file_path = '-';
+            $konten->url = $request->url;
+            $konten->file_path = null;
         }
 
         $konten->save();
@@ -143,7 +144,6 @@ class KontenDigitalController extends Controller
         $konten->judul = $request->judul;
         $konten->nuptk = $request->nuptk;
         $konten->pembuat = $request->pembuat;
-        $konten->url = $request->url;
 
         if ($request->hasFile('file_path')) {
             // Hapus file lama jika ada
@@ -155,6 +155,10 @@ class KontenDigitalController extends Controller
             $fileName = time() . '_konten_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('uploads/konten_digital', $fileName, 'public');
             $konten->file_path = $filePath;
+            $konten->url = null;
+        } else {
+            $konten->url = $request->url;
+            $konten->file_path = null;
         }
 
         $konten->save();

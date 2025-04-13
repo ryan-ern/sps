@@ -386,18 +386,19 @@
                         modalForm.action = `/apps/konten-digital/update/${button.getAttribute('data-id')}`;
                         modalForm.enctype = 'multipart/form-data';
 
-                        const jenis = button.getAttribute('data-jenis');
+                        let jenis = button.getAttribute('data-jenis');
                         const judul = button.getAttribute('data-judul');
                         const pembuat = button.getAttribute('data-pembuat');
                         const nuptk = button.getAttribute('data-nuptk');
                         const url = button.getAttribute('data-url');
+                        const file = button.getAttribute('data-file_path');
 
                         modalBodyHTML = `
                             @csrf
                             @method('PUT')
                             <div class="row">
                                 <div class="col-md-6">
-                                    <select name="jenis" required class="form-select mb-3">
+                                    <select name="jenis" id="jenisSelect" required class="form-select mb-3">
                                         <option value="" disabled>Pilih Jenis Konten</option>
                                         <option value="video" ${jenis === 'video' ? 'selected' : ''}>Video</option>
                                         <option value="buku digital" ${jenis === 'buku digital' ? 'selected' : ''}>Buku Digital</option>
@@ -408,11 +409,16 @@
                                     </select>
                                     <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Link URL Youtube</label>
-                                    <input type="text" class="form-control mb-2" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
-                                    <label class="form-label">Buku Digital</label>
-                                    <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                 <div class="col-md-6">
+                                    <div id="urlGroup" class="mb-3 ${jenis === 'video' ? '' : 'd-none'}">
+                                        <label class="form-label">Link URL Youtube</label>
+                                        <input type="text" class="form-control" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
+                                    </div>
+                                    <div id="fileGroup" class="mb-3 ${jenis === 'buku digital' ? '' : 'd-none'}">
+                                        <label class="form-label">Buku Digital</label>
+                                        <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                        ${file ? `<a href="/storage/${file}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
+                                    </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">
                                     <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
@@ -420,29 +426,40 @@
                                 </div>
                             </div>
                         `;
-
                         setTimeout(() => {
                             const guruSelect = document.getElementById('guruSelect');
                             const pembuatInput = document.getElementById('pembuat');
+                            const jenisSelect = document.getElementById('jenisSelect');
+                            const urlGroup = document.getElementById('urlGroup');
+                            const fileGroup = document.getElementById('fileGroup');
 
+                            // Isi guru select
                             if (guruSelect && guruOptions.length > 0) {
                                 guruOptions.forEach(guru => {
                                     const option = document.createElement('option');
                                     option.value = guru.nisn;
                                     option.textContent = `${guru.fullname} (${guru.nisn})`;
-                                    if (guru.nisn === nuptk) {
-                                        option.selected = true;
-                                        pembuatInput.value = guru.fullname;
-                                    }
+                                    if (guru.nisn === nuptk) option.selected = true;
                                     guruSelect.appendChild(option);
                                 });
 
                                 guruSelect.addEventListener('change', function() {
                                     const selectedGuru = guruOptions.find(g => g.nisn ===
                                         this.value);
-                                    if (selectedGuru) {
+                                    if (selectedGuru && pembuatInput) {
                                         pembuatInput.value = selectedGuru.fullname;
                                     }
+                                });
+                            }
+
+                            // Toggle field berdasarkan jenis konten
+                            if (jenisSelect) {
+                                jenisSelect.addEventListener('change', function() {
+                                    const isVideo = this.value === 'video';
+                                    const isBook = this.value === 'buku digital';
+
+                                    urlGroup.classList.toggle('d-none', !isVideo);
+                                    fileGroup.classList.toggle('d-none', !isBook);
                                 });
                             }
                         }, 100);
@@ -486,7 +503,7 @@
                             @method('POST')
                             <div class="row">
                                 <div class="col-md-6">
-                                    <select name="jenis" required class="form-select mb-3">
+                                    <select name="jenis" id="jenisSelect" required class="form-select mb-3">
                                         <option value="" disabled selected>Pilih Jenis Konten</option>
                                         <option value="video">Video</option>
                                         <option value="buku digital">Buku Digital</option>
@@ -498,10 +515,14 @@
                                     <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="url" class="form-label">Link URL Youtube</label>
-                                    <input type="text" class="form-control mb-2" name="url" placeholder="Link URL Youtube">
-                                    <label for="file_path" class="form-label">Buku Digital</label>
-                                    <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                    <div id="urlGroup" class="mb-3 d-none">
+                                        <label for="url" class="form-label">Link URL Youtube</label>
+                                        <input type="text" class="form-control" name="url" placeholder="Link URL Youtube">
+                                    </div>
+                                    <div id="fileGroup" class="mb-3 d-none">
+                                        <label for="file_path" class="form-label">Buku Digital</label>
+                                        <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                    </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">
                                     <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
@@ -509,10 +530,12 @@
                                 </div>
                             </div>
                         `;
-
                         setTimeout(() => {
                             const guruSelect = document.getElementById('guruSelect');
                             const pembuatInput = document.getElementById('pembuat');
+                            const jenisSelect = document.getElementById('jenisSelect');
+                            const urlGroup = document.getElementById('urlGroup');
+                            const fileGroup = document.getElementById('fileGroup');
 
                             if (guruSelect && guruOptions.length > 0) {
                                 guruOptions.forEach(guru => {
@@ -527,6 +550,21 @@
                                         this.value);
                                     if (selectedGuru && pembuatInput) {
                                         pembuatInput.value = selectedGuru.fullname;
+                                    }
+                                });
+                            }
+
+                            if (jenisSelect) {
+                                jenisSelect.addEventListener('change', function() {
+                                    if (this.value === 'video') {
+                                        urlGroup.classList.remove('d-none');
+                                        fileGroup.classList.add('d-none');
+                                    } else if (this.value === 'buku digital') {
+                                        fileGroup.classList.remove('d-none');
+                                        urlGroup.classList.add('d-none');
+                                    } else {
+                                        urlGroup.classList.add('d-none');
+                                        fileGroup.classList.add('d-none');
                                     }
                                 });
                             }
@@ -594,8 +632,8 @@
                     </div>
                     ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </a>`
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </a>`
                     : ''}
             </div>
         </div>
