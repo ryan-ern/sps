@@ -135,7 +135,9 @@ class BukuController extends Controller
         if ($request->hasFile('file_buku')) {
             $fileBuku = $request->file('file_buku');
             $fileBukuName = time() . '_buku_' . $fileBuku->getClientOriginalName();
-            $fileBukuPath = $fileBuku->storeAs('uploads/buku', $fileBukuName, 'public');
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileBukuName);
+            $extension = $fileBuku->getClientOriginalExtension();
+            $fileBukuPath = $fileBuku->storeAs('uploads/buku', $cleanName . '.' . $extension, 'public');
         } else {
             $fileBukuPath = 'default/default-book.png';
         }
@@ -143,7 +145,9 @@ class BukuController extends Controller
         if ($request->hasFile('file_cover')) {
             $fileCover = $request->file('file_cover');
             $fileCoverName = time() . '_cover_' . $fileCover->getClientOriginalName();
-            $fileCoverPath = $fileCover->storeAs('uploads/cover', $fileCoverName, 'public');
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileCoverName);
+            $extension = $fileCover->getClientOriginalExtension();
+            $fileCoverPath = $fileCover->storeAs('uploads/cover', $cleanName . '.' . $extension, 'public');
         } else {
             $fileCoverPath = 'default/default-book.png';
         }
@@ -270,8 +274,6 @@ class BukuController extends Controller
         return redirect()->back();
     }
 
-
-
     public function update(Request $request, Buku $buku)
     {
         $bukuYangSama = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->get();
@@ -282,13 +284,17 @@ class BukuController extends Controller
         if ($request->hasFile('file_buku')) {
             $fileBuku = $request->file('file_buku');
             $fileBukuName = time() . '_buku_' . $fileBuku->getClientOriginalName();
-            $fileBukuPath = $fileBuku->storeAs('uploads/buku', $fileBukuName, 'public');
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileBukuName);
+            $extension = $fileBuku->getClientOriginalExtension();
+            $fileBukuPath = $fileBuku->storeAs('uploads/buku', $cleanName . '.' . $extension, 'public');
         }
 
         if ($request->hasFile('file_cover')) {
             $fileCover = $request->file('file_cover');
             $fileCoverName = time() . '_cover_' . $fileCover->getClientOriginalName();
-            $fileCoverPath = $fileCover->storeAs('uploads/cover', $fileCoverName, 'public');
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileCoverName);
+            $extension = $fileCover->getClientOriginalExtension();
+            $fileCoverPath = $fileCover->storeAs('uploads/cover', $cleanName . '.' . $extension, 'public');
         }
 
 
