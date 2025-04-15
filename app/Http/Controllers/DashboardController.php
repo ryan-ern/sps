@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\KontenDigital;
 use App\Models\Kunjungan;
 use App\Models\Peminjaman;
 use Carbon\Carbon;
@@ -14,47 +15,34 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        function hitungProgres($hariIni, $targetKemarin)
+        {
+            if ($targetKemarin > 0) {
+                $persen = round(($hariIni / $targetKemarin) * 100);
+                return min($persen, 100); // Maksimal 100%
+            }
+            return ($hariIni > 0) ? 100 : 0; // Jika target 0, tapi hari ini ada data, maka 100%
+        }
+
         $roles = Auth::user()->role;
         if ($roles == 'siswa') {
             $today = Carbon::today();
 
-            // Statistik harian
-            $dataPengunjung  = Kunjungan::whereDate('created_at', $today)->count();
-            $dataPeminjam    = Peminjaman::whereDate('tgl_pinjam', $today)->count();
-            $dataKembali     = Peminjaman::whereDate('tgl_kembali', $today)->count();
+            $filterJenis = request()->get('jenis'); // 'referensi', 'paket', 'digital'
+            $search = request()->get('search');
 
-            // Buku Terfavorit: berdasarkan jumlah peminjaman per judul
-            $bukuFavorit = Buku::select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
-                ->groupBy('judul')
-                ->get()
-                ->map(function ($buku) {
-                    // Hitung total peminjaman berdasarkan judul
-                    $totalPinjam = Peminjaman::where('judul', $buku->judul)
-                        ->where('pinjam', 'terima')
-                        ->count();
+            // ---------- BUKU ----------
+            $bukuQuery = Buku::query();
 
-                    // Ambil cover dari no_regis terendah (karena biasanya data awal)
-                    $data = Buku::where('no_regis', $buku->regis_terendah)->first();
+            if (in_array($filterJenis, ['referensi', 'paket'])) {
+                $bukuQuery->where('jenis', $filterJenis);
+            }
 
-                    return (object) [
-                        'no_regis' => $buku->regis_terendah ?? '-',
-                        'judul' => $buku->judul ?? '-',
-                        'total_pinjam' => $totalPinjam ?? 0,
-                        'file_cover' => $data?->file_cover ?? 'default/default-book.png',
-                        'file_buku' => $data?->file_buku ?? 'default/default-book.png',
-                        'stok' => $data->stok ?? 0,
-                        'pengarang' => $data->pengarang ?? '-',
-                        'penerbit' => $data->penerbit ?? '-',
-                        'keterangan' => $data->keterangan ?? '-',
-                        'tahun' => $data->tahun ?? '-',
-                    ];
-                })
-                ->sortByDesc('total_pinjam')
-                ->take(5)
-                ->values();
+            if ($search) {
+                $bukuQuery->where('judul', 'like', '%' . $search . '%');
+            }
 
-            // Wajib Dilihat (semua buku urut berdasarkan total peminjaman)
-            $wajibDilihat = Buku::select('judul', DB::raw('MIN(no_regis) as regis_terendah'))
+            $bukuFavorit = $bukuQuery->select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
                 ->groupBy('judul')
                 ->get()
                 ->map(function ($buku) {
@@ -64,7 +52,7 @@ class DashboardController extends Controller
 
                     $data = Buku::where('no_regis', $buku->regis_terendah)->first();
 
-                    return (object) [
+                    return (object)[
                         'no_regis' => $data->no_regis ?? '-',
                         'judul' => $data->judul ?? '-',
                         'total_pinjam' => $totalPinjam ?? 0,
@@ -76,78 +64,130 @@ class DashboardController extends Controller
                         'keterangan' => $data->keterangan ?? '-',
                         'tahun' => $data->tahun ?? '-',
                     ];
-                })
-                ->sortByDesc('total_pinjam')
-                ->values();
+                })->sortByDesc('total_pinjam')->take(5)->values();
 
-            // Konten sering dilihat: bisa pakai updated_at sebagai simulasi
-            $kontenSeringDilihat = Buku::orderByDesc('updated_at')
-                ->limit(5)
+            $bukuTerbaru = Buku::latest()
+                ->when(in_array($filterJenis, ['referensi', 'paket']), function ($query) use ($filterJenis) {
+                    $query->where('jenis', $filterJenis);
+                })
+                ->when($search, function ($query) use ($search) {
+                    $query->where('judul', 'like', '%' . $search . '%');
+                })
                 ->get()
-                ->map(function ($item) {
-                    return (object) [
-                        'no_regis' => $item->regis_terendah ?? '-',
-                        'judul' => $item->judul ?? '-',
-                        'total_pinjam' => $totalPinjam ?? 0,
-                        'file_cover' => $item?->file_cover ?? 'default/default-book.png',
-                        'file_buku' => $item?->file_buku ?? 'default/default-book.png',
-                        'stok' => $item->stok ?? 0,
-                        'pengarang' => $item->pengarang ?? '-',
-                        'penerbit' => $item->penerbit ?? '-',
-                        'keterangan' => $item->keterangan ?? '-',
-                        'tahun' => $item->tahun ?? '-',
-                        'view_count' => 1 // Ganti dengan field aslinya jika ada
+                ->map(function ($data) {
+                    return (object)[
+                        'no_regis' => $data->no_regis ?? '-',
+                        'judul' => $data->judul ?? '-',
+                        'total_pinjam' => Peminjaman::where('judul', $data->judul)->count(),
+                        'file_cover' => $data->file_cover ?? 'default/default-book.png',
+                        'file_buku' => $data->file_buku ?? 'default/default-book.png',
+                        'stok' => $data->stok ?? 0,
+                        'pengarang' => $data->pengarang ?? '-',
+                        'penerbit' => $data->penerbit ?? '-',
+                        'keterangan' => $data->keterangan ?? '-',
+                        'tahun' => $data->tahun ?? '-',
                     ];
                 });
 
+            $allBuku = collect($bukuFavorit)
+                ->merge($bukuTerbaru)
+                ->unique('judul')
+                ->values();
+
+            // ---------- KONTEN DIGITAL ----------
+            $kontenQuery = KontenDigital::query();
+
+            if ($search) {
+                $kontenQuery->where('judul', 'like', '%' . $search . '%');
+            }
+
+            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
+                ->take(5)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'judul' => $item->judul ?? '-',
+                        'jenis' => $item->jenis ?? '-',
+                        'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
+                        'url' => $item->url ?? null,
+                        'pembuat' => $item->pembuat ?? '-',
+                        'cover' => $item->cover ?? 'default/default-book.png',
+                        'dilihat' => $item->dilihat ?? 0,
+                    ];
+                });
+
+            $kontenTerbaru = KontenDigital::latest()
+                ->when($search, function ($query) use ($search) {
+                    $query->where('judul', 'like', '%' . $search . '%');
+                })
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'judul' => $item->judul ?? '-',
+                        'jenis' => $item->jenis ?? '-',
+                        'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
+                        'url' => $item->url ?? null,
+                        'pembuat' => $item->pembuat ?? '-',
+                        'cover' => $item->cover ?? 'default/default-book.png',
+                        'dilihat' => $item->dilihat ?? 0,
+                    ];
+                });
+
+            $allKonten = collect($kontenSeringDilihat)
+                ->merge($kontenTerbaru)
+                ->unique('judul')
+                ->values();
+
+            // ---------- Wajib Dilihat ----------
+            $wajibDilihat = collect();
+
+            if ($filterJenis === 'referensi' || $filterJenis === 'paket') {
+                $wajibDilihat = $allBuku;
+            } elseif ($filterJenis === 'digital') {
+                $wajibDilihat = $allKonten;
+            } else {
+                // Selang-seling buku dan konten
+                $maxLength = max($allBuku->count(), $allKonten->count());
+                for ($i = 0; $i < $maxLength; $i++) {
+                    if (isset($allBuku[$i])) {
+                        $wajibDilihat->push($allBuku[$i]);
+                    }
+                    if (isset($allKonten[$i])) {
+                        $wajibDilihat->push($allKonten[$i]);
+                    }
+                }
+            }
+
             return view('pages.siswa.dashboard', compact(
-                'dataPengunjung',
-                'dataPeminjam',
-                'dataKembali',
                 'bukuFavorit',
                 'wajibDilihat',
                 'kontenSeringDilihat'
             ));
         } elseif ($roles == 'guru') {
             $today = Carbon::today();
-
+            $yesterday = Carbon::yesterday();
             // Statistik harian
-            $dataPengunjung  = Kunjungan::whereDate('created_at', $today)->count();
-            $dataPeminjam    = Peminjaman::whereDate('tgl_pinjam', $today)->count();
-            $dataKembali     = Peminjaman::whereDate('tgl_kembali', $today)->count();
+            // Pengunjung
+            $dataPengunjung = Kunjungan::whereDate('created_at', $today)->count();
+            $dataPengunjungKemarin = Kunjungan::whereDate('created_at', $yesterday)->count();
 
-            // Buku Terfavorit: berdasarkan jumlah peminjaman per judul
-            $bukuFavorit = Buku::select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
-                ->groupBy('judul')
-                ->get()
-                ->map(function ($buku) {
-                    // Hitung total peminjaman berdasarkan judul
-                    $totalPinjam = Peminjaman::where('judul', $buku->judul)
-                        ->where('pinjam', 'terima')
-                        ->count();
+            // Peminjam
+            $dataPeminjam = Peminjaman::whereDate('tgl_pinjam', $today)->count();
+            $dataPeminjamKemarin = Peminjaman::whereDate('tgl_pinjam', $yesterday)->count();
 
-                    // Ambil cover dari no_regis terendah (karena biasanya data awal)
-                    $data = Buku::where('no_regis', $buku->regis_terendah)->first();
+            // Kembali
+            $dataKembali = Peminjaman::whereDate('tgl_kembali', $today)->count();
+            $dataKembaliKemarin = Peminjaman::whereDate('tgl_kembali', $yesterday)->count();
 
-                    return (object) [
-                        'no_regis' => $buku->regis_terendah ?? '-',
-                        'judul' => $buku->judul ?? '-',
-                        'total_pinjam' => $totalPinjam ?? 0,
-                        'file_cover' => $data?->file_cover ?? 'default/default-book.png',
-                        'file_buku' => $data?->file_buku ?? 'default/default-book.png',
-                        'stok' => $data->stok ?? 0,
-                        'pengarang' => $data->pengarang ?? '-',
-                        'penerbit' => $data->penerbit ?? '-',
-                        'keterangan' => $data->keterangan ?? '-',
-                        'tahun' => $data->tahun ?? '-',
-                    ];
-                })
-                ->sortByDesc('total_pinjam')
-                ->take(5)
-                ->values();
 
-            // Wajib Dilihat (semua buku urut berdasarkan total peminjaman)
-            $wajibDilihat = Buku::select('judul', DB::raw('MIN(no_regis) as regis_terendah'))
+            $persenPengunjung = hitungProgres($dataPengunjung, $dataPengunjungKemarin);
+            $persenPeminjam   = hitungProgres($dataPeminjam, $dataPeminjamKemarin);
+            $persenKembali    = hitungProgres($dataKembali, $dataKembaliKemarin);
+
+            // ---------- BUKU ----------
+            $bukuQuery = Buku::query();
+            $bukuFavorit = $bukuQuery->select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
                 ->groupBy('judul')
                 ->get()
                 ->map(function ($buku) {
@@ -157,7 +197,7 @@ class DashboardController extends Controller
 
                     $data = Buku::where('no_regis', $buku->regis_terendah)->first();
 
-                    return (object) [
+                    return (object)[
                         'no_regis' => $data->no_regis ?? '-',
                         'judul' => $data->judul ?? '-',
                         'total_pinjam' => $totalPinjam ?? 0,
@@ -169,78 +209,137 @@ class DashboardController extends Controller
                         'keterangan' => $data->keterangan ?? '-',
                         'tahun' => $data->tahun ?? '-',
                     ];
-                })
-                ->sortByDesc('total_pinjam')
-                ->values();
+                })->sortByDesc('total_pinjam')->take(5)->values();
 
-            // Konten sering dilihat: bisa pakai updated_at sebagai simulasi
-            $kontenSeringDilihat = Buku::orderByDesc('updated_at')
-                ->limit(5)
+            $bukuTerbaru = Buku::latest()
                 ->get()
-                ->map(function ($item) {
-                    return (object) [
-                        'no_regis' => $item->regis_terendah ?? '-',
-                        'judul' => $item->judul ?? '-',
-                        'total_pinjam' => $totalPinjam ?? 0,
-                        'file_cover' => $item?->file_cover ?? 'default/default-book.png',
-                        'file_buku' => $item?->file_buku ?? 'default/default-book.png',
-                        'stok' => $item->stok ?? 0,
-                        'pengarang' => $item->pengarang ?? '-',
-                        'penerbit' => $item->penerbit ?? '-',
-                        'keterangan' => $item->keterangan ?? '-',
-                        'tahun' => $item->tahun ?? '-',
-                        'view_count' => 1 // Ganti dengan field aslinya jika ada
+                ->map(function ($data) {
+                    return (object)[
+                        'no_regis' => $data->no_regis ?? '-',
+                        'judul' => $data->judul ?? '-',
+                        'total_pinjam' => Peminjaman::where('judul', $data->judul)->count(),
+                        'file_cover' => $data->file_cover ?? 'default/default-book.png',
+                        'file_buku' => $data->file_buku ?? 'default/default-book.png',
+                        'stok' => $data->stok ?? 0,
+                        'pengarang' => $data->pengarang ?? '-',
+                        'penerbit' => $data->penerbit ?? '-',
+                        'keterangan' => $data->keterangan ?? '-',
+                        'tahun' => $data->tahun ?? '-',
                     ];
                 });
+
+            $allBuku = collect($bukuFavorit)
+                ->merge($bukuTerbaru)
+                ->unique('judul')
+                ->values();
+
+            // ---------- KONTEN DIGITAL ----------
+            $kontenQuery = KontenDigital::query();
+
+            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
+                ->take(5)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'nuptk' => $item->nuptk ?? '-',
+                        'judul' => $item->judul ?? '-',
+                        'jenis' => $item->jenis ?? '-',
+                        'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
+                        'url' => $item->url ?? null,
+                        'pembuat' => $item->pembuat ?? '-',
+                        'cover' => $item->cover ?? 'default/default-book.png',
+                        'dilihat' => $item->dilihat ?? 0,
+                    ];
+                });
+
+            $kontenTerbaru = KontenDigital::latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'nuptk' => $item->nuptk ?? '-',
+                        'judul' => $item->judul ?? '-',
+                        'jenis' => $item->jenis ?? '-',
+                        'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
+                        'url' => $item->url ?? null,
+                        'pembuat' => $item->pembuat ?? '-',
+                        'cover' => $item->cover ?? 'default/default-book.png',
+                        'dilihat' => $item->dilihat ?? 0,
+                    ];
+                });
+
+            $userNuptk = auth()->user()->nisn;
+
+            // Gabung dan unikkan dulu
+            $gabunganKonten = collect($kontenSeringDilihat)
+                ->merge($kontenTerbaru)
+                ->unique('judul');
+
+            // Ambil konten milik sendiri
+            $kontenSendiri = $gabunganKonten->filter(function ($item) use ($userNuptk) {
+                return $item->nuptk == $userNuptk;
+            });
+
+            // Ambil konten lainnya (bukan milik sendiri)
+            $kontenLain = $gabunganKonten->reject(function ($item) use ($userNuptk) {
+                return $item->pembuat == $userNuptk;
+            });
+
+            // Gabungkan ulang dengan milik sendiri di awal
+            $allKonten = $kontenSendiri->merge($kontenLain)->values();
+
+
+            // ---------- Wajib Dilihat ----------
+            $wajibDilihat = collect();
+
+            // Selang-seling buku dan konten
+            $maxLength = max($allBuku->count(), $allKonten->count());
+            for ($i = 0; $i < $maxLength; $i++) {
+                if (isset($allBuku[$i])) {
+                    $wajibDilihat->push($allBuku[$i]);
+                }
+                if (isset($allKonten[$i])) {
+                    $wajibDilihat->push($allKonten[$i]);
+                }
+            }
 
             return view('pages.guru.dashboard', compact(
                 'dataPengunjung',
                 'dataPeminjam',
                 'dataKembali',
+                'persenPengunjung',
+                'persenPeminjam',
+                'persenKembali',
                 'bukuFavorit',
                 'wajibDilihat',
                 'kontenSeringDilihat'
             ));
         } elseif ($roles == 'admin') {
             $today = Carbon::today();
+            $yesterday = Carbon::yesterday();
 
             // Statistik harian
-            $dataPengunjung  = Kunjungan::whereDate('created_at', $today)->count();
-            $dataPeminjam    = Peminjaman::whereDate('tgl_pinjam', $today)->count();
-            $dataKembali     = Peminjaman::whereDate('tgl_kembali', $today)->count();
+            // Pengunjung
+            $dataPengunjung = Kunjungan::whereDate('created_at', $today)->count();
+            $dataPengunjungKemarin = Kunjungan::whereDate('created_at', $yesterday)->count();
 
-            // Buku Terfavorit: berdasarkan jumlah peminjaman per judul
-            $bukuFavorit = Buku::select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
-                ->groupBy('judul')
-                ->get()
-                ->map(function ($buku) {
-                    // Hitung total peminjaman berdasarkan judul
-                    $totalPinjam = Peminjaman::where('judul', $buku->judul)
-                        ->where('pinjam', 'terima')
-                        ->count();
+            // Peminjam
+            $dataPeminjam = Peminjaman::whereDate('tgl_pinjam', $today)->count();
+            $dataPeminjamKemarin = Peminjaman::whereDate('tgl_pinjam', $yesterday)->count();
 
-                    // Ambil cover dari no_regis terendah (karena biasanya data awal)
-                    $data = Buku::where('no_regis', $buku->regis_terendah)->first();
+            // Kembali
+            $dataKembali = Peminjaman::whereDate('tgl_kembali', $today)->count();
+            $dataKembaliKemarin = Peminjaman::whereDate('tgl_kembali', $yesterday)->count();
 
-                    return (object) [
-                        'no_regis' => $buku->regis_terendah ?? '-',
-                        'judul' => $buku->judul ?? '-',
-                        'total_pinjam' => $totalPinjam ?? 0,
-                        'file_cover' => $data?->file_cover ?? 'default/default-book.png',
-                        'file_buku' => $data?->file_buku ?? 'default/default-book.png',
-                        'stok' => $data->stok ?? 0,
-                        'pengarang' => $data->pengarang ?? '-',
-                        'penerbit' => $data->penerbit ?? '-',
-                        'keterangan' => $data->keterangan ?? '-',
-                        'tahun' => $data->tahun ?? '-',
-                    ];
-                })
-                ->sortByDesc('total_pinjam')
-                ->take(5)
-                ->values();
 
-            // Wajib Dilihat (semua buku urut berdasarkan total peminjaman)
-            $wajibDilihat = Buku::select('judul', DB::raw('MIN(no_regis) as regis_terendah'))
+            $persenPengunjung = hitungProgres($dataPengunjung, $dataPengunjungKemarin);
+            $persenPeminjam   = hitungProgres($dataPeminjam, $dataPeminjamKemarin);
+            $persenKembali    = hitungProgres($dataKembali, $dataKembaliKemarin);
+
+            // ---------- BUKU ----------
+            $bukuQuery = Buku::query();
+
+            $bukuFavorit = $bukuQuery->select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
                 ->groupBy('judul')
                 ->get()
                 ->map(function ($buku) {
@@ -250,7 +349,7 @@ class DashboardController extends Controller
 
                     $data = Buku::where('no_regis', $buku->regis_terendah)->first();
 
-                    return (object) [
+                    return (object)[
                         'no_regis' => $data->no_regis ?? '-',
                         'judul' => $data->judul ?? '-',
                         'total_pinjam' => $totalPinjam ?? 0,
@@ -262,34 +361,89 @@ class DashboardController extends Controller
                         'keterangan' => $data->keterangan ?? '-',
                         'tahun' => $data->tahun ?? '-',
                     ];
-                })
-                ->sortByDesc('total_pinjam')
-                ->values();
+                })->sortByDesc('total_pinjam')->take(5)->values();
 
-            // Konten sering dilihat: bisa pakai updated_at sebagai simulasi
-            $kontenSeringDilihat = Buku::orderByDesc('updated_at')
-                ->limit(5)
+            $bukuTerbaru = Buku::latest()
                 ->get()
-                ->map(function ($item) {
-                    return (object) [
-                        'no_regis' => $item->regis_terendah ?? '-',
-                        'judul' => $item->judul ?? '-',
-                        'total_pinjam' => $totalPinjam ?? 0,
-                        'file_cover' => $item?->file_cover ?? 'default/default-book.png',
-                        'file_buku' => $item?->file_buku ?? 'default/default-book.png',
-                        'stok' => $item->stok ?? 0,
-                        'pengarang' => $item->pengarang ?? '-',
-                        'penerbit' => $item->penerbit ?? '-',
-                        'keterangan' => $item->keterangan ?? '-',
-                        'tahun' => $item->tahun ?? '-',
-                        'view_count' => 1 // Ganti dengan field aslinya jika ada
+                ->map(function ($data) {
+                    return (object)[
+                        'no_regis' => $data->no_regis ?? '-',
+                        'judul' => $data->judul ?? '-',
+                        'total_pinjam' => Peminjaman::where('judul', $data->judul)->count(),
+                        'file_cover' => $data->file_cover ?? 'default/default-book.png',
+                        'file_buku' => $data->file_buku ?? 'default/default-book.png',
+                        'stok' => $data->stok ?? 0,
+                        'pengarang' => $data->pengarang ?? '-',
+                        'penerbit' => $data->penerbit ?? '-',
+                        'keterangan' => $data->keterangan ?? '-',
+                        'tahun' => $data->tahun ?? '-',
                     ];
                 });
+
+            $allBuku = collect($bukuFavorit)
+                ->merge($bukuTerbaru)
+                ->unique('judul')
+                ->values();
+
+            // ---------- KONTEN DIGITAL ----------
+            $kontenQuery = KontenDigital::query();
+
+            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
+                ->take(5)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'judul' => $item->judul ?? '-',
+                        'jenis' => $item->jenis ?? '-',
+                        'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
+                        'url' => $item->url ?? null,
+                        'pembuat' => $item->pembuat ?? '-',
+                        'cover' => $item->cover ?? 'default/default-book.png',
+                        'dilihat' => $item->dilihat ?? 0,
+                    ];
+                });
+
+            $kontenTerbaru = KontenDigital::latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'judul' => $item->judul ?? '-',
+                        'jenis' => $item->jenis ?? '-',
+                        'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
+                        'url' => $item->url ?? null,
+                        'pembuat' => $item->pembuat ?? '-',
+                        'cover' => $item->cover ?? 'default/default-book.png',
+                        'dilihat' => $item->dilihat ?? 0,
+                    ];
+                });
+
+            $allKonten = collect($kontenSeringDilihat)
+                ->merge($kontenTerbaru)
+                ->unique('judul')
+                ->values();
+
+            // ---------- Wajib Dilihat ----------
+            $wajibDilihat = collect();
+
+            // Selang-seling buku dan konten
+            $maxLength = max($allBuku->count(), $allKonten->count());
+            for ($i = 0; $i < $maxLength; $i++) {
+                if (isset($allBuku[$i])) {
+                    $wajibDilihat->push($allBuku[$i]);
+                }
+                if (isset($allKonten[$i])) {
+                    $wajibDilihat->push($allKonten[$i]);
+                }
+            }
 
             return view('pages.admin.dashboard', compact(
                 'dataPengunjung',
                 'dataPeminjam',
                 'dataKembali',
+                'persenPengunjung',
+                'persenPeminjam',
+                'persenKembali',
                 'bukuFavorit',
                 'wajibDilihat',
                 'kontenSeringDilihat'
