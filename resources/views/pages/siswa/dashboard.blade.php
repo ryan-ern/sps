@@ -202,8 +202,10 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button class="btn btn-primary me-2" type="reset" id="closeModal"
-                                    data-bs-dismiss="modal">Tutup</button>
+                                @if ($kunjunganHariIni)
+                                    <button class="btn btn-primary me-2" type="reset" id="closeModal"
+                                        data-bs-dismiss="modal">Tutup</button>
+                                @endif
                                 <button class="btn btn-success" type="submit" id="closeModal"
                                     data-bs-dismiss="modal">Simpan</button>
                             </div>
@@ -277,6 +279,18 @@
             <x-app.footer />
         </div>
     </main>
+    @if (!$kunjunganHariIni)
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const modal = new bootstrap.Modal(document.getElementById('kunjunganModal'), {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                modal.show();
+            });
+        </script>
+    @endif
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const bukuCards = document.querySelectorAll('.buku-card');

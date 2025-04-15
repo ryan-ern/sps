@@ -31,6 +31,11 @@ class DashboardController extends Controller
             $filterJenis = request()->get('jenis'); // 'referensi', 'paket', 'digital'
             $search = request()->get('search');
 
+            // ---------- Kunjungan ----------
+            $kunjunganHariIni = Kunjungan::where('nisn', Auth::user()->nisn)
+                ->whereDate('created_at', $today)
+                ->exists();
+
             // ---------- BUKU ----------
             $bukuQuery = Buku::query();
 
@@ -162,7 +167,8 @@ class DashboardController extends Controller
             return view('pages.siswa.dashboard', compact(
                 'bukuFavorit',
                 'wajibDilihat',
-                'kontenSeringDilihat'
+                'kontenSeringDilihat',
+                'kunjunganHariIni'
             ));
         } elseif ($roles == 'guru') {
             $today = Carbon::today();
