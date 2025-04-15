@@ -1,6 +1,21 @@
 <?php
 $segments = request()->segments();
 ?>
+<style>
+    @media (max-width: 767.98px) {
+        #notifDropdownMenu {
+            max-width: 100%;
+            min-width: 350px;
+            width: auto;
+        }
+
+        #notifDropdownMenu .dropdown-item {
+            white-space: normal !important;
+            word-wrap: break-word;
+        }
+    }
+</style>
+
 <nav class="navbar navbar-main navbar-expand-lg mx-3 px-0 shadow-none rounded" id="navbarBlur" navbar-scroll="true">
     <div class="container-fluid py-1 px-2 d-flex justify-content-between align-items-center">
         <nav aria-label="breadcrumb" class="d-flex flex-column">
@@ -24,6 +39,33 @@ $segments = request()->segments();
         </nav>
 
         <div class="d-flex align-items-center">
+            <!-- Tombol Notifikasi -->
+            @if (auth()->user()->role == 'admin')
+                <div class="dropdown me-3">
+                    <button class="btn btn-sm btn-outline-info dropdown-toggle mb-0 fs-6" type="button"
+                        id="dropdownNotifikasi" data-bs-toggle="dropdown" aria-expanded="false">
+                        🔔
+                        {{ count($notifikasi) ?? 0 }} Pesan
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" id="notifDropdownMenu"
+                        aria-labelledby="dropdownNotifikasi" style="max-height: 300px; overflow-y: auto; ">
+                        @forelse ($notifikasi as $notif)
+                            <li>
+                                <a class="dropdown-item" href="{{ $notif['url'] ?? '#' }}">
+                                    {!! $notif['pesan'] !!}
+                                    <small class="d-block text-muted">{{ $notif['waktu'] }}</small>
+                                </a>
+                            </li>
+                            <li>
+                                <hr>
+                            </li>
+                        @empty
+                            <li><span class="dropdown-item text-muted">Tidak ada notifikasi</span></li>
+                        @endforelse
+                    </ul>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('logout') }}" class="me-3 mb-0">
                 @csrf
                 <button class="btn btn-sm btn-outline-dark mb-0 fs-6" type="submit">Logout</button>
@@ -38,4 +80,22 @@ $segments = request()->segments();
         </div>
     </div>
 </nav>
+<script>
+    function adjustDropdownPosition() {
+        const dropdown = document.getElementById('notifDropdownMenu');
+        if (window.innerWidth < 768) {
+            dropdown.classList.remove('dropdown-menu-end');
+            dropdown.classList.add('dropdown-menu-start');
+        } else {
+            dropdown.classList.remove('dropdown-menu-start');
+            dropdown.classList.add('dropdown-menu-end');
+        }
+    }
+
+    // Panggil saat halaman dimuat
+    window.addEventListener('load', adjustDropdownPosition);
+    // Panggil juga saat jendela di-resize
+    window.addEventListener('resize', adjustDropdownPosition);
+</script>
+
 <!-- End Navbar -->

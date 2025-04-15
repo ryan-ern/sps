@@ -77,6 +77,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/profil-siswa', [ProfileController::class, 'index'])->name('profil.read')->middleware(['role:siswa']);
     Route::post('/apps/profil-siswa/update', [ProfileController::class, 'update'])->name('profil.update')->middleware(['role:siswa']);
 
+    Route::post('/konten-digital/{id}/tambah-dilihat', [KontenDigitalController::class, 'tambahDilihat'])->name('konten.tambahDilihat');
+
+
     // ROLE GURU
     Route::get('/apps/konten-digital', [KontenDigitalController::class, 'index'])->name('konten-digital.read')->middleware(['role:guru']);
     Route::post('/apps/konten-digital/create', [KontenDigitalController::class, 'store'])->name('konten-digital.store')->middleware(['role:guru,admin']);

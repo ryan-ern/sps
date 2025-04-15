@@ -111,6 +111,7 @@ class DashboardController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return (object)[
+                        'id' => $item->id ?? '-',
                         'judul' => $item->judul ?? '-',
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
@@ -129,6 +130,7 @@ class DashboardController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return (object)[
+                        'id' => $item->id ?? '-',
                         'judul' => $item->judul ?? '-',
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,

@@ -15,6 +15,11 @@
     $search = request('search');
 @endphp
 
+<head>
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+
 <x-app-layout>
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
         <x-app.navbar />
@@ -107,7 +112,8 @@
                                             style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                             data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
                                             data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
-                                            data-file="{{ $konten->file_path }}" data-pembuat="{{ $konten->pembuat }}"
+                                            data-id="{{ $konten->id }}" data-file="{{ $konten->file_path }}"
+                                            data-pembuat="{{ $konten->pembuat }}"
                                             data-dilihat="{{ $konten->dilihat }}">
                                             <img src="{{ asset('storage/' . $konten->cover ?? '') }}"
                                                 class="img-fluid mb-2" style="height: 180px; object-fit: cover;">
@@ -148,9 +154,9 @@
                                     <div class="bg-dark text-white p-3 text-center rounded konten-card"
                                         style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                         data-bs-target="#kontenModal" data-judul="{{ $item->judul }}"
-                                        data-pembuat="{{ $item->pembuat }}"
+                                        data-pembuat="{{ $item->pembuat }}" data-id="{{ $item->id }}"
                                         data-cover="{{ asset('storage/' . $item->cover) }}"
-                                        data-url="{{ $item->url }}" data-file_path="{{ $item->file_path }}"
+                                        data-url="{{ $item->url }}" data-file="{{ $item->file_path }}"
                                         data-dilihat="{{ $item->dilihat }}" data-jenis="{{ $item->jenis }}">
                                         <img src="{{ asset('storage/' . $item->cover) }}" class="img-fluid mb-2"
                                             alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
@@ -321,13 +327,38 @@
                     const file = this.getAttribute('data-file'); // file_path (untuk buku digital)
                     const url = this.getAttribute('data-url'); // link (untuk video)
                     const pembuat = this.getAttribute('data-pembuat');
-                    const dilihat = this.getAttribute('data-dilihat');
-
+                    let dilihat = this.getAttribute('data-dilihat');
+                    const kontenId = this.getAttribute('data-id');
                     // Isi konten modal
                     document.getElementById('modalJudul').textContent = judul;
                     document.getElementById('modalJenis').textContent = jenis;
                     document.getElementById('modalPembuat').textContent = pembuat;
                     document.getElementById('modalDilihat').textContent = dilihat;
+
+                    // Tambah jumlah dilihat
+                    if (kontenId) {
+                        fetch(`/konten-digital/${kontenId}/tambah-dilihat`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                        'meta[name="csrf-token"]').getAttribute('content'),
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    dilihat = data.dilihat;
+                                    document.getElementById('modalDilihat').textContent =
+                                        dilihat;
+                                    this.setAttribute('data-dilihat', dilihat);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Gagal memperbarui jumlah dilihat:', error);
+                            });
+                    }
+
 
                     const bukaLink = document.getElementById('modalBuka');
                     bukaLink.href = url || file || '#';

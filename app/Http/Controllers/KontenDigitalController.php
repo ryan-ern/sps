@@ -222,4 +222,11 @@ class KontenDigitalController extends Controller
         );
         return redirect()->back();
     }
+
+    public function tambahDilihat($id)
+    {
+        $konten = KontenDigital::findOrFail($id);
+        $konten->increment('dilihat');
+        return response()->json(['success' => true, 'dilihat' => $konten->dilihat]);
+    }
 }

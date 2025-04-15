@@ -25,7 +25,7 @@
 
                         {{-- Statistik Harian --}}
                         <div class="row mb-4">
-                            <div class="col mb-md-0 mb-4">
+                            <div class="col-12 col-md-4 mb-md-0 mb-4">
                                 <div class="bg-dark text-white px-4 py-2 rounded">
                                     <div class="row">
                                         <div
@@ -51,7 +51,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col mb-md-0 mb-4">
+                            <div class="col-12 col-md-4 mb-md-0 mb-4">
                                 <div class="bg-dark text-white px-4 py-2 rounded">
                                     <div class="row">
                                         <div
@@ -61,7 +61,7 @@
                                         <div class="col-md-7">
                                             <div class="row">
                                                 <div class="col">
-                                                    <small class="fs-5">Data Buku Pinjam</small>
+                                                    <small class="fs-5">Data Pinjam</small>
                                                 </div>
                                             </div>
                                             <div class="border-2 border-bottom border-light my-3"></div>
@@ -77,7 +77,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col mb-md-0 mb-4">
+                            <div class="col-12 col-md-4 mb-md-0 mb-4">
                                 <div class="bg-dark text-white px-4 py-2 rounded">
                                     <div class="row">
                                         <div
@@ -87,7 +87,7 @@
                                         <div class="col-md-7">
                                             <div class="row">
                                                 <div class="col">
-                                                    <small class="fs-5">Data Buku Kembali</small>
+                                                    <small class="fs-5">Data Kembali</small>
                                                 </div>
                                             </div>
                                             <div class="border-2 border-bottom border-light my-3"></div>
@@ -109,7 +109,7 @@
 
                         {{-- Buku Terfavorit --}}
                         <h6>Buku Terfavorit</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-3 justify-content-md-evenly mb-4">
+                        <div class="d-flex flex-wrap justify-content-center  gap-2 justify-content-md-evenly mb-4">
                             @forelse ($bukuFavorit as $buku)
                                 <div class="bg-dark text-white p-3 text-center rounded buku-card"
                                     style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
@@ -135,7 +135,7 @@
 
                         {{-- Konten Sering Dilihat --}}
                         <h6>Konten Digital Sering Dilihat</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-3 justify-content-md-evenly mb-4">
+                        <div class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
                             @foreach ($kontenSeringDilihat as $konten)
                                 <div class="bg-dark text-white p-3 text-center konten-card rounded"
                                     style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
@@ -155,7 +155,7 @@
 
                         {{-- Wajib Dilihat --}}
                         <h6>Wajib Dilihat</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-3 justify-content-md-evenly mb-4">
+                        <div class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
                             @forelse ($wajibDilihat as $item)
                                 {{-- Jika item adalah Buku --}}
                                 @if (isset($item->no_regis))
@@ -182,7 +182,7 @@
                                         data-bs-target="#kontenModal" data-judul="{{ $item->judul }}"
                                         data-pembuat="{{ $item->pembuat }}"
                                         data-cover="{{ asset('storage/' . $item->cover) }}"
-                                        data-url="{{ $item->url }}" data-file_path="{{ $item->file_path }}"
+                                        data-url="{{ $item->url }}" data-file="{{ $item->file_path }}"
                                         data-dilihat="{{ $item->dilihat }}" data-jenis="{{ $item->jenis }}">
                                         <img src="{{ asset('storage/' . $item->cover) }}" class="img-fluid mb-2"
                                             alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
@@ -232,7 +232,30 @@
                 </div>
             </div>
         </div>
+        <!-- Modal Konten Digital -->
+        <div class="modal fade" id="kontenModal" tabindex="-1" aria-labelledby="kontenModalLabel"
+            data-bs-backdrop="static">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content bg-light">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="kontenModalLabel">Detail Konten Digital</h5>
+                        <button class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                    <div class="modal-body">
+                        <h4 id="modalJudul" class="mb-3"></h4>
+                        <p><strong>Jenis:</strong> <span id="modalJenis"></span></p>
+                        <p><strong>Pembuat:</strong> <span id="modalPembuat"></span></p>
+                        <p><strong>Jumlah Dilihat:</strong> <span id="modalDilihat"></span>x</p>
+                        <p id="tab_baru"><strong>Buka di tab baru:</strong> <a id="modalBuka" href="#"
+                                target="_blank">Klik di sini</a></p>
 
+                        <div id="kontenPreview" class="mt-2">
+                            <!-- Preview Konten akan muncul di sini -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <x-app.footer />
         </div>
     </main>
@@ -257,6 +280,62 @@
                     document.getElementById('btn-download').setAttribute('download', card.dataset
                         .judul);
                     document.getElementById('btn-baca').href = card.dataset.file;
+                });
+            });
+
+            // Modal Konten
+            const kontenCards = document.querySelectorAll('.konten-card');
+
+            kontenCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const judul = this.getAttribute('data-judul');
+                    const jenis = this.getAttribute('data-jenis'); // 'video' atau 'buku digital'
+                    const file = this.getAttribute('data-file'); // file_path (untuk buku digital)
+                    const url = this.getAttribute('data-url'); // link (untuk video)
+                    const pembuat = this.getAttribute('data-pembuat');
+                    const dilihat = this.getAttribute('data-dilihat');
+
+                    // Isi konten modal
+                    document.getElementById('modalJudul').textContent = judul;
+                    document.getElementById('modalJenis').textContent = jenis;
+                    document.getElementById('modalPembuat').textContent = pembuat;
+                    document.getElementById('modalDilihat').textContent = dilihat;
+
+                    const bukaLink = document.getElementById('modalBuka');
+                    bukaLink.href = url || file || '#';
+                    bukaLink.target = "_blank";
+                    bukaLink.innerHTML = 'Klik di sini';
+
+                    const preview = document.getElementById('kontenPreview');
+                    const tabBaru = document.getElementById('tab_baru');
+                    preview.innerHTML = '';
+
+                    if (jenis === 'video' && url) {
+                        const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+
+                        if (isYoutube) {
+                            let embedUrl = url;
+                            if (url.includes('watch?v=')) {
+                                embedUrl = url.replace('watch?v=', 'embed/');
+                            } else if (url.includes('youtu.be/')) {
+                                const videoId = url.split('youtu.be/')[1];
+                                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                            }
+
+                            preview.innerHTML = `
+                    <div class="ratio ratio-16x9">
+                        <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+                    </div>`;
+                        }
+                    } else if (jenis === 'buku digital' && file) {
+                        preview.innerHTML = `
+                <iframe src="${file}" width="100%" height="500px" frameborder="0">
+                    File tidak dapat ditampilkan.
+                </iframe>`;
+                    } else {
+                        preview.innerHTML =
+                            `<p class="text-muted">Konten tidak tersedia untuk ditampilkan.</p>`;
+                    }
                 });
             });
         });
