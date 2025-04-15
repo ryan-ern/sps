@@ -23,7 +23,8 @@ class KontenDigitalFactory extends Factory
             'jenis' => fake()->randomElement(['buku digital', 'video']),
             'judul' => fake()->sentence(),
             'url' => fake()->url(),
-            'file_path' => fake()->sentence(),
+            'cover' => 'default/default-book.png',
+            'file_path' => 'default/default-book.png',
             'pembuat' => $user->fullname,
             'dilihat' => fake()->randomNumber(2),
         ];
