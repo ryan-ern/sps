@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/apps/anggota/kartu', [UserController::class, 'cardDownload'])->name('kartu-anggota')->middleware(['role:admin']);
 
     Route::get('/apps/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.read')->middleware(['role:admin']);
-    Route::post('/apps/kunjungan/store', [KunjunganController::class, 'store'])->name('kunjungan.store')->middleware(['role:admin']);
+    Route::post('/apps/kunjungan/store', [KunjunganController::class, 'store'])->name('kunjungan.store')->middleware(['role:admin,siswa']);
 
 
     Route::get('/apps/pustaka', [BebasPustakaController::class, 'index'])->name('pustaka.read')->middleware(['role:admin']);

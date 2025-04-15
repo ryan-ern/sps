@@ -62,7 +62,8 @@ class KunjunganController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nisn' => 'required|string'
+            'nisn' => 'required|string',
+            'keterangan' => 'nullable|string',
         ]);
 
         $user = User::where('nisn', $request->nisn)->first();
@@ -76,13 +77,28 @@ class KunjunganController extends Controller
             );
             return redirect()->route('kunjungan.read');
         }
-
-        Kunjungan::create([
-            'nisn' => $user->nisn,
-            'fullname' => $user->fullname,
-            'kelas' => $user->kelas,
-            'keterangan' => 'Diisi dengan scan barcode',
-        ]);
+        if ($request->filled('keterangan')) {
+            Kunjungan::create([
+                'nisn' => $user->nisn,
+                'fullname' => $user->fullname,
+                'kelas' => $user->kelas,
+                'keterangan' => $request->keterangan,
+            ]);
+            flash()->flash(
+                'success',
+                'Kunjungan ' . $user->fullname . ' berhasil dicatat. ',
+                [],
+                'Isi Kunjungan Berhasil'
+            );
+            return redirect()->back();
+        } else {
+            Kunjungan::create([
+                'nisn' => $user->nisn,
+                'fullname' => $user->fullname,
+                'kelas' => $user->kelas,
+                'keterangan' => 'Diisi dengan scan barcode',
+            ]);
+        }
 
         flash()->flash(
             'success',

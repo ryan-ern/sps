@@ -28,7 +28,8 @@
                                 <h5>{{ $greeting }}, {{ auth()->user()->fullname }}</h5>
                             </div>
                             <div class="col">
-                                <button class="btn btn-dark float-end">Isi Kunjungan</button>
+                                <button class="btn btn-dark float-end" data-bs-toggle="modal"
+                                    data-bs-target="#kunjunganModal">Isi Kunjungan</button>
                             </div>
                         </div>
 
@@ -164,6 +165,52 @@
                     </div>
                 </div>
             </div>
+            {{-- Modal isi kunjungan --}}
+            <div class="modal fade" id="kunjunganModal" tabindex="-1" aria-labelledby="kunjunganModalLabel"
+                data-bs-backdrop="static">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content">
+                        <form action="{{ route('kunjungan.store') }}" method="POST">
+                            @csrf
+                            @method('POST')
+                            <div class="modal-body">
+                                <h5 class="text-center">Selamat Datang {{ auth()->user()->fullname }}, <br> Harap
+                                    lengkapi
+                                    form
+                                    kunjungan <br> di bawah
+                                    ini terlebih dahulu</h5>
+                                <div class="container">
+                                    <p>
+                                        <label for="fullname" class="form-label">Nama Lengkap:</label>
+                                        <input type="text" name="fullname" id="fullname"
+                                            value="{{ auth()->user()->fullname }}" class="form-control" readonly>
+                                    </p>
+                                    <p>
+                                        <label for="nisn" class="form-label">NISN:</label>
+                                        <input type="text" name="nisn" id="nisn"
+                                            value="{{ auth()->user()->nisn }}" class="form-control" readonly>
+                                    </p>
+                                    <p>
+                                        <label for="kelas" class="form-label">Kelas:</label>
+                                        <input type="text" name="kelas" id="kelas"
+                                            value="{{ auth()->user()->kelas }}" class="form-control" readonly>
+                                    </p>
+                                    <p>
+                                        <textarea name="keterangan" id="keterangan" cols="30" rows="10" class="form-control"
+                                            placeholder="Keterangan" required></textarea>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary me-2" type="reset" id="closeModal"
+                                    data-bs-dismiss="modal">Tutup</button>
+                                <button class="btn btn-success" type="submit" id="closeModal"
+                                    data-bs-dismiss="modal">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
             <!-- Modal Konten Digital -->
             <div class="modal fade" id="kontenModal" tabindex="-1" aria-labelledby="kontenModalLabel"
                 data-bs-backdrop="static">
@@ -189,7 +236,6 @@
                     </div>
                 </div>
             </div>
-
 
             <!-- Modal Buku -->
             <div class="modal fade" id="globalBukuModal" tabindex="-1" aria-labelledby="globalBukuModalLabel">
