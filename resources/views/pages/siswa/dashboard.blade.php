@@ -75,7 +75,7 @@
                                 {{-- Buku Terfavorit --}}
                                 <h6>Buku Terfavorit</h6>
                                 <div
-                                    class="d-flex flex-wrap justify-content-center gap-3 justify-content-md-evenly mb-4">
+                                    class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
                                     @forelse ($bukuFavorit as $buku)
                                         <div class="bg-dark text-white p-3 text-center rounded buku-card"
                                             style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
@@ -106,7 +106,7 @@
                                 {{-- Konten Digital Sering Dilihat --}}
                                 <h6>Konten Digital Sering Dilihat</h6>
                                 <div
-                                    class="d-flex flex-wrap justify-content-center gap-3 justify-content-md-evenly mb-4">
+                                    class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
                                     @foreach ($kontenSeringDilihat as $konten)
                                         <div class="bg-dark text-white p-3 text-center konten-card rounded"
                                             style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
@@ -129,7 +129,7 @@
 
                         {{-- Wajib Dilihat --}}
                         <h6>Wajib Dilihat</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-3 justify-content-md-evenly mb-4">
+                        <div class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
                             @forelse ($wajibDilihat as $item)
                                 {{-- Jika item adalah Buku --}}
                                 @if (isset($item->no_regis))
