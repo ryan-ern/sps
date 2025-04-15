@@ -23,13 +23,13 @@
                                         <div class="mb-3">
                                             <input type="text" id="username" name="username" class="form-control"
                                                 placeholder="Masukkan username terdaftar"
-                                                value="{{ old('username') ? old('username') : 'admin' }}"
+                                                value="{{ old('username') ? old('username') : '' }}"
                                                 aria-label="username" aria-describedby="username-addon">
                                         </div>
                                         <label>Password</label>
                                         <div class="mb-3">
                                             <input type="password" id="password" name="password"
-                                                value="{{ old('password') ? old('password') : '123' }}"
+                                                value="{{ old('password') ? old('password') : '' }}"
                                                 class="form-control" placeholder="Masukkan password disini"
                                                 aria-label="Password" aria-describedby="password-addon">
                                         </div>

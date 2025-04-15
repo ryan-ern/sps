@@ -29,7 +29,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($data as $dataPengembalian)
+                                        @forelse ($data as $dataPengembalian)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="truncate">{{ $dataPengembalian->judul }}</td>
@@ -59,7 +59,11 @@
                                                     @endif
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="7" class="text-center">Belum Ada Data Pengembalian</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                                 {{-- Tambahkan Navigasi Pagination --}}
