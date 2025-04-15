@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('jenis', ['buku digital', 'video']);
             $table->text('judul');
             $table->text('url')->nullable();
+            $table->string('cover')->nullable();
             $table->string('file_path')->nullable();
             $table->string('pembuat');
             $table->integer('dilihat')->default(0);

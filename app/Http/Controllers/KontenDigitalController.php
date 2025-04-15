@@ -69,6 +69,7 @@ class KontenDigitalController extends Controller
             'pembuat' => 'required|string|max:255',
             'url' => 'nullable|url',
             'file_path' => 'nullable|file|mimes:pdf|max:10000',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'nuptk' => 'required',
         ], [
             'nuptk.required' => 'NUPTK harus diisi.',
@@ -84,6 +85,9 @@ class KontenDigitalController extends Controller
             'file_path.file' => 'File yang diunggah harus berupa file.',
             'file_path.mimes' => 'File harus berformat PDF.',
             'file_path.max' => 'Ukuran file maksimal 10MB.',
+            'cover.image' => 'Cover harus berupa gambar.',
+            'cover.mimes' => 'Cover harus berformat JPEG, PNG, atau JPG.',
+            'cover.max' => 'Ukuran cover maksimal 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -106,13 +110,27 @@ class KontenDigitalController extends Controller
         if ($request->hasFile('file_path')) {
             $file = $request->file('file_path');
             $fileName = time() . '_konten_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('uploads/konten_digital', $fileName, 'public');
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileName);
+            $extension = $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('uploads/konten_digital', $cleanName . '.' . $extension, 'public');
             $konten->file_path = $filePath;
             $konten->url = null;
         } else {
             $konten->url = $request->url;
             $konten->file_path = null;
         }
+
+        if ($request->hasFile('cover')) {
+            $fileCover = $request->file('cover');
+            $coverName = time() . '_cover_' . $fileCover->getClientOriginalName();
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $coverName);
+            $extension = $file->getClientOriginalExtension();
+            $coverPath = $fileCover->storeAs('uploads/konten_cover', $cleanName . '.' . $extension, 'public');
+        } else {
+            $coverPath = 'default/default-book.png';
+        }
+
+        $konten->cover = $coverPath;
 
         $konten->save();
 
@@ -137,6 +155,7 @@ class KontenDigitalController extends Controller
             'pembuat' => 'required|string|max:255',
             'nuptk' => 'required',
             'url' => 'nullable|url',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'file_path' => 'nullable|file|mimes:pdf|max:10000',
         ]);
 
@@ -153,13 +172,27 @@ class KontenDigitalController extends Controller
 
             $file = $request->file('file_path');
             $fileName = time() . '_konten_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('uploads/konten_digital', $fileName, 'public');
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileName);
+            $extension = $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('uploads/konten_digital', $cleanName . '.' . $extension, 'public');
             $konten->file_path = $filePath;
             $konten->url = null;
         } else {
             $konten->url = $request->url;
             $konten->file_path = null;
         }
+
+        if ($request->hasFile('cover')) {
+            $fileCover = $request->file('cover');
+            $coverName = time() . '_cover_' . $fileCover->getClientOriginalName();
+            $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $coverName);
+            $extension = $file->getClientOriginalExtension();
+            $coverPath = $fileCover->storeAs('uploads/konten_cover', $coverName . '.' . $extension, 'public');
+        } else {
+            $coverPath = $konten->cover ?? 'default/default-book.png';
+        }
+
+        $konten->cover = $coverPath;
 
         $konten->save();
         flash()->flash(
