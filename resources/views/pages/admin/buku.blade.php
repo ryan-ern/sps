@@ -276,6 +276,7 @@
                                                                 data-url="{{ $data->url }}"
                                                                 data-nuptk="{{ $data->nuptk }}"
                                                                 data-file_path="{{ $data->file_path }}"
+                                                                data-cover="{{ $data->cover }}"
                                                                 data-bs-toggle="modal" data-bs-target="#dynamicModal"
                                                                 data-modal-type="update">
                                                                 Edit
@@ -391,6 +392,7 @@
                         const pembuat = button.getAttribute('data-pembuat');
                         const nuptk = button.getAttribute('data-nuptk');
                         const url = button.getAttribute('data-url');
+                        const cover = button.getAttribute('data-cover');
                         const file = button.getAttribute('data-file_path');
 
                         modalBodyHTML = `
@@ -413,6 +415,11 @@
                                     <div id="urlGroup" class="mb-3 ${jenis === 'video' ? '' : 'd-none'}">
                                         <label class="form-label">Link URL Youtube</label>
                                         <input type="text" class="form-control" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
+                                    </div>
+                                    <div id="coverGroup" class="mb-3>
+                                        <label class="form-label">Cover Preview</label>
+                                        <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
+                                        ${cover ? `<a href="/storage/${cover}" target="_blank" class="d-block mt-2 text-info">Lihat File Cover</a>` : ''}
                                     </div>
                                     <div id="fileGroup" class="mb-3 ${jenis === 'buku digital' ? '' : 'd-none'}">
                                         <label class="form-label">Buku Digital</label>
@@ -523,6 +530,10 @@
                                         <label for="file_path" class="form-label">Buku Digital</label>
                                         <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
                                     </div>
+                                    <div id="coverGroup" class="mb-3>
+                                        <label for="cover" class="form-label">Cover Preview</label>
+                                        <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
+                                    </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">
                                     <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
@@ -632,8 +643,8 @@
                     </div>
                     ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </a>`
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </a>`
                     : ''}
             </div>
         </div>
