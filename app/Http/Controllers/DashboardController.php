@@ -44,7 +44,7 @@ class DashboardController extends Controller
             }
 
             if ($search) {
-                $bukuQuery->where('judul', 'like', '%' . $search . '%');
+                $bukuQuery->where('judul', 'like', '%' . $search . '%')->orWhere('no_regis', 'like', '%' . $search . '%')->orWhere('pengarang', 'like', '%' . $search . '%')->orWhere('penerbit', 'like', '%' . $search . '%');
             }
 
             $bukuFavorit = $bukuQuery->select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
