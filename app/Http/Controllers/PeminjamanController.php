@@ -6,6 +6,7 @@ use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
@@ -310,6 +311,10 @@ class PeminjamanController extends Controller
         }
 
         $peminjaman->save();
+
+        Buku::where('judul', $peminjaman->buku->judul)->update([
+            'stok' => DB::raw('stok - 1')
+        ]);
 
         flash()->flash(
             'success',

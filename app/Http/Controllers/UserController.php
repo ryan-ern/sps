@@ -300,7 +300,7 @@ class UserController extends Controller
         }
 
         // Filter tanggal
-        if ($dateRange) {
+        if ($dateRange !== '01/01/0001 - 01/01/0001') {
             $dates = explode(" - ", $dateRange);
             if (count($dates) === 2) {
                 $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->startOfDay();
