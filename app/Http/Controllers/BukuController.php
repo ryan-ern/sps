@@ -8,6 +8,7 @@ use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -259,6 +260,9 @@ class BukuController extends Controller
             );
             return redirect()->back();
         }
+        Buku::where('judul', $bukuList->buku->judul)->update([
+            'stok' => DB::raw('stok - 1')
+        ]);
 
         // Jika aman, lanjutkan penghapusan
         $bukuList->delete();
