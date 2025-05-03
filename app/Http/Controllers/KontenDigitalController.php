@@ -31,7 +31,7 @@ class KontenDigitalController extends Controller
         $dateRange = $request->input('dates');
 
         // Query dasar untuk Konten Digital
-        $kontenQuery = KontenDigital::where('nuptk', auth()->user()->nisn)->where('created_by', auth()->user()->nisn)->orderBy('created_at', 'desc');
+        $kontenQuery = KontenDigital::where('nuptk', auth()->user()->nisn)->orderBy('created_at', 'desc');
 
         // Filter berdasarkan pencarian
         if ($search) {
