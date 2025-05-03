@@ -32,7 +32,7 @@
                                     </div>
                                     <hr>
                                 </form>
-                                <table class="table table-sm table-bordered dataTable tanpa-filter tanpa-aksi" id="table">
+                                <table class="table table-sm table-bordered dataTable tanpa-aksi" id="table">
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th>No</th>

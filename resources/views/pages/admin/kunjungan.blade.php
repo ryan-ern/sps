@@ -106,7 +106,7 @@
                 clearTimeout(barcodeDebounce);
                 barcodeDebounce = setTimeout(() => {
                     if (barcodeInput.value.trim() !== "") {
-                        document.getElementById("scanForm").submit();
+                        document.getElementById("scanForm");
                     }
                 }, 500);
             });
