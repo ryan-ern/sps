@@ -19,17 +19,26 @@ class UsersImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatc
 
     public function model(array $row)
     {
+        // Pisahkan fullname menjadi array kata
+        $namaParts = explode(' ', trim($row['fullname']));
+        $namaDepan = $namaParts[0];
+        $namaBelakang = end($namaParts); // Nama terakhir (jika hanya 1 kata, jadi nama depan)
+
+        // Ambil 4 digit terakhir dari NISN
+        $nisnAkhir = substr($row['nisn'], -4);
+
         return new User([
             'nisn' => $row['nisn'],
             'fullname' => $row['fullname'],
-            'username' => $row['fullname'],
+            'username' => strtolower($namaDepan), // lowercase
             'kelas' => $row['kelas'],
-            'password' => bcrypt($row['nisn']),
+            'password' => bcrypt(strtolower($namaBelakang) . $nisnAkhir),
             'role' => $row['role'],
             'status' => $row['status'],
             'email' => $row['email'],
         ]);
     }
+
 
     public function uniqueBy()
     {
