@@ -269,7 +269,7 @@ class BukuController extends Controller
 
         flash()->flash(
             'success',
-            'Semua buku dengan nomor registrasi ' . $id . ' berhasil dihapus.',
+            'Data buku dengan nomor registrasi ' . $id . ' berhasil dihapus.',
             [],
             'Hapus Data Sukses'
         );
