@@ -22,9 +22,9 @@ class UsersImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatc
         return new User([
             'nisn' => $row['nisn'],
             'fullname' => $row['fullname'],
-            'username' => $row['username'],
+            'username' => $row['fullname'],
             'kelas' => $row['kelas'],
-            'password' => bcrypt($row['password']),
+            'password' => bcrypt($row['nisn']),
             'role' => $row['role'],
             'status' => $row['status'],
             'email' => $row['email'],

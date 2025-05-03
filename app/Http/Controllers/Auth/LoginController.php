@@ -39,7 +39,7 @@ class LoginController extends Controller
                 ['timeout' => 1500],
                 'Login Sukses'
             );
-            return redirect()->intended('/apps/dashboard');
+            return redirect()->intended('/apps/dashboard')->with('show_pop_up', true);
         }
 
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password'], 'status' => 'tidak aktif'])) {

@@ -241,7 +241,7 @@ class PeminjamanController extends Controller
         }
 
         // Ambil semua buku dengan judul yang sama dan status tersedia
-        $bukuTersedia = Buku::where('judul', $buku->judul)
+        $bukuTersedia = Buku::where('no_regis', $id)
             ->where('status', 'tersedia')
             ->get();
 

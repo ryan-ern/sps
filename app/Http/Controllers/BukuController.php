@@ -224,16 +224,15 @@ class BukuController extends Controller
 
     public function destroy(Request $request)
     {
-        $judul = $request->judul;
-        $stok = $request->stok;
+        $id = $request->no_regis;
 
         // Ambil semua buku yang cocok
-        $bukuList = Buku::where('judul', $judul)->where('stok', $stok)->get();
+        $bukuList = Buku::where('no_regis', $id)->first();
 
-        if ($bukuList->isEmpty()) {
+        if (!$bukuList) {
             flash()->flash(
                 'error',
-                'Data buku dengan judul ' . $judul . ' tidak ditemukan.',
+                'Data buku dengan nomor registrasi ' . $id . ' tidak ditemukan.',
                 [],
                 'Hapus Data Gagal'
             );
@@ -241,10 +240,10 @@ class BukuController extends Controller
         }
 
         // Ambil semua no_regis dari buku yang ditemukan
-        $noRegisList = $bukuList->pluck('no_regis');
+        // $noRegisList = $bukuList->pluck('no_regis');
 
         // Cek apakah ada peminjaman aktif yang belum selesai
-        $peminjamanAktif = Peminjaman::whereIn('no_regis', $noRegisList)
+        $peminjamanAktif = Peminjaman::where('no_regis', $id)
             ->where(function ($query) {
                 $query->whereNull('tgl_kembali')
                     ->orWhere('kembali', '!=', 'selesai');
@@ -262,11 +261,11 @@ class BukuController extends Controller
         }
 
         // Jika aman, lanjutkan penghapusan
-        Buku::whereIn('no_regis', $noRegisList)->delete();
+        $bukuList->delete();
 
         flash()->flash(
             'success',
-            'Semua buku dengan judul ' . $judul . ' berhasil dihapus.',
+            'Semua buku dengan nomor registrasi ' . $id . ' berhasil dihapus.',
             [],
             'Hapus Data Sukses'
         );

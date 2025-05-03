@@ -16,9 +16,7 @@ class UsersExport implements FromCollection, WithHeadings
             [
                 '1234567890',
                 'Tester Satu',
-                'testersatu',
                 '9A',
-                'password',
                 'siswa',
                 'aktif',
                 'testersatu@example.com'
@@ -26,9 +24,7 @@ class UsersExport implements FromCollection, WithHeadings
             [
                 '1234567891',
                 'Tester Dua',
-                'testerdua',
                 '9B',
-                'password',
                 'admin',
                 'tidak aktif',
                 'testerdua@example.com'
@@ -36,9 +32,7 @@ class UsersExport implements FromCollection, WithHeadings
             [
                 '1234567892',
                 'Tester Tiga',
-                'testertiga',
                 '9C',
-                'password',
                 'guru',
                 'aktif',
                 'testertiga@example.com'
@@ -48,6 +42,6 @@ class UsersExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['nisn', 'fullname', 'username', 'kelas', 'password', 'role', 'status', 'email'];
+        return ['nisn', 'fullname', 'kelas', 'role', 'status', 'email'];
     }
 }

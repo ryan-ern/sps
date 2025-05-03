@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\KontenDigital;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,7 +31,7 @@ class KontenDigitalController extends Controller
         $dateRange = $request->input('dates');
 
         // Query dasar untuk Konten Digital
-        $kontenQuery = KontenDigital::where('nuptk', auth()->user()->nisn)->orderBy('created_at', 'desc');
+        $kontenQuery = KontenDigital::where('nuptk', auth()->user()->nisn)->where('created_by', auth()->user()->nisn)->orderBy('created_at', 'desc');
 
         // Filter berdasarkan pencarian
         if ($search) {
@@ -56,8 +58,9 @@ class KontenDigitalController extends Controller
         } else {
             $datas = $kontenQuery->paginate($perPage);
         }
+        $guru = User::where('role', 'guru')->get();
 
-        return view('pages.guru.konten', compact('datas', 'perPage', 'search', 'dateRange'));
+        return view('pages.guru.konten', compact('datas', 'perPage', 'search', 'dateRange', 'guru'));
     }
 
 
@@ -106,6 +109,7 @@ class KontenDigitalController extends Controller
         $konten->judul = $request->judul;
         $konten->pembuat = $request->pembuat;
         $konten->nuptk = $request->nuptk;
+        $konten->created_by = auth()->user()->nisn;
 
         if ($request->hasFile('file_path')) {
             $file = $request->file('file_path');
@@ -124,7 +128,7 @@ class KontenDigitalController extends Controller
             $fileCover = $request->file('cover');
             $coverName = time() . '_cover_' . $fileCover->getClientOriginalName();
             $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $coverName);
-            $extension = $file->getClientOriginalExtension();
+            $extension = $fileCover->getClientOriginalExtension();
             $coverPath = $fileCover->storeAs('uploads/konten_cover', $cleanName . '.' . $extension, 'public');
         } else {
             $coverPath = 'default/default-book.png';
@@ -186,7 +190,7 @@ class KontenDigitalController extends Controller
             $fileCover = $request->file('cover');
             $coverName = time() . '_cover_' . $fileCover->getClientOriginalName();
             $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $coverName);
-            $extension = $file->getClientOriginalExtension();
+            $extension = $fileCover->getClientOriginalExtension();
             $coverPath = $fileCover->storeAs('uploads/konten_cover', $coverName . '.' . $extension, 'public');
         } else {
             $coverPath = $konten->cover ?? 'default/default-book.png';

@@ -14,7 +14,7 @@
                                 <div class="card-header pb-0 text-left bg-transparent text-center">
                                     <h3 class="font-weight-black text-dark display-6">Selamat Datang Kutu Buku</h3>
                                     <img src="{{ asset('assets/img/logo.png') }}" alt="logo" class="w-30">
-                                    <div class="text-muted mt-2">di Sistem Perpustakaan Sekolah</div>
+                                    <div class="text-muted mt-2">di Perpustakaan Digital SMP Negeri 1 Sidomulyo</div>
                                 </div>
                                 <div class="card-body">
                                     <form role="form" class="text-start" method="POST" action="sign-in">

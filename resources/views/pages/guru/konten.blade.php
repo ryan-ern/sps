@@ -8,16 +8,16 @@
                         <div class="card-body p-5">
                             <div class="table-responsive text-center">
                                 {{-- Filter --}}
-                                <form method="GET" action="{{ route('data-buku.read') }}" class="mb-3">
+                                <form method="GET" action="{{ route('konten-digital.read') }}" class="mb-3">
                                     <div class="row d-flex justify-content-between">
                                         <!-- Date Range Picker -->
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <!-- <div class="col-lg-4 col-md-6 col-sm-12">
                                             <input type="text" name="dates" value="{{ request('dates') }}"
                                                 class="dates form-control mb-2" />
-                                        </div>
+                                        </div> -->
 
                                         <!-- Search Input -->
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
                                             <input type="search" id="search" name="search"
                                                 class="form-control mb-2" placeholder="Cari Buku Referensi"
                                                 value="{{ request('search') }}">
@@ -25,7 +25,7 @@
 
                                         <!-- Submit Button -->
                                         <div class="col-lg-4 d-inline-flex gap-2 col-md-4 col-sm-12">
-                                            <a href="{{ route('data-buku.read') }}"
+                                            <a href="{{ route('konten-digital.read') }}"
                                                 class="btn btn-warning w-100">Reset</a>
                                             <button type="submit" class="btn btn-primary w-100">Terapkan</button>
                                         </div>
@@ -33,7 +33,7 @@
                                     <hr>
                                 </form>
 
-                                <table class="table table-sm table-bordered dataTable" id="table">
+                                <table class="table table-sm table-bordered dataTable tanpa-filter tanpa-aksi" id="table">
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th scope="col">No</th>
@@ -64,7 +64,7 @@
                                                         data-url="{{ $data->url }}"
                                                         data-nuptk="{{ $data->nuptk }}"
                                                         data-file_path="{{ $data->file_path }}" data-bs-toggle="modal"
-                                                        data-bs-target="#dynamicModal" data-modal-type="update">
+                                                        data-bs-target="#dynamicModal" data-modal-type="update" data-cover="{{ $data->cover }}">
                                                         Edit
                                                     </button>
 
@@ -117,6 +117,9 @@
             <x-app.footer />
         </div>
     </main>
+    <script>
+        const guruOptions = @json($guru);
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let tabs = document.querySelectorAll("#Tabs .nav-link");
@@ -172,6 +175,7 @@
                     const nuptk = button.getAttribute('data-nuptk');
                     const url = button.getAttribute('data-url');
                     const file = button.getAttribute('data-file_path');
+                    const cover = button.getAttribute('data-cover');
 
                     modalBodyHTML = `
                             @csrf
@@ -184,13 +188,20 @@
                                         <option value="buku digital" ${jenis === 'buku digital' ? 'selected' : ''}>Buku Digital</option>
                                     </select>
                                     <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" value="${judul}" required>
-                                    <input type="text" class="form-control mb-3" name="nuptk" placeholder="NUPTK" value="{{ auth()->user()->nisn }}" readonly>
+                                    <select name="nuptk" required class="form-select mb-3" id="guruSelect">
+                                        <option value="" disabled>Pilih Guru (NUPTK)</option>
+                                    </select>
                                     <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
                                 </div>
                                  <div class="col-md-6">
                                     <div id="urlGroup" class="mb-3 ${jenis === 'video' ? '' : 'd-none'}">
                                         <label class="form-label">Link URL Youtube</label>
                                         <input type="text" class="form-control" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
+                                    </div>
+                                    <div id="coverGroup" class="mb-3>
+                                        <label class="form-label">Cover Preview</label>
+                                        <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
+                                        ${cover ? `<a href="/storage/${cover}" target="_blank" class="d-block mt-2 text-info">Lihat File Cover</a>` : ''}
                                     </div>
                                     <div id="fileGroup" class="mb-3 ${jenis === 'buku digital' ? '' : 'd-none'}">
                                         <label class="form-label">Buku Digital</label>
@@ -205,9 +216,30 @@
                             </div>
                         `;
                     setTimeout(() => {
+                        const guruSelect = document.getElementById('guruSelect');
+                        const pembuatInput = document.getElementById('pembuat');
                         const jenisSelect = document.getElementById('jenisSelect');
                         const urlGroup = document.getElementById('urlGroup');
                         const fileGroup = document.getElementById('fileGroup');
+
+                        if (guruSelect && guruOptions.length > 0) {
+                                guruOptions.forEach(guru => {
+                                    const option = document.createElement('option');
+                                    option.value = guru.nisn;
+                                    option.textContent = `${guru.fullname} (${guru.nisn})`;
+                                    if (guru.nisn === nuptk) option.selected = true;
+                                    guruSelect.appendChild(option);
+                                });
+
+                                guruSelect.addEventListener('change', function() {
+                                    const selectedGuru = guruOptions.find(g => g.nisn ===
+                                        this.value);
+                                    if (selectedGuru && pembuatInput) {
+                                        pembuatInput.value = selectedGuru.fullname;
+                                    }
+                                });
+                            }
+
 
                         // Toggle field berdasarkan jenis konten
                         if (jenisSelect) {
@@ -266,8 +298,10 @@
                                         <option value="buku digital">Buku Digital</option>
                                     </select>
                                     <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
-                                    <input type="text" class="form-control mb-3" name="nuptk" placeholder="NUPTK" value="{{ auth()->user()->nisn }}" readonly>
-                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="{{ auth()->user()->fullname }}" required>
+                                    <select name="nuptk" required class="form-select mb-3" id="guruSelect">
+                                        <option value="" disabled selected>Pilih Guru (NUPTK)</option>
+                                    </select>
+                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="" required>
                                 </div>
                                 <div class="col-md-6">
                                     <div id="urlGroup" class="mb-3 d-none">
@@ -278,6 +312,10 @@
                                         <label for="file_path" class="form-label">Buku Digital</label>
                                         <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
                                     </div>
+                                    <div id="coverGroup" class="mb-3>
+                                        <label for="cover" class="form-label">Cover Preview</label>
+                                        <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
+                                    </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">
                                     <button type="reset" class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Kembali</button>
@@ -286,9 +324,29 @@
                             </div>
                         `;
                     setTimeout(() => {
+                        const guruSelect = document.getElementById('guruSelect');
+                        const pembuatInput = document.getElementById('pembuat');
                         const jenisSelect = document.getElementById('jenisSelect');
                         const urlGroup = document.getElementById('urlGroup');
                         const fileGroup = document.getElementById('fileGroup');
+
+                        if (guruSelect && guruOptions.length > 0) {
+                                guruOptions.forEach(guru => {
+                                    const option = document.createElement('option');
+                                    option.value = guru.nisn;
+                                    option.textContent = `${guru.fullname} (${guru.nisn})`;
+                                    guruSelect.appendChild(option);
+                                });
+
+                                guruSelect.addEventListener('change', function() {
+                                    const selectedGuru = guruOptions.find(g => g.nisn ===
+                                        this.value);
+                                    if (selectedGuru && pembuatInput) {
+                                        pembuatInput.value = selectedGuru.fullname;
+                                    }
+                                });
+                            }
+
 
                         if (jenisSelect) {
                             jenisSelect.addEventListener('change', function() {
