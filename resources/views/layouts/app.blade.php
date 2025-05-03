@@ -8,16 +8,16 @@ $segments = request()->segments(); ?>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     @if (config('app.is_demo'))
         <title itemprop="name">
-            SPS - Sistem Perpustakaan Sekolah
+            Perpustakaan Digital SMP Negeri 1 Sidomulyo
         </title>
-        <meta name="description" content="SPS - Sistem Perpustakaan Sekolah SMP N 1 Sidomulyo">
+        <meta name="description" content="Perpustakaan Digital SMP Negeri 1 Sidomulyo">
         <meta name="keywords"
             content="perpus smp n 1 sidmulyo, smp 1 sidomulyo, smp n 1 sidomulyo, smpn 1 sidumulyo, perpustakaan, perpustakaan online, sistem perpustakaan smp, sistem perpustakaan sekolah, sistem perpus, perpus online, sistem perpustakaan smp n 1 sidomulyo">
     @endif
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <title>
-        {{ ucwords(str_replace('-', ' ', end($segments) ?? 'Dashboard')) }} | Sistem Perpustakaan Sekolah (SPS)
+        {{ ucwords(str_replace('-', ' ', end($segments) ?? 'Dashboard')) }} | Perpustakaan Digital SMP Negeri 1 Sidomulyo)
     </title>
     <!--     Fonts and icons     -->
     <link

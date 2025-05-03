@@ -5,7 +5,7 @@
         </i>
         <a class="navbar-brand d-flex align-items-center m-0" href=" {{ route('dashboard') }}" target="_blank">
             <img src="{{ asset('assets/img/logo.png') }}" alt="logo" class="w-50">
-            <span class="text-wrap mx-3">Sistem Perpusatakaan Sekolah</span>
+            <span class="text-wrap mx-3">Perpustakaan Digital SMP Negeri 1 Sidomulyo</span>
         </a>
     </div>
     <div class="collapse navbar-collapse px-4 mt-3 w-auto " id="sidenav-collapse-main">

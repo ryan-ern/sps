@@ -55,7 +55,7 @@
                                             <script>
                                                 document.write(new Date().getFullYear())
                                             </script>
-                                            SPS - Sistem Perpustakaan Sekolah
+                                            Perpustakaan Digital SMP Negeri 1 Sidomulyo
                                         </h6>
                                     </div>
                                 </div>

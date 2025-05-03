@@ -8,13 +8,14 @@
                     document.write(new Date().getFullYear())
                 </script>
                 |
-                SPS - Sistem Perpustakaan Sekolah
+                Perpustakaan Digital
             </div>
         </div>
         <div class="col-lg-6">
             <ul class="nav nav-footer justify-content-center justify-content-lg-end">
                 <li class="nav-item">
-                    <a href="https://www.smpn1sdm.sch.id/" class="nav-link text-m text-muted" target="_blank">SMP N 1 Sidomulyo</a>
+                    <a href="https://www.smpn1sdm.sch.id/" class="nav-link text-m text-muted" target="_blank">SMP N 1
+                        Sidomulyo</a>
                 </li>
             </ul>
         </div>
