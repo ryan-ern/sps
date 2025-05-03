@@ -90,17 +90,21 @@ class KunjunganController extends Controller
 
         // Cek apakah sudah ada kunjungan dalam 1 menit terakhir
         $recentVisit = Kunjungan::where("nisn", $user->nisn)
-            ->where("created_at", ">=", Carbon::now()->subMinute())
+            ->where("created_at", ">=", Carbon::now()->subMinutes(5))
             ->exists();
 
         if ($recentVisit) {
             flash()->flash(
                 "warning",
-                "Kunjungan sudah dicatat kurang dari 1 menit yang lalu.",
+                "Kunjungan sudah dicatat kurang dari 5 menit yang lalu.",
                 [],
                 "Scan Duplikat Dihindari"
             );
-            return redirect()->route("kunjungan.read");
+            if (auth()->user()->role == "admin") {
+                return redirect()->route("kunjungan.read");
+            } else {
+                return redirect()->route("dashboard");
+            }
         }
 
         // Buat data kunjungan
@@ -122,6 +126,10 @@ class KunjunganController extends Controller
                 : "Scan Kunjungan Berhasil"
         );
 
-        return redirect()->route("kunjungan.read");
+        if (auth()->user()->role == "admin") {
+            return redirect()->route("kunjungan.read");
+        } else {
+            return redirect()->route("dashboard");
+        }
     }
 }
