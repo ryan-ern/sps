@@ -260,7 +260,7 @@ class BukuController extends Controller
             );
             return redirect()->back();
         }
-        Buku::where('judul', $bukuList->buku->judul)->update([
+        Buku::where('judul', $bukuList->judul)->update([
             'stok' => DB::raw('stok - 1')
         ]);
 
