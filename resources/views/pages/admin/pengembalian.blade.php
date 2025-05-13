@@ -54,7 +54,7 @@
                                             <hr>
                                         </form>
 
-                                        <table class="table table-sm table-bordered dataTable" id="table">
+                                        <table class="table table-sm table-bordered dataTable tanpa-tambah" id="table">
                                             <thead class="bg-dark text-white">
                                                 <tr>
                                                     <th scope="col">No</th>
@@ -148,7 +148,7 @@
                                             </div>
                                             <hr>
                                         </form>
-                                        <table class="table table-sm table-bordered dataTable" id="table">
+                                        <table class="table table-sm table-bordered dataTable tanpa-tambah" id="table">
                                             <thead class="bg-dark text-white">
                                                 <tr>
                                                     <th scope="col">No</th>

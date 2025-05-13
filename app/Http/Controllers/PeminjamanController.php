@@ -282,6 +282,10 @@ class PeminjamanController extends Controller
 
         $peminjaman->save();
 
+        Buku::where('judul', $peminjaman->buku->judul)->update([
+            'stok' => DB::raw('stok - 1')
+        ]);
+
         flash()->flash(
             'success',
             'Data peminjaman ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' berhasil diterima.',

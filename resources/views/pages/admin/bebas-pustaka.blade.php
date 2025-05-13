@@ -8,16 +8,16 @@
                         <div class="card-body p-5">
                             <div class="table-responsive text-center">
                                 {{-- Filter --}}
-                                <form method="GET" action="{{ route('kunjungan.read') }}" class="mb-3">
+                                <form method="GET" action="{{ route('pustaka.read') }}" class="mb-3">
                                     <div class="row d-flex justify-content-between">
                                         <!-- Date Range Picker -->
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <!-- <div class="col-lg-4 col-md-6 col-sm-12">
                                             <input type="text" name="dates" value="{{ request('dates') }}"
                                                 class="dates form-control mb-2" />
-                                        </div>
+                                        </div> -->
 
                                         <!-- Search Input -->
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
                                             <input type="search" id="search" name="search"
                                                 class="form-control mb-2" placeholder="Cari Data Bebas Pustaka"
                                                 value="{{ request('search') }}">
@@ -25,14 +25,14 @@
 
                                         <!-- Submit Button -->
                                         <div class="col-lg-4 d-inline-flex gap-2 col-md-4 col-sm-12">
-                                            <a href="{{ route('kunjungan.read') }}"
+                                            <a href="{{ route('pustaka.read') }}"
                                                 class="btn btn-warning w-100">Reset</a>
                                             <button type="submit" class="btn btn-primary w-100">Terapkan</button>
                                         </div>
                                     </div>
                                     <hr>
                                 </form>
-                                <table class="table table-sm table-bordered dataTable" id="table">
+                                <table class="table table-sm table-bordered dataTable tanpa-aksi" id="table">
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th>No</th>

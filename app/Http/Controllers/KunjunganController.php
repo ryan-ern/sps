@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kunjungan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class KunjunganController extends Controller
 {
@@ -12,100 +13,123 @@ class KunjunganController extends Controller
     {
         // Validasi input request
         $request->validate([
-            'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
-            'page' => 'integer|min:1',
-            'search' => 'nullable|string|max:255',
-            'dates' => 'nullable|string',
+            "per_page" => "nullable|in:5,10,25,50,100,500,Semua",
+            "page" => "integer|min:1",
+            "search" => "nullable|string|max:255",
+            "dates" => "nullable|string",
         ]);
 
         // Ambil jumlah data per halaman (default: 10)
-        $perPage = $request->input('per_page', 5);
+        $perPage = $request->input("per_page", 5);
 
         // Ambil nilai pencarian
-        $search = $request->input('search');
+        $search = $request->input("search");
 
         // Ambil tanggal range
-        $dateRange = $request->input('dates');
+        $dateRange = $request->input("dates");
 
         // Query dasar untuk Kunjungan
-        $DataQuery = Kunjungan::query()->orderBy('created_at', 'desc');
+        $DataQuery = Kunjungan::query()->orderBy("created_at", "desc");
 
         // Filter berdasarkan pencarian
         if ($search) {
             $DataQuery
-                ->where('fullname', 'like', "%{$search}%")
-                ->orWhere('nisn', 'like', "%{$search}%")
-                ->orWhere('kelas', 'like', "%{$search}%");
+                ->where("fullname", "like", "%{$search}%")
+                ->orWhere("nisn", "like", "%{$search}%")
+                ->orWhere("kelas", "like", "%{$search}%");
         }
 
         // Filter berdasarkan rentang tanggal
         if ($dateRange) {
             $dates = explode(" - ", $dateRange);
             if (count($dates) === 2) {
-                $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[0]))->startOfDay();
-                $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', trim($dates[1]))->endOfDay();
+                $startDate = \Carbon\Carbon::createFromFormat(
+                    "m/d/Y",
+                    trim($dates[0])
+                )->startOfDay();
+                $endDate = \Carbon\Carbon::createFromFormat(
+                    "m/d/Y",
+                    trim($dates[1])
+                )->endOfDay();
 
-                $DataQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $DataQuery->whereBetween("created_at", [$startDate, $endDate]);
             }
         }
 
         // Jika per_page adalah "Semua", tampilkan semua data
-        if ($request->per_page == 'Semua') {
+        if ($request->per_page == "Semua") {
             $kunjungans = $DataQuery->paginate(1000000);
         } else {
             $kunjungans = $DataQuery->paginate($perPage);
         }
 
-        return view('pages.admin.kunjungan', compact('kunjungans', 'perPage', 'search', 'dateRange'));
+        return view(
+            "pages.admin.kunjungan",
+            compact("kunjungans", "perPage", "search", "dateRange")
+        );
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nisn' => 'required|string',
-            'keterangan' => 'nullable|string',
+            "nisn" => "required|string",
+            "keterangan" => "nullable|string",
         ]);
 
-        $user = User::where('nisn', $request->nisn)->first();
+        $user = User::where("nisn", $request->nisn)->first();
 
         if (!$user) {
             flash()->flash(
-                'error',
-                'Data tidak ditemukan',
+                "error",
+                "Data tidak ditemukan",
                 [],
-                'Scan Kunjungan Gagal'
+                "Scan Kunjungan Gagal"
             );
-            return redirect()->route('kunjungan.read');
-        }
-        if ($request->filled('keterangan')) {
-            Kunjungan::create([
-                'nisn' => $user->nisn,
-                'fullname' => $user->fullname,
-                'kelas' => $user->kelas,
-                'keterangan' => $request->keterangan,
-            ]);
-            flash()->flash(
-                'success',
-                'Kunjungan ' . $user->fullname . ' berhasil dicatat. ',
-                [],
-                'Isi Kunjungan Berhasil'
-            );
-            return redirect()->back();
-        } else {
-            Kunjungan::create([
-                'nisn' => $user->nisn,
-                'fullname' => $user->fullname,
-                'kelas' => $user->kelas,
-                'keterangan' => 'Diisi dengan scan barcode',
-            ]);
+            return redirect()->route("kunjungan.read");
         }
 
+        // Cek apakah sudah ada kunjungan dalam 1 menit terakhir
+        $recentVisit = Kunjungan::where("nisn", $user->nisn)
+            ->where("created_at", ">=", Carbon::now()->subMinutes(5))
+            ->exists();
+
+        if ($recentVisit) {
+            flash()->flash(
+                "warning",
+                "Kunjungan sudah dicatat kurang dari 5 menit yang lalu.",
+                [],
+                "Scan Duplikat Dihindari"
+            );
+            if (auth()->user()->role == "admin") {
+                return redirect()->route("kunjungan.read");
+            } else {
+                return redirect()->route("dashboard");
+            }
+        }
+
+        // Buat data kunjungan
+        Kunjungan::create([
+            "nisn" => $user->nisn,
+            "fullname" => $user->fullname,
+            "kelas" => $user->kelas,
+            "keterangan" => $request->filled("keterangan")
+                ? $request->keterangan
+                : "Diisi dengan scan barcode",
+        ]);
+
         flash()->flash(
-            'success',
-            'Kunjungan ' . $user->fullname . ' berhasil dicatat. ',
+            "success",
+            "Kunjungan " . $user->fullname . " berhasil dicatat.",
             [],
-            'Scan Kunjungan Berhasil'
+            $request->filled("keterangan")
+                ? "Isi Kunjungan Berhasil"
+                : "Scan Kunjungan Berhasil"
         );
-        return redirect()->route('kunjungan.read');
+
+        if (auth()->user()->role == "admin") {
+            return redirect()->route("kunjungan.read");
+        } else {
+            return redirect()->route("dashboard");
+        }
     }
 }

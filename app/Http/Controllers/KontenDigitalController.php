@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\KontenDigital;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -56,8 +58,9 @@ class KontenDigitalController extends Controller
         } else {
             $datas = $kontenQuery->paginate($perPage);
         }
+        $guru = User::where('role', 'guru')->get();
 
-        return view('pages.guru.konten', compact('datas', 'perPage', 'search', 'dateRange'));
+        return view('pages.guru.konten', compact('datas', 'perPage', 'search', 'dateRange', 'guru'));
     }
 
 
@@ -106,6 +109,7 @@ class KontenDigitalController extends Controller
         $konten->judul = $request->judul;
         $konten->pembuat = $request->pembuat;
         $konten->nuptk = $request->nuptk;
+        $konten->created_by = auth()->user()->nisn;
 
         if ($request->hasFile('file_path')) {
             $file = $request->file('file_path');

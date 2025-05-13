@@ -52,7 +52,6 @@
                                 </form>
                             </div>
                         </div>
-
                         {{-- Filter --}}
                         <form method="GET"
                             class="d-flex flex-wrap justify-content-center justify-content-md-evenly gap-lg-5 gap-2">
@@ -208,10 +207,8 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                @if ($kunjunganHariIni)
-                                    <button class="btn btn-primary me-2" type="reset" id="closeModal"
-                                        data-bs-dismiss="modal">Tutup</button>
-                                @endif
+                                <button class="btn btn-primary me-2" type="reset" id="closeModal"
+                                    data-bs-dismiss="modal">Tutup</button>
                                 <button class="btn btn-success" type="submit" id="closeModal"
                                     data-bs-dismiss="modal">Simpan</button>
                             </div>
@@ -285,7 +282,7 @@
             <x-app.footer />
         </div>
     </main>
-    @if (!$kunjunganHariIni)
+    @if (!$kunjunganHariIni && session('show_pop_up'))
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 const modal = new bootstrap.Modal(document.getElementById('kunjunganModal'), {

@@ -664,8 +664,7 @@
                         @method('DELETE')
                         <p class="text-center fs-5 text-capitalize">Apakah Anda ingin menghapus <br/> data buku dengan <br/><strong>nomor registrasi <br/>${button.getAttribute('data-no_regis')}</strong></p>
                                     <div class="d-flex justify-content-end mt-3">
-                                        <input type="hidden" name="judul" value="${button.getAttribute('data-judul')}">
-                                        <input type="hidden" name="stok" value="${button.getAttribute('data-stok')}">
+                                        <input type="hidden" name="no_regis" value="${button.getAttribute('data-no_regis')}">
                                         <button type="reset" class="btn btn-primary me-2" id="closeModal"
                                             data-bs-dismiss="modal">Tidak</button>
                                         <button type="submit" class="btn btn-danger">Hapus</button>

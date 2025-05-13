@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PengembalianController extends Controller
 {
@@ -145,6 +146,11 @@ class PengembalianController extends Controller
         $buku = Buku::where('no_regis', $peminjaman->no_regis)->first();
         $buku->status = 'tersedia';
         $buku->save();
+
+        Buku::where('judul', $peminjaman->buku->judul)->update([
+            'stok' => DB::raw('stok + 1')
+        ]);
+
 
         flash()->flash(
             'success',

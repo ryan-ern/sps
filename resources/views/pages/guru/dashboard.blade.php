@@ -10,7 +10,15 @@
     } else {
         $greeting = 'Selamat Malam';
     }
+
+    $jenis = request('jenis');
+    $search = request('search');
 @endphp
+
+<head>
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
 
 <x-app-layout>
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
@@ -20,251 +28,133 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="card p-4">
-                        <h5>{{ $greeting }}, {{ auth()->user()->fullname }}</h5>
-                        <p>Data Hari ini, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-
-                        {{-- Statistik Harian --}}
-                        <div class="row mb-4">
-                            <div class="col-12 col-md-4 mb-md-0 mb-4">
-                                <div class="bg-dark text-white px-4 py-2 rounded">
-                                    <div class="row">
-                                        <div
-                                            class="col-md-3 border border-white justify-content-center align-items-center d-flex">
-                                            <div class="fs-3">{{ $dataPengunjung }}</div>
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <small class="fs-5">Data Pengunjung</small>
-                                                </div>
-                                            </div>
-                                            <div class="border-2 border-bottom border-light my-3"></div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <h2
-                                                        class="{{ $persenPengunjung >= 0 ? 'text-success' : 'text-danger' }}">
-                                                        {{ $persenPengunjung >= 0 ? '+' : '' }}{{ number_format($persenPengunjung) }}%
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <h5>{{ $greeting }}, {{ auth()->user()->fullname }}</h5>
                             </div>
-                            <div class="col-12 col-md-4 mb-md-0 mb-4">
-                                <div class="bg-dark text-white px-4 py-2 rounded">
-                                    <div class="row">
-                                        <div
-                                            class="col-md-3 border border-white justify-content-center align-items-center d-flex">
-                                            <div class="fs-3">{{ $dataPeminjam }}</div>
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <small class="fs-5">Data Pinjam</small>
-                                                </div>
-                                            </div>
-                                            <div class="border-2 border-bottom border-light my-3"></div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <h2
-                                                        class="{{ $persenPeminjam >= 0 ? 'text-success' : 'text-danger' }}">
-                                                        {{ $persenPeminjam >= 0 ? '+' : '' }}{{ number_format($persenPeminjam) }}%
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-4 mb-md-0 mb-4">
-                                <div class="bg-dark text-white px-4 py-2 rounded">
-                                    <div class="row">
-                                        <div
-                                            class="col-md-3 border border-white justify-content-center align-items-center d-flex">
-                                            <div class="fs-3">{{ $dataKembali }}</div>
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <small class="fs-5">Data Kembali</small>
-                                                </div>
-                                            </div>
-                                            <div class="border-2 border-bottom border-light my-3"></div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <h2
-                                                        class="{{ $persenKembali >= 0 ? 'text-success' : 'text-danger' }}">
-                                                        {{ $persenKembali >= 0 ? '+' : '' }}{{ number_format($persenKembali) }}%
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="col">
                             </div>
                         </div>
 
-                        <div class="border-5 border-bottom border-dark my-3"></div>
-
-                        {{-- Buku Terfavorit --}}
-                        <h6>Buku Terfavorit</h6>
-                        <div class="d-flex flex-wrap justify-content-center  gap-2 justify-content-md-evenly mb-4">
-                            @forelse ($bukuFavorit as $buku)
-                                <div class="bg-dark text-white p-3 text-center rounded buku-card"
-                                    style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
-                                    data-bs-target="#globalBukuModal" data-judul="{{ $buku->judul }}"
-                                    data-no_regis="{{ $buku->no_regis }}" data-pengarang="{{ $buku->pengarang }}"
-                                    data-penerbit="{{ $buku->penerbit }}" data-tahun="{{ $buku->tahun }}"
-                                    data-stok="{{ $buku->stok }}" data-total_pinjam="{{ $buku->total_pinjam }}"
-                                    data-keterangan="{{ $buku->keterangan }}"
-                                    data-cover="{{ asset('storage/' . $buku->file_cover) }}"
-                                    data-file="{{ asset('storage/' . $buku->file_buku) }}"
-                                    data-rute="{{ route('peminjaman-siswa.post', $buku->no_regis) }}">
-                                    <img src="{{ asset('storage/' . $buku->file_cover) }}" class="img-fluid mb-2"
-                                        alt="{{ $buku->judul }}" style="height: 180px; object-fit: cover;">
-                                    <div class="fs-5">{{ Str::limit($buku->judul, 20) }}</div>
-                                    <div class="fs-5 mt-2">{{ $buku->total_pinjam }}x <br> Peminjaman</div>
-                                </div>
-                            @empty
-                                <div class="text-center fs-5">Belum Ada Buku Terfavorit</div>
-                            @endforelse
-                        </div>
-
-                        <div class="border-5 border-bottom border-dark my-3"></div>
-
-                        {{-- Konten Sering Dilihat --}}
-                        <h6>Konten Digital Sering Dilihat</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
-                            @foreach ($kontenSeringDilihat as $konten)
-                                <div class="bg-dark text-white p-3 text-center konten-card rounded"
-                                    style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
-                                    data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
-                                    data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
-                                    data-file="{{ $konten->file_path }}" data-pembuat="{{ $konten->pembuat }}"
-                                    data-dilihat="{{ $konten->dilihat }}">
-                                    <img src="{{ asset('storage/' . $konten->cover ?? '') }}" class="img-fluid mb-2"
-                                        style="height: 180px; object-fit: cover;">
-                                    <div class="fs-5">{{ Str::limit($konten->judul, 20) }}</div>
-                                    <div class="fs-5 mt-2">{{ $konten->dilihat }}x <br> Dilihat</div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="border-5 border-bottom border-dark my-3"></div>
-
-                        {{-- Wajib Dilihat --}}
-                        <h6>Wajib Dilihat</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
-                            @forelse ($wajibDilihat as $item)
-                                {{-- Jika item adalah Buku --}}
-                                @if (isset($item->no_regis))
-                                    <div class="bg-dark text-white p-3 text-center rounded buku-card"
-                                        style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
-                                        data-bs-target="#globalBukuModal" data-judul="{{ $item->judul }}"
-                                        data-no_regis="{{ $item->no_regis }}" data-pengarang="{{ $item->pengarang }}"
-                                        data-penerbit="{{ $item->penerbit }}" data-tahun="{{ $item->tahun }}"
-                                        data-stok="{{ $item->stok }}" data-total_pinjam="{{ $item->total_pinjam }}"
-                                        data-keterangan="{{ $item->keterangan }}"
-                                        data-cover="{{ asset('storage/' . $item->file_cover) }}"
-                                        data-file="{{ asset('storage/' . $item->file_buku) }}"
-                                        data-rute="{{ route('peminjaman-siswa.post', $item->no_regis) }}">
-                                        <img src="{{ asset('storage/' . $item->file_cover) }}" class="img-fluid mb-2"
-                                            alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
-                                        <div class="fs-5">{{ Str::limit($item->judul, 20) }}</div>
-                                        <div class="fs-5 mt-2">{{ $item->total_pinjam }}x <br> Peminjaman</div>
+                        {{-- Filter --}}
+                        <div class="row mb-3">
+                            <div class="col-md-8 mx-auto">
+                                <form method="GET">
+                                    <div class="input-group border border-dark">
+                                        <input type="text" class="form-control"
+                                            placeholder="Ketik Judul Buku Disini, Untuk Pencarian"
+                                            aria-label="Ketik Judul Buku Disini, Untuk Pencarian"
+                                            aria-describedby="button-addon2" name="search">
+                                        <button class="btn btn-success m-1 px-5">Cari</button>
                                     </div>
-
-                                    {{-- Jika item adalah Konten Digital --}}
-                                @elseif (isset($item->jenis))
-                                    <div class="bg-dark text-white p-3 text-center rounded konten-card"
-                                        style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
-                                        data-bs-target="#kontenModal" data-judul="{{ $item->judul }}"
-                                        data-pembuat="{{ $item->pembuat }}"
-                                        data-cover="{{ asset('storage/' . $item->cover) }}"
-                                        data-url="{{ $item->url }}" data-file="{{ $item->file_path }}"
-                                        data-dilihat="{{ $item->dilihat }}" data-jenis="{{ $item->jenis }}">
-                                        <img src="{{ asset('storage/' . $item->cover) }}" class="img-fluid mb-2"
-                                            alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
-                                        <div class="fs-5">{{ Str::limit($item->judul, 20) }}</div>
-                                        <div class="fs-5 mt-2">{{ $item->dilihat }}x <br> Dilihat</div>
-                                    </div>
-                                @endif
-                            @empty
-                                <div class="text-center fs-5">Belum Ada Data Ditampilkan</div>
-                            @endforelse
+                                </form>
+                            </div>
                         </div>
+
+
+
+                            @if (!$jenis || $jenis === 'digital')
+                                <div class="border-5 border-bottom border-dark my-3"></div>
+                                {{-- Konten Digital Sering Dilihat --}}
+                                <h6>Konten Digital Sering Dilihat</h6>
+                                <div
+                                    class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
+                                    @foreach ($kontenSeringDilihat as $konten)
+                                        <div class="bg-dark text-white p-3 text-center konten-card rounded"
+                                            style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
+                                            data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
+                                            data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
+                                            data-id="{{ $konten->id }}" data-file="{{ $konten->file_path }}"
+                                            data-pembuat="{{ $konten->pembuat }}"
+                                            data-dilihat="{{ $konten->dilihat }}">
+                                            <img src="{{ asset('storage/' . $konten->cover ?? '') }}"
+                                                class="img-fluid mb-2" style="height: 180px; object-fit: cover;">
+                                            <div class="fs-5">{{ Str::limit($konten->judul, 20) }}</div>
+                                            <div class="fs-5 mt-2">{{ $konten->dilihat }}x <br> Dilihat</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                        <div class="border-5 border-bottom border-dark my-3"></div>
+
+
                     </div>
-
                 </div>
             </div>
-        </div>
-        <!-- Modal Global -->
-        <div class="modal fade" id="globalBukuModal" tabindex="-1" aria-labelledby="globalBukuModalLabel">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-body text-center">
-                        <div class="d-flex justify-content-between mb-3 px-3">
-                            <a id="btn-download" href="#" class="btn btn-outline-dark" download>Download</a>
-                            <a id="btn-baca" href="#" class="btn btn-outline-dark" target="_blank">Baca
-                                Online</a>
+            <!-- Modal Konten Digital -->
+            <div class="modal fade" id="kontenModal" tabindex="-1" aria-labelledby="kontenModalLabel"
+                data-bs-backdrop="static">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content bg-light">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="kontenModalLabel">Detail Konten Digital</h5>
+                            <button class="btn btn-primary me-2" id="closeModal"
+                                data-bs-dismiss="modal">Tutup</button>
                         </div>
-                        <img id="modal-cover" src="" class="img-fluid mb-3"
-                            style="max-height: 300px; object-fit: contain;">
-                        <div class="text-start px-3">
-                            <h6 class="fw-bold">Detail Buku</h6>
-                            <div class="row">
-                                <div class="col-6">
-                                    <p>Judul : <span id="modal-judul"></span></p>
-                                    <p>Pengarang : <span id="modal-pengarang"></span></p>
-                                    <p>Penerbit : <span id="modal-penerbit"></span></p>
-                                    <p>Tahun : <span id="modal-tahun"></span></p>
-                                </div>
-                                <div class="col-6">
-                                    <p>Stok Buku : <span id="modal-stok"></span></p>
-                                    <p>Jumlah dipinjam : <span id="modal-pinjam"></span> Kali</p>
-                                </div>
+                        <div class="modal-body">
+                            <h4 id="modalJudul" class="mb-3"></h4>
+                            <p><strong>Jenis:</strong> <span id="modalJenis"></span></p>
+                            <p><strong>Pembuat:</strong> <span id="modalPembuat"></span></p>
+                            <p><strong>Jumlah Dilihat:</strong> <span id="modalDilihat"></span>x</p>
+                            <p id="tab_baru"><strong>Buka di tab baru:</strong> <a id="modalBuka" href="#"
+                                    target="_blank">Klik di sini</a></p>
+
+                            <div id="kontenPreview" class="mt-2">
+                                <!-- Preview Konten akan muncul di sini -->
                             </div>
-                            <h6 class="fw-bold mt-3">Keterangan</h6>
-                            <p id="modal-keterangan" class="text-justify"></p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- Modal Konten Digital -->
-        <div class="modal fade" id="kontenModal" tabindex="-1" aria-labelledby="kontenModalLabel"
-            data-bs-backdrop="static">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
-                <div class="modal-content bg-light">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="kontenModalLabel">Detail Konten Digital</h5>
-                        <button class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Tutup</button>
-                    </div>
-                    <div class="modal-body">
-                        <h4 id="modalJudul" class="mb-3"></h4>
-                        <p><strong>Jenis:</strong> <span id="modalJenis"></span></p>
-                        <p><strong>Pembuat:</strong> <span id="modalPembuat"></span></p>
-                        <p><strong>Jumlah Dilihat:</strong> <span id="modalDilihat"></span>x</p>
-                        <p id="tab_baru"><strong>Buka di tab baru:</strong> <a id="modalBuka" href="#"
-                                target="_blank">Klik di sini</a></p>
 
-                        <div id="kontenPreview" class="mt-2">
-                            <!-- Preview Konten akan muncul di sini -->
+            <!-- Modal Buku -->
+            <div class="modal fade" id="globalBukuModal" tabindex="-1" aria-labelledby="globalBukuModalLabel">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-body text-center">
+                            <div class="d-flex justify-content-end mb-3 px-3">
+                                <form id="form-pinjam" method="POST" action="">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success  me-2">Pinjam</button>
+                                    <button type="reset" class="btn btn-primary" id="closeModal"
+                                        data-bs-dismiss="modal">Tutup</button>
+                                </form>
+                            </div>
+                            <img id="modal-cover" src="" class="img-fluid mb-3"
+                                style="max-height: 300px; object-fit: contain;">
+                            <div class="text-start px-3">
+                                <h6 class="fw-bold">Detail Buku</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p>Judul : <span id="modal-judul"></span></p>
+                                        <p>Pengarang : <span id="modal-pengarang"></span></p>
+                                        <p>Penerbit : <span id="modal-penerbit"></span></p>
+                                        <p>Tahun : <span id="modal-tahun"></span></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p>Stok Buku : <span id="modal-stok"></span></p>
+                                        <p>Jumlah dipinjam : <span id="modal-pinjam"></span> Kali</p>
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mt-3">Keterangan</h6>
+                                <p id="modal-keterangan" class="text-justify"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <x-app.footer />
+
+            <x-app.footer />
         </div>
     </main>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.buku-card');
-            const modal = document.getElementById('globalBukuModal');
+            const bukuCards = document.querySelectorAll('.buku-card');
 
-            cards.forEach(card => {
+            // Modal Buku
+            bukuCards.forEach(card => {
                 card.addEventListener('click', () => {
                     document.getElementById('modal-cover').src = card.dataset.cover;
                     document.getElementById('modal-judul').textContent = card.dataset.judul;
@@ -275,11 +165,7 @@
                     document.getElementById('modal-pinjam').textContent = card.dataset.total_pinjam;
                     document.getElementById('modal-keterangan').textContent = card.dataset
                         .keterangan;
-
-                    document.getElementById('btn-download').href = card.dataset.file;
-                    document.getElementById('btn-download').setAttribute('download', card.dataset
-                        .judul);
-                    document.getElementById('btn-baca').href = card.dataset.file;
+                    document.getElementById('form-pinjam').action = card.dataset.rute;
                 });
             });
 
@@ -293,13 +179,38 @@
                     const file = this.getAttribute('data-file'); // file_path (untuk buku digital)
                     const url = this.getAttribute('data-url'); // link (untuk video)
                     const pembuat = this.getAttribute('data-pembuat');
-                    const dilihat = this.getAttribute('data-dilihat');
-
+                    let dilihat = this.getAttribute('data-dilihat');
+                    const kontenId = this.getAttribute('data-id');
                     // Isi konten modal
                     document.getElementById('modalJudul').textContent = judul;
                     document.getElementById('modalJenis').textContent = jenis;
                     document.getElementById('modalPembuat').textContent = pembuat;
                     document.getElementById('modalDilihat').textContent = dilihat;
+
+                    // Tambah jumlah dilihat
+                    if (kontenId) {
+                        fetch(`/konten-digital/${kontenId}/tambah-dilihat`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                        'meta[name="csrf-token"]').getAttribute('content'),
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    dilihat = data.dilihat;
+                                    document.getElementById('modalDilihat').textContent =
+                                        dilihat;
+                                    this.setAttribute('data-dilihat', dilihat);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Gagal memperbarui jumlah dilihat:', error);
+                            });
+                    }
+
 
                     const bukaLink = document.getElementById('modalBuka');
                     bukaLink.href = url || file || '#';
@@ -323,15 +234,15 @@
                             }
 
                             preview.innerHTML = `
-                    <div class="ratio ratio-16x9">
-                        <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
-                    </div>`;
+                                <div class="ratio ratio-16x9">
+                                    <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+                                </div>`;
                         }
                     } else if (jenis === 'buku digital' && file) {
                         preview.innerHTML = `
-                <iframe src="${file}" width="100%" height="500px" frameborder="0">
-                    File tidak dapat ditampilkan.
-                </iframe>`;
+                            <iframe src="${file}" width="100%" height="500px" frameborder="0">
+                                File tidak dapat ditampilkan.
+                            </iframe>`;
                     } else {
                         preview.innerHTML =
                             `<p class="text-muted">Konten tidak tersedia untuk ditampilkan.</p>`;
@@ -340,4 +251,6 @@
             });
         });
     </script>
+
+
 </x-app-layout>

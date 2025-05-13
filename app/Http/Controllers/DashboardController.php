@@ -173,6 +173,7 @@ class DashboardController extends Controller
                 'kunjunganHariIni'
             ));
         } elseif ($roles == 'guru') {
+            $search = request()->get('search');
             $today = Carbon::today();
             $yesterday = Carbon::yesterday();
             // Statistik harian
@@ -242,13 +243,14 @@ class DashboardController extends Controller
                 ->values();
 
             // ---------- KONTEN DIGITAL ----------
-            $kontenQuery = KontenDigital::query();
+            $kontenQuery = KontenDigital::where('judul', 'like', '%' . $search . '%')->orWhere('jenis', 'like', '%' . $search . '%')->orWhere('url', 'like', '%' . $search . '%')->orWhere('pembuat', 'like', '%' . $search . '%');
 
             $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
                 ->take(5)
                 ->get()
                 ->map(function ($item) {
                     return (object)[
+                        'id' => $item->id ?? '-',
                         'nuptk' => $item->nuptk ?? '-',
                         'judul' => $item->judul ?? '-',
                         'jenis' => $item->jenis ?? '-',
