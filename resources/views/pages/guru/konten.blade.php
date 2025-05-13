@@ -63,6 +63,7 @@
                                                         data-jenis="{{ $data->jenis }}"
                                                         data-url="{{ $data->url }}"
                                                         data-nuptk="{{ $data->nuptk }}"
+                                                        data-cover="{{ $data->cover }}"
                                                         data-file_path="{{ $data->file_path }}" data-bs-toggle="modal"
                                                         data-bs-target="#dynamicModal" data-modal-type="update">
                                                         Edit
@@ -172,6 +173,7 @@
                     const nuptk = button.getAttribute('data-nuptk');
                     const url = button.getAttribute('data-url');
                     const file = button.getAttribute('data-file_path');
+                    const cover = button.getAttribute('data-cover');
 
                     modalBodyHTML = `
                             @csrf
@@ -188,6 +190,11 @@
                                     <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
                                 </div>
                                  <div class="col-md-6">
+                                    <div id="coverGroup" class="mb-3>
+                                        <label class="form-label">Cover Preview</label>
+                                        <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
+                                        ${cover ? `<a href="/storage/${cover}" target="_blank" class="d-block mt-2 text-info">Lihat File Cover</a>` : ''}
+                                    </div>
                                     <div id="urlGroup" class="mb-3 ${jenis === 'video' ? '' : 'd-none'}">
                                         <label class="form-label">Link URL Youtube</label>
                                         <input type="text" class="form-control" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
@@ -277,6 +284,10 @@
                                     <div id="fileGroup" class="mb-3 d-none">
                                         <label for="file_path" class="form-label">Buku Digital</label>
                                         <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                    </div>
+                                    <div id="coverGroup" class="mb-3>
+                                        <label for="cover" class="form-label">Cover Preview</label>
+                                        <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">

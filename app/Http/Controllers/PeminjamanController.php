@@ -6,6 +6,7 @@ use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
@@ -200,89 +201,54 @@ class PeminjamanController extends Controller
 
     public function pinjam($id)
     {
-        $buku = Buku::where('no_regis', $id)->first();
+        $buku = Buku::where('no_regis', $id)->where('status', 'tersedia')->first();
 
         if (!$buku || $buku->stok < 1) {
-            return back()->with('error', 'Stok buku tidak tersedia.');
+            flash()->flash('error', 'Buku dengan no_regis ' . $id . ' tidak tersedia.', [], 'Tahap Peminjaman Gagal');
+            return redirect()->route('dashboard');
         }
 
-        // Ambil user yang sedang login
         $user = auth()->user();
 
         // Validasi untuk buku referensi
         if ($buku->jenis_buku === 'referensi') {
-            // Ambil semua peminjaman referensi oleh user (judul unik)
             $peminjamanReferensi = Peminjaman::where('nisn', $user->nisn)
-                ->whereHas('buku', function ($query) {
-                    $query->where('jenis_buku', 'referensi');
-                })
+                ->whereHas('buku', fn($q) => $q->where('jenis_buku', 'referensi'))
                 ->pluck('judul')
                 ->unique();
 
             if ($peminjamanReferensi->count() >= 2) {
-                flash()->flash(
-                    'error',
-                    'Maksimal 2 buku referensi yang dapat dipinjam.',
-                    [],
-                    'Tahap Peminjaman Gagal'
-                );
+                flash()->flash('error', 'Maksimal 2 buku referensi yang dapat dipinjam.', [], 'Tahap Peminjaman Gagal');
                 return redirect()->route('dashboard');
             }
 
             if ($peminjamanReferensi->contains($buku->judul)) {
-                flash()->flash(
-                    'error',
-                    'Anda sudah meminjam buku referensi dengan judul ' . $buku->judul . '.',
-                    [],
-                    'Tahap Peminjaman Gagal'
-                );
+                flash()->flash('error', 'Anda sudah meminjam buku referensi dengan judul ' . $buku->judul . '.', [], 'Tahap Peminjaman Gagal');
                 return redirect()->route('dashboard');
             }
         }
 
-        // Ambil semua buku dengan judul yang sama dan status tersedia
-        $bukuTersedia = Buku::where('judul', $buku->judul)
-            ->where('status', 'tersedia')
-            ->get();
-
-        if ($bukuTersedia->isEmpty()) {
-            flash()->flash(
-                'error',
-                'Stok buku dengan judul ' . $buku->judul . ' tidak tersedia.',
-                [],
-                'Tahap Peminjaman Gagal'
-            );
-            return redirect()->route('dashboard');
-        }
-
-        // Pilih salah satu buku yang tersedia secara acak
-        $bukuTerpilih = $bukuTersedia->random();
-
-        // Ubah status buku menjadi tidak tersedia
-        $bukuTerpilih->update([
-            'status' => 'tidak tersedia',
+        // Ubah status buku yang dipinjam menjadi tidak tersedia
+        $buku->update([
+            'status' => 'tidak tersedia'
         ]);
 
-        // Buat peminjaman baru
+        // Catat peminjaman
         Peminjaman::create([
             'nisn' => $user->nisn,
-            'no_regis' => $bukuTerpilih->no_regis,
+            'no_regis' => $buku->no_regis,
             'fullname' => $user->fullname,
-            'judul' => $bukuTerpilih->judul,
+            'judul' => $buku->judul,
             'tgl_pinjam' => now(),
             'denda' => 0,
             'pinjam' => 'verifikasi'
         ]);
 
-        flash()->flash(
-            'success',
-            'Buku ' . $bukuTerpilih->judul . ' dengan nomor registrasi ' . $bukuTerpilih->no_regis . ' berhasil diajukan.',
-            [],
-            'Tahap Peminjaman dilakukan'
-        );
+        flash()->flash('success', 'Buku ' . $buku->judul . ' dengan nomor registrasi ' . $buku->no_regis . ' berhasil diajukan.', [], 'Tahap Peminjaman dilakukan');
 
         return redirect()->route('peminjaman-siswa.read');
     }
+
 
 
 
@@ -299,6 +265,11 @@ class PeminjamanController extends Controller
             );
             return redirect()->route('peminjaman.read');
         }
+
+        // Kurangi stok seluruh buku dengan judul yang sama (jika dikelola sebagai satu grup)
+        Buku::where('judul', $peminjaman->buku->judul)->update([
+            'stok' => DB::raw('stok - 1')
+        ]);
 
         $peminjaman->pinjam = 'terima';
         $peminjaman->kembali = '-';

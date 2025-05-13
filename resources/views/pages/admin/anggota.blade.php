@@ -297,6 +297,37 @@
                 }
 
                 modalContent.innerHTML = modalBodyHTML;
+                setInterval(() => {
+                    const nisnInput = document.querySelector('input[name="nisn"]');
+                    const fullnameInput = document.querySelector('input[name="fullname"]');
+                    const usernameInput = document.querySelector('input[name="username"]');
+                    const passwordInput = document.querySelector('input[name="password"]');
+
+                    function updateUsernameAndPassword() {
+                        const nisn = nisnInput.value.trim();
+                        const fullname = fullnameInput.value.trim();
+
+                        if (nisn.length >= 4 && fullname.length > 0) {
+                            // Username = NISN langsung
+                            usernameInput.value = nisn;
+
+                            // Ambil 4 digit terakhir NISN
+                            const last4Nisn = nisn.slice(-4);
+
+                            // Ambil kata terakhir dari nama (belakang) atau tengah
+                            const nameParts = fullname.split(' ');
+                            const nameBase = nameParts.length > 1 ? nameParts[nameParts.length -
+                                1] : nameParts[0];
+
+                            // Password = nama belakang/tengah + 4 digit akhir nisn
+                            passwordInput.value = nameBase.toLowerCase() + last4Nisn;
+                        }
+                    }
+
+                    // Jalankan saat nama lengkap atau nisn diubah
+                    nisnInput.addEventListener('input', updateUsernameAndPassword);
+                    fullnameInput.addEventListener('input', updateUsernameAndPassword);
+                }, 100);
             });
 
             dynamicModal.addEventListener('hidden.bs.modal', function() {

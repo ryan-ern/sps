@@ -124,7 +124,7 @@ class KontenDigitalController extends Controller
             $fileCover = $request->file('cover');
             $coverName = time() . '_cover_' . $fileCover->getClientOriginalName();
             $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $coverName);
-            $extension = $file->getClientOriginalExtension();
+            $extension = $fileCover->getClientOriginalExtension();
             $coverPath = $fileCover->storeAs('uploads/konten_cover', $cleanName . '.' . $extension, 'public');
         } else {
             $coverPath = 'default/default-book.png';
@@ -186,7 +186,7 @@ class KontenDigitalController extends Controller
             $fileCover = $request->file('cover');
             $coverName = time() . '_cover_' . $fileCover->getClientOriginalName();
             $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $coverName);
-            $extension = $file->getClientOriginalExtension();
+            $extension = $fileCover->getClientOriginalExtension();
             $coverPath = $fileCover->storeAs('uploads/konten_cover', $coverName . '.' . $extension, 'public');
         } else {
             $coverPath = $konten->cover ?? 'default/default-book.png';

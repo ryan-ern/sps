@@ -19,7 +19,7 @@
                                         <!-- Search Input -->
                                         <div class="col-lg-4 col-md-6 col-sm-12">
                                             <input type="search" id="search" name="search"
-                                                class="form-control mb-2" placeholder="Cari Data Kunjungan"
+                                                class="form-control mb-2" placeholder="Cari Data Bebas Pustaka"
                                                 value="{{ request('search') }}">
                                         </div>
 
