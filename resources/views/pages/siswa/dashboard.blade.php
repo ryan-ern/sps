@@ -247,12 +247,14 @@
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-body text-center">
-                            <div class="d-flex justify-content-end mb-3 px-3">
-                                <form id="form-pinjam" method="POST" action="">
-                                    @csrf
+                            <div class="d-flex justify-content-between mb-3 px-3">
+                                <div>
                                     <a id="btn-baca" href="#" class="btn btn-outline-dark"
                                         target="_blank">Baca
                                         Online</a>
+                                </div>
+                                <form id="form-pinjam" method="POST" action="">
+                                    @csrf
                                     <button type="submit" class="btn btn-success  me-2">Pinjam</button>
                                     <button type="reset" class="btn btn-primary" id="closeModal"
                                         data-bs-dismiss="modal">Tutup</button>
@@ -320,7 +322,7 @@
                     const file = card.dataset.file;
 
                     // Aktifkan "Baca Online" hanya jika jenis adalah 'paket'
-                    if (jenis === 'paket' && file) {
+                    if (file) {
                         btnBaca.style.display = 'inline-block';
                         btnBaca.href = file;
                         btnBaca.target = '_blank';
