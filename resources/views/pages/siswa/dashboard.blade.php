@@ -250,10 +250,10 @@
                             <div class="d-flex justify-content-end mb-3 px-3">
                                 <form id="form-pinjam" method="POST" action="">
                                     @csrf
-                                    <button type="submit" class="btn btn-success  me-2">Pinjam</button>
                                     <a id="btn-baca" href="#" class="btn btn-outline-dark"
                                         target="_blank">Baca
                                         Online</a>
+                                    <button type="submit" class="btn btn-success  me-2">Pinjam</button>
                                     <button type="reset" class="btn btn-primary" id="closeModal"
                                         data-bs-dismiss="modal">Tutup</button>
                                 </form>
