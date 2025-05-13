@@ -53,28 +53,26 @@
 
 
 
-                            @if (!$jenis || $jenis === 'digital')
-                                <div class="border-5 border-bottom border-dark my-3"></div>
-                                {{-- Konten Digital Sering Dilihat --}}
-                                <h6>Konten Digital Sering Dilihat</h6>
-                                <div
-                                    class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
-                                    @foreach ($kontenSeringDilihat as $konten)
-                                        <div class="bg-dark text-white p-3 text-center konten-card rounded"
-                                            style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
-                                            data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
-                                            data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
-                                            data-id="{{ $konten->id }}" data-file="{{ $konten->file_path }}"
-                                            data-pembuat="{{ $konten->pembuat }}"
-                                            data-dilihat="{{ $konten->dilihat }}">
-                                            <img src="{{ asset('storage/' . $konten->cover ?? '') }}"
-                                                class="img-fluid mb-2" style="height: 180px; object-fit: cover;">
-                                            <div class="fs-5">{{ Str::limit($konten->judul, 20) }}</div>
-                                            <div class="fs-5 mt-2">{{ $konten->dilihat }}x <br> Dilihat</div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
+                        @if (!$jenis || $jenis === 'digital')
+                            <div class="border-5 border-bottom border-dark my-3"></div>
+                            {{-- Konten Digital Sering Dilihat --}}
+                            <h6>Konten Digital Sering Dilihat</h6>
+                            <div class="d-flex flex-wrap justify-content-center gap-2 justify-content-md-evenly mb-4">
+                                @foreach ($kontenSeringDilihat as $konten)
+                                    <div class="bg-dark text-white p-3 text-center konten-card rounded"
+                                        style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
+                                        data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
+                                        data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
+                                        data-id="{{ $konten->id }}" data-file="{{ $konten->file_path }}"
+                                        data-pembuat="{{ $konten->pembuat }}" data-dilihat="{{ $konten->dilihat }}">
+                                        <img src="{{ asset('storage/' . $konten->cover ?? '') }}"
+                                            class="img-fluid mb-2" style="height: 180px; object-fit: cover;">
+                                        <div class="fs-5">{{ Str::limit($konten->judul, 20) }}</div>
+                                        <div class="fs-5 mt-2">{{ $konten->dilihat }}x <br> Dilihat</div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
 
                         <div class="border-5 border-bottom border-dark my-3"></div>
 
@@ -89,8 +87,7 @@
                     <div class="modal-content bg-light">
                         <div class="modal-header">
                             <h5 class="modal-title" id="kontenModalLabel">Detail Konten Digital</h5>
-                            <button class="btn btn-primary me-2" id="closeModal"
-                                data-bs-dismiss="modal">Tutup</button>
+                            <button class="btn btn-primary me-2" id="closeModal" data-bs-dismiss="modal">Tutup</button>
                         </div>
                         <div class="modal-body">
                             <h4 id="modalJudul" class="mb-3"></h4>

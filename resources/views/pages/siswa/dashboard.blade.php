@@ -79,7 +79,7 @@
                                         <div class="bg-dark text-white p-3 text-center rounded buku-card"
                                             style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                             data-bs-target="#globalBukuModal" data-judul="{{ $buku->judul }}"
-                                            data-no_regis="{{ $buku->no_regis }}"
+                                            data-jenis="{{ $buku->jenis }}" data-no_regis="{{ $buku->no_regis }}"
                                             data-pengarang="{{ $buku->pengarang }}"
                                             data-penerbit="{{ $buku->penerbit }}" data-tahun="{{ $buku->tahun }}"
                                             data-stok="{{ $buku->stok }}"
@@ -138,7 +138,7 @@
                                         data-no_regis="{{ $item->no_regis }}" data-pengarang="{{ $item->pengarang }}"
                                         data-penerbit="{{ $item->penerbit }}" data-tahun="{{ $item->tahun }}"
                                         data-stok="{{ $item->stok }}" data-total_pinjam="{{ $item->total_pinjam }}"
-                                        data-keterangan="{{ $item->keterangan }}"
+                                        data-keterangan="{{ $item->keterangan }}" data-jenis="{{ $item->jenis }}"
                                         data-cover="{{ asset('storage/' . $item->file_cover) }}"
                                         data-file="{{ asset('storage/' . $item->file_buku) }}"
                                         data-rute="{{ route('peminjaman-siswa.post', $item->no_regis) }}">
@@ -251,6 +251,9 @@
                                 <form id="form-pinjam" method="POST" action="">
                                     @csrf
                                     <button type="submit" class="btn btn-success  me-2">Pinjam</button>
+                                    <a id="btn-baca" href="#" class="btn btn-outline-dark"
+                                        target="_blank">Baca
+                                        Online</a>
                                     <button type="reset" class="btn btn-primary" id="closeModal"
                                         data-bs-dismiss="modal">Tutup</button>
                                 </form>
@@ -311,6 +314,20 @@
                     document.getElementById('modal-keterangan').textContent = card.dataset
                         .keterangan;
                     document.getElementById('form-pinjam').action = card.dataset.rute;
+
+                    const jenis = card.dataset.jenis;
+                    const btnBaca = document.getElementById('btn-baca');
+                    const file = card.dataset.file;
+
+                    // Aktifkan "Baca Online" hanya jika jenis adalah 'paket'
+                    if (jenis === 'paket' && file) {
+                        btnBaca.style.display = 'inline-block';
+                        btnBaca.href = file;
+                        btnBaca.target = '_blank';
+                    } else {
+                        btnBaca.style.display = 'none';
+                    }
+
                 });
             });
 
