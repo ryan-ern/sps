@@ -140,7 +140,7 @@ class BukuController extends Controller
             $extension = $fileBuku->getClientOriginalExtension();
             $fileBukuPath = $fileBuku->storeAs('uploads/buku', $cleanName . '.' . $extension, 'public');
         } else {
-            $fileBukuPath = 'default/default-book.png';
+            $fileBukuPath = '-';
         }
 
         if ($request->hasFile('file_cover')) {
