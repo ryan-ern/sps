@@ -142,7 +142,7 @@
                                         data-keterangan="{{ $item->keterangan }}" data-jenis="{{ $item->jenis }}"
                                         data-cover="{{ asset('storage/' . $item->file_cover) }}"
                                         data-file="{{ asset('storage/' . $item->file_buku) }}"
-                                        data-check="{{ $buku->file_buku }}"
+                                        data-check="{{ $item->file_buku }}"
                                         data-rute="{{ route('peminjaman-siswa.post', $item->no_regis) }}">
                                         <img src="{{ asset('storage/' . $item->file_cover) }}" class="img-fluid mb-2"
                                             alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
