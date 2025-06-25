@@ -69,7 +69,7 @@ class KunjunganController extends Controller
         );
     }
 
-    public function store(Request $request)
+    public function store(Request $request) //untuk mencatat kunjungan pengguna (siswa) ke perpustakaan dengan menggunakan NISN
     {
         $request->validate([
             "nisn" => "required|string",

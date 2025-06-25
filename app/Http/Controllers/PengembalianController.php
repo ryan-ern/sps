@@ -88,7 +88,7 @@ class PengembalianController extends Controller
         return view('pages.admin.pengembalian', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
     }
 
-    public function indexSiswa(Request $request)
+    public function indexSiswa(Request $request)  //Menampilkan data peminjaman buku yang dilakukan oleh siswa
     {
         $request->validate([
             'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
@@ -125,7 +125,7 @@ class PengembalianController extends Controller
         return view('pages.siswa.pengembalian', compact('data'));
     }
 
-    public function accept(Request $request, $id)
+    public function accept(Request $request, $id)  // memverifikasi dan menyelesaikan proses pengembalian buku oleh siswa
     {
         $peminjaman = Peminjaman::where('id', $id)
             ->first();
@@ -162,7 +162,7 @@ class PengembalianController extends Controller
         return redirect()->route('pengembalian.read');
     }
 
-    public function kembali(Request $request, $id)
+    public function kembali(Request $request, $id) //mengajukan pengembalian buku oleh siswa
     {
         $peminjaman = Peminjaman::where('id', $id)
             ->first();

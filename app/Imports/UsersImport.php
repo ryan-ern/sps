@@ -56,3 +56,4 @@ class UsersImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatc
         return 1000;
     }
 }
+ // Mengatur bagaimana data dari setiap baris Excel diolah menjadi model User.

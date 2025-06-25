@@ -88,7 +88,7 @@ class BukuController extends Controller
     }
 
 
-    private function buatRentang($nomorRegistrasi)
+    private function buatRentang($nomorRegistrasi) //mengelompokkan nomor registrasi berurutan menjadi rentang
     {
         $rentang = [];
         $start = $nomorRegistrasi[0];
@@ -109,7 +109,7 @@ class BukuController extends Controller
         return $rentang;
     }
 
-    public function store(Request $request)
+    public function store(Request $request) //TAMBAH DATA BUKU
     {
         $maxStok = Validator::make($request->all(), [
             'stok' => 'required|integer|max:10000',
@@ -223,7 +223,7 @@ class BukuController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request) //HAPUS DATA BUKU
     {
         $id = $request->no_regis;
 
@@ -277,7 +277,7 @@ class BukuController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, Buku $buku)
+    public function update(Request $request, Buku $buku) // EDIT DATA BUKU
     {
         $bukuYangSama = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->get();
 

@@ -24,7 +24,7 @@ class DashboardController extends Controller
             return ($hariIni > 0) ? 100 : 0; // Jika target 0, tapi hari ini ada data, maka 100%
         }
 
-        $roles = Auth::user()->role;
+        $roles = Auth::user()->role; //DASHBOARD SISWA
         if ($roles == 'siswa') {
             $today = Carbon::today();
 
@@ -72,7 +72,7 @@ class DashboardController extends Controller
                     ];
                 })->sortByDesc('total_pinjam')->take(5)->values();
 
-            $bukuTerbaru = Buku::latest()
+            $bukuTerbaru = Buku::latest() //untuk menampilkan daftar buku terbaru dan menggabungkannya dengan daftar buku favorit
                 ->when(in_array($filterJenis, ['referensi', 'paket']), function ($query) use ($filterJenis) {
                     $query->where('jenis', $filterJenis);
                 })
@@ -108,7 +108,7 @@ class DashboardController extends Controller
                 $kontenQuery->where('judul', 'like', '%' . $search . '%');
             }
 
-            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
+            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat') //untuk mengambil dan menampilkan konten digital yang paling sering dilihat oleh pengguna
                 ->take(5)
                 ->get()
                 ->map(function ($item) {
@@ -174,7 +174,7 @@ class DashboardController extends Controller
                 'kontenSeringDilihat',
                 'kunjunganHariIni'
             ));
-        } elseif ($roles == 'guru') {
+        } elseif ($roles == 'guru') {   // DASHBOARD GURU
             $search = request()->get('search');
             $today = Carbon::today();
             $yesterday = Carbon::yesterday();
@@ -326,7 +326,7 @@ class DashboardController extends Controller
                 'wajibDilihat',
                 'kontenSeringDilihat'
             ));
-        } elseif ($roles == 'admin') {
+        } elseif ($roles == 'admin') {  //DASHBOARD ADMIN
             $today = Carbon::today();
             $yesterday = Carbon::yesterday();
 
