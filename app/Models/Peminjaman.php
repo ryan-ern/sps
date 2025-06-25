@@ -40,16 +40,18 @@ class Peminjaman extends Model
         $estKembali = Carbon::parse($this->est_kembali);
         $tglKembali = $this->tgl_kembali != null ? Carbon::parse($this->tgl_kembali) : now();
 
-        // Cek apakah telat
-        if ($tglKembali->greaterThan($estKembali)) {
-            $hariTelat = abs($tglKembali->diffInDays($estKembali, false));
-            $this->denda = $hariTelat * 500;
+        $jamTelat = $tglKembali->greaterThan($estKembali) ? $estKembali->diffInHours($tglKembali) : 0;
+
+        if ($jamTelat >= 24) {
+            $jumlahHariTelat = floor($jamTelat / 24);
+            $this->denda = $jumlahHariTelat * 500;
         } else {
             $this->denda = 0;
         }
 
         $this->save();
     }
+
 
     public function user()
     {

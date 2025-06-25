@@ -21,7 +21,7 @@ class UsersImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatc
     {
         // Pisahkan fullname menjadi array kata
         $namaParts = explode(' ', trim($row['fullname']));
-        $namaBelakang = end($namaParts); // Nama terakhir (jika hanya 1 kata, jadi nama depan)
+        $namaDepan = strtolower($namaParts[0]); // Nama depan
 
         // Ambil 4 digit terakhir dari NISN
         $nisnAkhir = substr($row['nisn'], -4);
@@ -29,14 +29,15 @@ class UsersImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatc
         return new User([
             'nisn' => $row['nisn'],
             'fullname' => $row['fullname'],
-            'username' => strtolower($row['fullname']), // lowercase
+            'username' => $namaDepan . $nisnAkhir, // nama depan + 4 digit nisn
             'kelas' => $row['kelas'],
-            'password' => bcrypt(strtolower($namaBelakang) . $nisnAkhir),
+            'password' => bcrypt($row['nisn']),
             'role' => $row['role'],
             'status' => $row['status'],
             'email' => $row['email'],
         ]);
     }
+
 
 
     public function uniqueBy()

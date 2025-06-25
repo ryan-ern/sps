@@ -87,6 +87,7 @@
                                             data-keterangan="{{ $buku->keterangan }}"
                                             data-cover="{{ asset('storage/' . $buku->file_cover) }}"
                                             data-file="{{ asset('storage/' . $buku->file_buku) }}"
+                                            data-check="{{ $buku->file_buku }}"
                                             data-rute="{{ route('peminjaman-siswa.post', $buku->no_regis) }}">
                                             <img src="{{ asset('storage/' . $buku->file_cover) }}"
                                                 class="img-fluid mb-2" alt="{{ $buku->judul }}"
@@ -141,6 +142,7 @@
                                         data-keterangan="{{ $item->keterangan }}" data-jenis="{{ $item->jenis }}"
                                         data-cover="{{ asset('storage/' . $item->file_cover) }}"
                                         data-file="{{ asset('storage/' . $item->file_buku) }}"
+                                        data-check="{{ $buku->file_buku }}"
                                         data-rute="{{ route('peminjaman-siswa.post', $item->no_regis) }}">
                                         <img src="{{ asset('storage/' . $item->file_cover) }}" class="img-fluid mb-2"
                                             alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
@@ -320,9 +322,9 @@
                     const jenis = card.dataset.jenis;
                     const btnBaca = document.getElementById('btn-baca');
                     const file = card.dataset.file;
-
+                    const check = card.dataset.check;
                     // Aktifkan "Baca Online" hanya jika jenis adalah 'paket'
-                    if (file) {
+                    if (check != "-") {
                         btnBaca.style.display = 'inline-block';
                         btnBaca.href = file;
                         btnBaca.target = '_blank';
