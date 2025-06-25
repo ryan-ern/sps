@@ -64,7 +64,7 @@ class KontenDigitalController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(Request $request) // digunakan untuk menambah (menyimpan) data baru ke dalam database
     {
         $validator = Validator::make($request->all(), [
             'jenis' => 'required|in:video,buku digital',
@@ -149,7 +149,7 @@ class KontenDigitalController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id) //EDIT DATA
     {
         $konten = KontenDigital::findOrFail($id);
 
@@ -208,7 +208,7 @@ class KontenDigitalController extends Controller
         return redirect()->back();
     }
 
-    public function destroy($id)
+    public function destroy($id) //HAPUS DATA
     {
         $konten = KontenDigital::findOrFail($id);
 

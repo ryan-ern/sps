@@ -55,7 +55,7 @@ class BebasPustakaController extends Controller
         }
 
         // Tambahkan atribut status bebas pustaka
-        $users->transform(function ($user) {
+        $users->transform(function ($user) { // HITUNG STATUS
             $user->dipinjam = $user->peminjaman->count();
             $user->dikembalikan = $user->pengembalian->count();
             $user->status = $user->dipinjam == $user->dikembalikan ? 'Sesuai' : 'Tidak Sesuai';

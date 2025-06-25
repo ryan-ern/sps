@@ -256,7 +256,7 @@ class UserController extends Controller
     }
 
 
-    public function import(Request $request)
+    public function import(Request $request) //menangani unggah file Excel dan menjalankan proses import-nya, menggunakan logika dari kode pertama.
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls',

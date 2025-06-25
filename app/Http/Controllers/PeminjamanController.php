@@ -80,7 +80,7 @@ class PeminjamanController extends Controller
         return view('pages.admin.peminjaman', compact('referensi', 'paket', 'perPage', 'search', 'dateRange'));
     }
 
-    public function userPeminjaman(Request $request)
+    public function userPeminjaman(Request $request) //admin untuk menampilkan riwayat peminjaman buku
     {
         $request->validate([
             'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
@@ -163,7 +163,7 @@ class PeminjamanController extends Controller
         return view('pages.admin.peminjaman-detail', compact('referensi', 'paket', 'perPage', 'search', 'dateRange', 'user'));
     }
 
-    public function indexSiswa(Request $request)
+    public function indexSiswa(Request $request) //menampilkan data peminjaman buku yang dilakukan oleh siswa yang sedang login
     {
         $request->validate([
             'per_page' => 'nullable|in:5,10,25,50,100,500,Semua',
@@ -199,7 +199,7 @@ class PeminjamanController extends Controller
         return view('pages.siswa.peminjaman', compact('data'));
     }
 
-    public function pinjam($id)
+    public function pinjam($id) // siswa yang sedang login untuk mengajukan peminjaman buku
     {
         $buku = Buku::where('no_regis', $id)->where('status', 'tersedia')->first();
 
@@ -252,7 +252,7 @@ class PeminjamanController extends Controller
 
 
 
-    public function accept(Request $request, $id)
+    public function accept(Request $request, $id) //digunakan oleh admin untuk menerima atau menyetujui permintaan peminjaman buku dari siswa
     {
         $peminjaman = Peminjaman::where('id', $id)
             ->first();
@@ -296,7 +296,7 @@ class PeminjamanController extends Controller
         return redirect()->route('peminjaman.read');
     }
 
-    public function decline(Request $request, $id)
+    public function decline(Request $request, $id) //digunakan oleh admin untuk menolak permintaan peminjaman buku
     {
         $peminjaman = Peminjaman::where('id', $id)
             ->first();
