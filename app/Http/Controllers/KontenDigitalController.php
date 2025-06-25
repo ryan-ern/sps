@@ -109,7 +109,7 @@ class KontenDigitalController extends Controller
         $konten->judul = $request->judul;
         $konten->pembuat = $request->pembuat;
         $konten->nuptk = $request->nuptk;
-        $konten->created_by = auth()->user()->nisn;
+        // $konten->created_by = auth()->user()->nisn;
 
         if ($request->hasFile('file_path')) {
             $file = $request->file('file_path');
