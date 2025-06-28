@@ -69,8 +69,13 @@ class DashboardController extends Controller
                         'penerbit' => $data->penerbit ?? '-',
                         'keterangan' => $data->keterangan ?? '-',
                         'tahun' => $data->tahun ?? '-',
+                        'created_at' => $data->created_at ?? now()->subYears(10)
                     ];
-                })->sortByDesc('total_pinjam')->take(5)->values();
+                })->sortByDesc(function ($item) {
+                    return [$item->total_pinjam, $item->created_at]; // Urutkan berdasarkan total_pinjam dan created_at
+                })
+                ->take(5)
+                ->values();
 
             $bukuTerbaru = Buku::latest() //untuk menampilkan daftar buku terbaru dan menggabungkannya dengan daftar buku favorit
                 ->when(in_array($filterJenis, ['referensi', 'paket']), function ($query) use ($filterJenis) {
@@ -219,8 +224,13 @@ class DashboardController extends Controller
                         'penerbit' => $data->penerbit ?? '-',
                         'keterangan' => $data->keterangan ?? '-',
                         'tahun' => $data->tahun ?? '-',
+                        'created_at' => $data->created_at ?? now()->subYears(10)
                     ];
-                })->sortByDesc('total_pinjam')->take(5)->values();
+                })->sortByDesc(function ($item) {
+                    return [$item->total_pinjam, $item->created_at];
+                })
+                ->take(5)
+                ->values();
 
             $bukuTerbaru = Buku::latest()
                 ->get()
@@ -372,8 +382,13 @@ class DashboardController extends Controller
                         'penerbit' => $data->penerbit ?? '-',
                         'keterangan' => $data->keterangan ?? '-',
                         'tahun' => $data->tahun ?? '-',
+                        'created_at' => $data->created_at ?? now()->subYears(10)
                     ];
-                })->sortByDesc('total_pinjam')->take(5)->values();
+                })->sortByDesc(function ($item) {
+                    return [$item->total_pinjam, $item->created_at]; // Urutkan berdasarkan total_pinjam dan created_at
+                })
+                ->take(5)
+                ->values();
 
             $bukuTerbaru = Buku::latest()
                 ->get()
