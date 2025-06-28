@@ -114,6 +114,7 @@ class DashboardController extends Controller
             }
 
             $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat') //untuk mengambil dan menampilkan konten digital yang paling sering dilihat oleh pengguna
+                ->orderByDesc('created_at')
                 ->take(5)
                 ->get()
                 ->map(function ($item) {
@@ -129,7 +130,7 @@ class DashboardController extends Controller
                     ];
                 });
 
-            $kontenTerbaru = KontenDigital::latest()
+            $kontenTerbaru = KontenDigital::orderByDesc('created_at')
                 ->when($search, function ($query) use ($search) {
                     $query->where('judul', 'like', '%' . $search . '%');
                 })
@@ -415,7 +416,7 @@ class DashboardController extends Controller
             // ---------- KONTEN DIGITAL ----------
             $kontenQuery = KontenDigital::query();
 
-            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
+            $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')->orderByDesc('created_at')
                 ->take(5)
                 ->get()
                 ->map(function ($item) {
@@ -430,7 +431,7 @@ class DashboardController extends Controller
                     ];
                 });
 
-            $kontenTerbaru = KontenDigital::latest()
+            $kontenTerbaru = KontenDigital::orderByDesc('created_at')
                 ->take(10)
                 ->get()
                 ->map(function ($item) {
