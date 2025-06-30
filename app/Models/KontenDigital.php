@@ -19,7 +19,8 @@ class KontenDigital extends Model
         'url',
         'cover',
         'file_path',
-        'pembuat',
+        'pengarang',
+        'penerbit',
         'dilihat',
     ];
 

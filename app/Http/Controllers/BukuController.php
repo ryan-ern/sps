@@ -54,7 +54,7 @@ class BukuController extends Controller
                 ->orWhere('tahun', 'like', "%{$search}%");
             $kontenQuery
                 ->where('judul', 'like', "%{$search}%")
-                ->orWhere('pembuat', 'like', "%{$search}%")
+                ->orWhere('pengarang', 'like', "%{$search}%")
                 ->orWhere('jenis', 'like', "%{$search}%");
         }
 

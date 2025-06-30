@@ -19,7 +19,7 @@ class DashboardController extends Controller
         {
             if ($targetKemarin > 0) {
                 $persen = round(($hariIni / $targetKemarin) * 100);
-                return min($persen, 100); // Maksimal 100%
+                return $persen; // Maksimal 100%
             }
             return ($hariIni > 0) ? 100 : 0; // Jika target 0, tapi hari ini ada data, maka 100%
         }
@@ -124,7 +124,8 @@ class DashboardController extends Controller
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
                         'url' => $item->url ?? null,
-                        'pembuat' => $item->pembuat ?? '-',
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
                         'cover' => $item->cover ?? 'default/default-book.png',
                         'dilihat' => $item->dilihat ?? 0,
                     ];
@@ -143,7 +144,8 @@ class DashboardController extends Controller
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
                         'url' => $item->url ?? null,
-                        'pembuat' => $item->pembuat ?? '-',
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
                         'cover' => $item->cover ?? 'default/default-book.png',
                         'dilihat' => $item->dilihat ?? 0,
                     ];
@@ -256,7 +258,7 @@ class DashboardController extends Controller
                 ->values();
 
             // ---------- KONTEN DIGITAL ----------
-            $kontenQuery = KontenDigital::where('judul', 'like', '%' . $search . '%')->orWhere('jenis', 'like', '%' . $search . '%')->orWhere('url', 'like', '%' . $search . '%')->orWhere('pembuat', 'like', '%' . $search . '%');
+            $kontenQuery = KontenDigital::where('judul', 'like', '%' . $search . '%')->orWhere('jenis', 'like', '%' . $search . '%')->orWhere('url', 'like', '%' . $search . '%')->orWhere('pengarang', 'like', '%' . $search . '%');
 
             $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
                 ->take(5)
@@ -269,7 +271,8 @@ class DashboardController extends Controller
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
                         'url' => $item->url ?? null,
-                        'pembuat' => $item->pembuat ?? '-',
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
                         'cover' => $item->cover ?? 'default/default-book.png',
                         'dilihat' => $item->dilihat ?? 0,
                     ];
@@ -285,7 +288,8 @@ class DashboardController extends Controller
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
                         'url' => $item->url ?? null,
-                        'pembuat' => $item->pembuat ?? '-',
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
                         'cover' => $item->cover ?? 'default/default-book.png',
                         'dilihat' => $item->dilihat ?? 0,
                     ];
@@ -305,7 +309,7 @@ class DashboardController extends Controller
 
             // Ambil konten lainnya (bukan milik sendiri)
             $kontenLain = $gabunganKonten->reject(function ($item) use ($userNuptk) {
-                return $item->pembuat == $userNuptk;
+                return $item->pengarang == $userNuptk;
             });
 
             // Gabungkan ulang dengan milik sendiri di awal
@@ -425,7 +429,8 @@ class DashboardController extends Controller
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
                         'url' => $item->url ?? null,
-                        'pembuat' => $item->pembuat ?? '-',
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
                         'cover' => $item->cover ?? 'default/default-book.png',
                         'dilihat' => $item->dilihat ?? 0,
                     ];
@@ -440,7 +445,8 @@ class DashboardController extends Controller
                         'jenis' => $item->jenis ?? '-',
                         'file_path' => $item->file_path ? asset('storage/' . $item->file_path) : null,
                         'url' => $item->url ?? null,
-                        'pembuat' => $item->pembuat ?? '-',
+                        'pengarang' => $item->pengarang ?? '-',
+                        'penerbit' => $item->penerbit ?? '-',
                         'cover' => $item->cover ?? 'default/default-book.png',
                         'dilihat' => $item->dilihat ?? 0,
                     ];
@@ -467,8 +473,11 @@ class DashboardController extends Controller
 
             return view('pages.admin.dashboard', compact(
                 'dataPengunjung',
+                'dataPengunjungKemarin',
                 'dataPeminjam',
+                'dataPeminjamKemarin',
                 'dataKembali',
+                'dataKembaliKemarin',
                 'persenPengunjung',
                 'persenPeminjam',
                 'persenKembali',

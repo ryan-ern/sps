@@ -29,10 +29,13 @@
                                 <div class="bg-dark text-white px-4 py-2 rounded">
                                     <div class="row">
                                         <div
-                                            class="col-md-3 border border-white justify-content-center align-items-center d-flex">
-                                            <div class="fs-3">{{ $dataPengunjung }}</div>
+                                            class="col-md-4 border border-white justify-content-center align-items-center d-flex">
+                                            <div
+                                                class="fs-3 fw-bold {{ $persenPengunjung >= 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ $persenPengunjung >= 0 ? '+' : '' }}{{ number_format($persenPengunjung) }}%
+                                            </div>
                                         </div>
-                                        <div class="col-md-7">
+                                        <div class="col-md-6">
                                             <div class="row">
                                                 <div class="col">
                                                     <small class="fs-5">Data Pengunjung</small>
@@ -41,10 +44,8 @@
                                             <div class="border-2 border-bottom border-light my-3"></div>
                                             <div class="row">
                                                 <div class="col">
-                                                    <h2
-                                                        class="{{ $persenPengunjung >= 0 ? 'text-success' : 'text-danger' }}">
-                                                        {{ $persenPengunjung >= 0 ? '+' : '' }}{{ number_format($persenPengunjung) }}%
-                                                    </h2>
+                                                    Hari Ini: {{ $dataPengunjung }} <br>
+                                                    Kemarin: {{ $dataPengunjungKemarin }}
                                                 </div>
                                             </div>
                                         </div>
@@ -55,10 +56,14 @@
                                 <div class="bg-dark text-white px-4 py-2 rounded">
                                     <div class="row">
                                         <div
-                                            class="col-md-3 border border-white justify-content-center align-items-center d-flex">
-                                            <div class="fs-3">{{ $dataPeminjam }}</div>
+                                            class="col-md-4 border border-white justify-content-center align-items-center d-flex">
+                                            <div
+                                                class="fs-3 fw-bold
+                                                {{ $persenPeminjam >= 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ $persenPeminjam >= 0 ? '+' : '' }}{{ number_format($persenPeminjam) }}%
+                                            </div>
                                         </div>
-                                        <div class="col-md-7">
+                                        <div class="col-md-6">
                                             <div class="row">
                                                 <div class="col">
                                                     <small class="fs-5">Data Pinjam</small>
@@ -67,10 +72,8 @@
                                             <div class="border-2 border-bottom border-light my-3"></div>
                                             <div class="row">
                                                 <div class="col">
-                                                    <h2
-                                                        class="{{ $persenPeminjam >= 0 ? 'text-success' : 'text-danger' }}">
-                                                        {{ $persenPeminjam >= 0 ? '+' : '' }}{{ number_format($persenPeminjam) }}%
-                                                    </h2>
+                                                    Hari Ini: {{ $dataPeminjam }} <br>
+                                                    Kemarin: {{ $dataPeminjamKemarin }}
                                                 </div>
                                             </div>
                                         </div>
@@ -81,10 +84,14 @@
                                 <div class="bg-dark text-white px-4 py-2 rounded">
                                     <div class="row">
                                         <div
-                                            class="col-md-3 border border-white justify-content-center align-items-center d-flex">
-                                            <div class="fs-3">{{ $dataKembali }}</div>
+                                            class="col-md-4 border border-white justify-content-center align-items-center d-flex">
+                                            <div
+                                                class="fs-3 fw-bold
+                                            {{ $persenKembali >= 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ $persenKembali >= 0 ? '+' : '' }}{{ number_format($persenKembali) }}%
+                                            </div>
                                         </div>
-                                        <div class="col-md-7">
+                                        <div class="col-md-6">
                                             <div class="row">
                                                 <div class="col">
                                                     <small class="fs-5">Data Kembali</small>
@@ -93,10 +100,8 @@
                                             <div class="border-2 border-bottom border-light my-3"></div>
                                             <div class="row">
                                                 <div class="col">
-                                                    <h2
-                                                        class="{{ $persenKembali >= 0 ? 'text-success' : 'text-danger' }}">
-                                                        {{ $persenKembali >= 0 ? '+' : '' }}{{ number_format($persenKembali) }}%
-                                                    </h2>
+                                                    Hari Ini: {{ $dataKembali }} <br>
+                                                    Kemarin: {{ $dataKembaliKemarin }}
                                                 </div>
                                             </div>
                                         </div>
@@ -141,8 +146,8 @@
                                     style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                     data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
                                     data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
-                                    data-file="{{ $konten->file_path }}" data-pembuat="{{ $konten->pembuat }}"
-                                    data-dilihat="{{ $konten->dilihat }}">
+                                    data-file="{{ $konten->file_path }}" data-pengarang="{{ $konten->pengarang }}"
+                                    data-penerbit="{{ $konten->penerbit }}" data-dilihat="{{ $konten->dilihat }}">
                                     <img src="{{ asset('storage/' . $konten->cover ?? '') }}" class="img-fluid mb-2"
                                         style="height: 180px; object-fit: cover;">
                                     <div class="fs-5">{{ Str::limit($konten->judul, 20) }}</div>
@@ -181,10 +186,11 @@
                                     <div class="bg-dark text-white p-3 text-center rounded konten-card"
                                         style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                         data-bs-target="#kontenModal" data-judul="{{ $item->judul }}"
-                                        data-pembuat="{{ $item->pembuat }}"
+                                        data-pengarang="{{ $item->pengarang }}"
                                         data-cover="{{ asset('storage/' . $item->cover) }}"
-                                        data-url="{{ $item->url }}" data-file="{{ $item->file_path }}"
-                                        data-dilihat="{{ $item->dilihat }}" data-jenis="{{ $item->jenis }}">
+                                        data-penerbit="{{ $item->penerbit }}" data-url="{{ $item->url }}"
+                                        data-file="{{ $item->file_path }}" data-dilihat="{{ $item->dilihat }}"
+                                        data-jenis="{{ $item->jenis }}">
                                         <img src="{{ asset('storage/' . $item->cover) }}" class="img-fluid mb-2"
                                             alt="{{ $item->judul }}" style="height: 180px; object-fit: cover;">
                                         <div class="fs-5">{{ Str::limit($item->judul, 20) }}</div>
@@ -247,7 +253,8 @@
                         <div class="modal-body">
                             <h4 id="modalJudul" class="mb-3"></h4>
                             <p><strong>Jenis:</strong> <span id="modalJenis"></span></p>
-                            <p><strong>Pembuat:</strong> <span id="modalPembuat"></span></p>
+                            <p><strong>Pengarang:</strong> <span id="modalpengarang"></span></p>
+                            <p><strong>Penerbit:</strong> <span id="modalPenerbit"></span></p>
                             <p><strong>Jumlah Dilihat:</strong> <span id="modalDilihat"></span>x</p>
                             <p id="tab_baru"><strong>Buka di tab baru:</strong> <a id="modalBuka" href="#"
                                     target="_blank">Klik di sini</a></p>
@@ -295,13 +302,15 @@
                     const jenis = this.getAttribute('data-jenis'); // 'video' atau 'buku digital'
                     const file = this.getAttribute('data-file'); // file_path (untuk buku digital)
                     const url = this.getAttribute('data-url'); // link (untuk video)
-                    const pembuat = this.getAttribute('data-pembuat');
+                    const pengarang = this.getAttribute('data-pengarang');
+                    const penerbit = this.getAttribute('data-penerbit');
+                    console.log(penerbit);
                     const dilihat = this.getAttribute('data-dilihat');
-
                     // Isi konten modal
                     document.getElementById('modalJudul').textContent = judul;
                     document.getElementById('modalJenis').textContent = jenis;
-                    document.getElementById('modalPembuat').textContent = pembuat;
+                    document.getElementById('modalpengarang').textContent = pengarang;
+                    document.getElementById('modalPenerbit').textContent = penerbit;
                     document.getElementById('modalDilihat').textContent = dilihat;
 
                     const bukaLink = document.getElementById('modalBuka');

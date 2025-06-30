@@ -64,7 +64,8 @@
                                         data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
                                         data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
                                         data-id="{{ $konten->id }}" data-file="{{ $konten->file_path }}"
-                                        data-pembuat="{{ $konten->pembuat }}" data-dilihat="{{ $konten->dilihat }}">
+                                        data-pengarang="{{ $konten->pengarang }}"
+                                        data-penerbit="{{ $konten->penerbit }}" data-dilihat="{{ $konten->dilihat }}">
                                         <img src="{{ asset('storage/' . $konten->cover ?? '') }}"
                                             class="img-fluid mb-2" style="height: 180px; object-fit: cover;">
                                         <div class="fs-5">{{ Str::limit($konten->judul, 20) }}</div>
@@ -92,7 +93,8 @@
                         <div class="modal-body">
                             <h4 id="modalJudul" class="mb-3"></h4>
                             <p><strong>Jenis:</strong> <span id="modalJenis"></span></p>
-                            <p><strong>Pembuat:</strong> <span id="modalPembuat"></span></p>
+                            <p><strong>pengarang:</strong> <span id="modalpengarang"></span></p>
+                            <p><strong>Penerbit:</strong> <span id="modalPenerbit"></span></p>
                             <p><strong>Jumlah Dilihat:</strong> <span id="modalDilihat"></span>x</p>
                             <p id="tab_baru"><strong>Buka di tab baru:</strong> <a id="modalBuka" href="#"
                                     target="_blank">Klik di sini</a></p>
@@ -175,13 +177,15 @@
                     const jenis = this.getAttribute('data-jenis'); // 'video' atau 'buku digital'
                     const file = this.getAttribute('data-file'); // file_path (untuk buku digital)
                     const url = this.getAttribute('data-url'); // link (untuk video)
-                    const pembuat = this.getAttribute('data-pembuat');
+                    const pengarang = this.getAttribute('data-pengarang');
+                    const penerbit = this.getAttribute('data-penerbit');
                     let dilihat = this.getAttribute('data-dilihat');
                     const kontenId = this.getAttribute('data-id');
                     // Isi konten modal
                     document.getElementById('modalJudul').textContent = judul;
                     document.getElementById('modalJenis').textContent = jenis;
-                    document.getElementById('modalPembuat').textContent = pembuat;
+                    document.getElementById('modalpengarang').textContent = pengarang;
+                    document.getElementById('modalPenerbit').textContent = penerbit;
                     document.getElementById('modalDilihat').textContent = dilihat;
 
                     // Tambah jumlah dilihat

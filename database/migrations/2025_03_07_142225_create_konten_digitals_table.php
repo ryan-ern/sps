@@ -20,7 +20,8 @@ return new class extends Migration
             $table->text('url')->nullable();
             $table->string('cover')->nullable();
             $table->string('file_path')->nullable();
-            $table->string('pembuat');
+            $table->string('pengarang');
+            $table->string('penerbit');
             $table->integer('dilihat')->default(0);
             $table->timestamps();
         });

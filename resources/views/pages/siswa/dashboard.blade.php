@@ -111,9 +111,10 @@
                                         <div class="bg-dark text-white p-3 text-center konten-card rounded"
                                             style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                             data-bs-target="#kontenModal" data-judul="{{ $konten->judul }}"
-                                            data-jenis="{{ $konten->jenis }}" data-url="{{ $konten->url }}"
-                                            data-id="{{ $konten->id }}" data-file="{{ $konten->file_path }}"
-                                            data-pembuat="{{ $konten->pembuat }}"
+                                            data-penerbit="{{ $konten->penerbit }}" data-jenis="{{ $konten->jenis }}"
+                                            data-url="{{ $konten->url }}" data-id="{{ $konten->id }}"
+                                            data-file="{{ $konten->file_path }}"
+                                            data-pengarang="{{ $konten->pengarang }}"
                                             data-dilihat="{{ $konten->dilihat }}">
                                             <img src="{{ asset('storage/' . $konten->cover ?? '') }}"
                                                 class="img-fluid mb-2" style="height: 180px; object-fit: cover;">
@@ -155,7 +156,8 @@
                                     <div class="bg-dark text-white p-3 text-center rounded konten-card"
                                         style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                         data-bs-target="#kontenModal" data-judul="{{ $item->judul }}"
-                                        data-pembuat="{{ $item->pembuat }}" data-id="{{ $item->id }}"
+                                        data-pengarang="{{ $item->pengarang }}" data-id="{{ $item->id }}"
+                                        data-penerbit="{{ $item->penerbit }}"
                                         data-cover="{{ asset('storage/' . $item->cover) }}"
                                         data-url="{{ $item->url }}" data-file="{{ $item->file_path }}"
                                         data-dilihat="{{ $item->dilihat }}" data-jenis="{{ $item->jenis }}">
@@ -231,7 +233,8 @@
                         <div class="modal-body">
                             <h4 id="modalJudul" class="mb-3"></h4>
                             <p><strong>Jenis:</strong> <span id="modalJenis"></span></p>
-                            <p><strong>Pembuat:</strong> <span id="modalPembuat"></span></p>
+                            <p><strong>pengarang:</strong> <span id="modalpengarang"></span></p>
+                            <p><strong>Penerbit:</strong> <span id="modalPenerbit"></span></p>
                             <p><strong>Jumlah Dilihat:</strong> <span id="modalDilihat"></span>x</p>
                             <p id="tab_baru"><strong>Buka di tab baru:</strong> <a id="modalBuka" href="#"
                                     target="_blank">Klik di sini</a></p>
@@ -257,7 +260,9 @@
                                 </div>
                                 <form id="form-pinjam" method="POST" action="">
                                     @csrf
-                                    <button type="submit" class="btn btn-success  me-2">Pinjam</button>
+                                    <button type="button" class="btn btn-success me-2"
+                                        id="btnPinjamTrigger">Pinjam</button>
+
                                     <button type="reset" class="btn btn-primary" id="closeModal"
                                         data-bs-dismiss="modal">Tutup</button>
                                 </form>
@@ -286,6 +291,38 @@
                 </div>
             </div>
 
+            <!-- Modal Konfirmasi Persyaratan -->
+            <div class="modal fade" id="modalKonfirmasi" tabindex="-1" aria-labelledby="modalKonfirmasiLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-white">Konfirmasi Peminjaman</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body text-light">
+                            <p>Dengan ini saya menyatakan telah membaca dan memahami persyaratan peminjaman buku.
+                                sebagai berikut:</p>
+                            <ul class="text-capitalize">
+                                <li>Pinjam buku <b>paket</b> harus dikembalikan dalam waktu jangka waktu 180 hari</li>
+                                <li>Pinjam buku <b>referensi</b> harus dikembalikan dalam waktu jangka waktu 3 hari</li>
+                                <li>Jika terlambat dalam mengembalikan satu buku, maka dikenakan denda sebesar
+                                    <b>Rp.500/ hari</b>
+                                </li>
+                                <li>Masimal pinjam buku referensi sebanyak <b>2</b> buku</li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-success" id="btnKonfirmasiSubmit">Lanjutkan &
+                                Pinjam</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <x-app.footer />
         </div>
     </main>
@@ -304,7 +341,19 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const bukuCards = document.querySelectorAll('.buku-card');
+            const btnPinjamTrigger = document.getElementById('btnPinjamTrigger');
+            const btnKonfirmasiSubmit = document.getElementById('btnKonfirmasiSubmit');
+            const formPinjam = document.getElementById('form-pinjam');
 
+            btnPinjamTrigger.addEventListener('click', function() {
+                const konfirmasiModal = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
+                konfirmasiModal.show();
+            });
+
+            btnKonfirmasiSubmit.addEventListener('click', function() {
+                // Submit form hanya setelah konfirmasi
+                formPinjam.submit();
+            });
             // Modal Buku
             bukuCards.forEach(card => {
                 card.addEventListener('click', () => {
@@ -344,13 +393,15 @@
                     const jenis = this.getAttribute('data-jenis'); // 'video' atau 'buku digital'
                     const file = this.getAttribute('data-file'); // file_path (untuk buku digital)
                     const url = this.getAttribute('data-url'); // link (untuk video)
-                    const pembuat = this.getAttribute('data-pembuat');
+                    const pengarang = this.getAttribute('data-pengarang');
+                    const penerbit = this.getAttribute('data-penerbit');
                     let dilihat = this.getAttribute('data-dilihat');
                     const kontenId = this.getAttribute('data-id');
                     // Isi konten modal
                     document.getElementById('modalJudul').textContent = judul;
                     document.getElementById('modalJenis').textContent = jenis;
-                    document.getElementById('modalPembuat').textContent = pembuat;
+                    document.getElementById('modalpengarang').textContent = pengarang;
+                    document.getElementById('modalPenerbit').textContent = penerbit;
                     document.getElementById('modalDilihat').textContent = dilihat;
 
                     // Tambah jumlah dilihat

@@ -37,7 +37,8 @@ class KontenDigitalController extends Controller
         if ($search) {
             $kontenQuery
                 ->where('judul', 'like', "%{$search}%")
-                ->orWhere('pembuat', 'like', "%{$search}%")
+                ->orWhere('pengarang', 'like', "%{$search}%")
+                ->orWhere('penerbit', 'like', "%{$search}%")
                 ->orWhere('jenis', 'like', "%{$search}%");
         }
 
@@ -69,7 +70,8 @@ class KontenDigitalController extends Controller
         $validator = Validator::make($request->all(), [
             'jenis' => 'required|in:video,buku digital',
             'judul' => 'required|string|max:255',
-            'pembuat' => 'required|string|max:255',
+            'pengarang' => 'required|string|max:255',
+            'penerbit' => 'required|string|max:255',
             'url' => 'nullable|url',
             'file_path' => 'nullable|file|mimes:pdf|max:10000',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -81,9 +83,9 @@ class KontenDigitalController extends Controller
             'judul.required' => 'Judul konten harus diisi.',
             'judul.string' => 'Judul konten harus berupa teks.',
             'judul.max' => 'Judul konten maksimal 255 karakter.',
-            'pembuat.required' => 'Nama pembuat harus diisi.',
-            'pembuat.string' => 'Nama pembuat harus berupa teks.',
-            'pembuat.max' => 'Nama pembuat maksimal 255 karakter.',
+            'pengarang.required' => 'Nama pengarang harus diisi.',
+            'pengarang.string' => 'Nama pengarang harus berupa teks.',
+            'pengarang.max' => 'Nama pengarang maksimal 255 karakter.',
             'url.url' => 'URL harus berupa tautan yang valid.',
             'file_path.file' => 'File yang diunggah harus berupa file.',
             'file_path.mimes' => 'File harus berformat PDF.',
@@ -107,8 +109,9 @@ class KontenDigitalController extends Controller
         $konten = new KontenDigital();
         $konten->jenis = $request->jenis;
         $konten->judul = $request->judul;
-        $konten->pembuat = $request->pembuat;
-        $konten->nuptk = $request->nuptk;
+        $konten->pengarang = $request->pengarang;
+        $konten->penerbit = $request->penerbit;
+        $konten->nuptk = $request->nuptk == 'lainnya' ? 1 : $request->nuptk;
         // $konten->created_by = auth()->user()->nisn;
 
         if ($request->hasFile('file_path')) {
@@ -156,7 +159,8 @@ class KontenDigitalController extends Controller
         $request->validate([
             'jenis' => 'required|in:video,buku digital',
             'judul' => 'required|string|max:255',
-            'pembuat' => 'required|string|max:255',
+            'pengarang' => 'required|string|max:255',
+            'penerbit' => 'nullable|string|max:255',
             'nuptk' => 'required',
             'url' => 'nullable|url',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -166,7 +170,8 @@ class KontenDigitalController extends Controller
         $konten->jenis = $request->jenis;
         $konten->judul = $request->judul;
         $konten->nuptk = $request->nuptk;
-        $konten->pembuat = $request->pembuat;
+        $konten->pengarang = $request->pengarang;
+        $konten->penerbit = $request->penerbit;
 
         if ($request->hasFile('file_path')) {
             // Hapus file lama jika ada

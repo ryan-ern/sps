@@ -33,7 +33,8 @@
                                     <hr>
                                 </form>
 
-                                <table class="table table-sm table-bordered dataTable tanpa-filter tanpa-aksi" id="table">
+                                <table class="table table-sm table-bordered dataTable tanpa-filter tanpa-aksi"
+                                    id="table">
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th scope="col">No</th>
@@ -49,7 +50,7 @@
                                         @foreach ($datas as $data)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td class="text-capitalize">{{ $data->pembuat }}</td>
+                                                <td class="text-capitalize">{{ $data->pengarang }}</td>
                                                 <td class="truncate">{{ $data->judul }}</td>
                                                 <td class="truncate">{{ $data->jenis }}</td>
                                                 <td class="text-uppercase">
@@ -59,13 +60,15 @@
                                                 <td>
                                                     <button class="mx-2 btn btn-primary editBtn"
                                                         data-id="{{ $data->id }}" data-judul="{{ $data->judul }}"
-                                                        data-pembuat="{{ $data->pembuat }}"
+                                                        data-pengarang="{{ $data->pengarang }}"
+                                                        data-penerbit="{{ $data->penerbit }}"
                                                         data-jenis="{{ $data->jenis }}"
                                                         data-url="{{ $data->url }}"
                                                         data-nuptk="{{ $data->nuptk }}"
                                                         data-cover="{{ $data->cover }}"
                                                         data-file_path="{{ $data->file_path }}" data-bs-toggle="modal"
-                                                        data-bs-target="#dynamicModal" data-modal-type="update" data-cover="{{ $data->cover }}">
+                                                        data-bs-target="#dynamicModal" data-modal-type="update"
+                                                        data-cover="{{ $data->cover }}">
                                                         Edit
                                                     </button>
 
@@ -172,7 +175,8 @@
 
                     let jenis = button.getAttribute('data-jenis');
                     const judul = button.getAttribute('data-judul');
-                    const pembuat = button.getAttribute('data-pembuat');
+                    const pengarang = button.getAttribute('data-pengarang');
+                    const penerbit = button.getAttribute('data-penerbit');
                     const nuptk = button.getAttribute('data-nuptk');
                     const url = button.getAttribute('data-url');
                     const file = button.getAttribute('data-file_path');
@@ -192,7 +196,8 @@
                                     <select name="nuptk" required class="form-select mb-3" id="guruSelect">
                                         <option value="" disabled>Pilih Guru (NUPTK)</option>
                                     </select>
-                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
+                                    <input type="text" class="form-control mb-3" name="pengarang" id="pengarang" placeholder="Pengarang" value="${pengarang}" required>
+                                    <input type="text" class="form-control mb-3" name="penerbit" id="penerbit" placeholder="Penerbit" value="${penerbit}" required>
                                 </div>
                                  <div class="col-md-6">
                                     <div id="coverGroup" class="mb-3>
@@ -223,28 +228,28 @@
                         `;
                     setTimeout(() => {
                         const guruSelect = document.getElementById('guruSelect');
-                        const pembuatInput = document.getElementById('pembuat');
+                        const pengarangInput = document.getElementById('pengarang');
                         const jenisSelect = document.getElementById('jenisSelect');
                         const urlGroup = document.getElementById('urlGroup');
                         const fileGroup = document.getElementById('fileGroup');
 
                         if (guruSelect && guruOptions.length > 0) {
-                                guruOptions.forEach(guru => {
-                                    const option = document.createElement('option');
-                                    option.value = guru.nisn;
-                                    option.textContent = `${guru.fullname} (${guru.nisn})`;
-                                    if (guru.nisn === nuptk) option.selected = true;
-                                    guruSelect.appendChild(option);
-                                });
+                            guruOptions.forEach(guru => {
+                                const option = document.createElement('option');
+                                option.value = guru.nisn;
+                                option.textContent = `${guru.fullname} (${guru.nisn})`;
+                                if (guru.nisn === nuptk) option.selected = true;
+                                guruSelect.appendChild(option);
+                            });
 
-                                guruSelect.addEventListener('change', function() {
-                                    const selectedGuru = guruOptions.find(g => g.nisn ===
-                                        this.value);
-                                    if (selectedGuru && pembuatInput) {
-                                        pembuatInput.value = selectedGuru.fullname;
-                                    }
-                                });
-                            }
+                            guruSelect.addEventListener('change', function() {
+                                const selectedGuru = guruOptions.find(g => g.nisn ===
+                                    this.value);
+                                if (selectedGuru && pengarangInput) {
+                                    pengarangInput.value = selectedGuru.fullname;
+                                }
+                            });
+                        }
 
 
                         // Toggle field berdasarkan jenis konten
@@ -306,8 +311,10 @@
                                     <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
                                     <select name="nuptk" required class="form-select mb-3" id="guruSelect">
                                         <option value="" disabled selected>Pilih Guru (NUPTK)</option>
+                                        <option value="lainnya">Lainnya</option>
                                     </select>
-                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="" required>
+                                    <input type="text" class="form-control mb-3" name="pengarang" id="pengarang" placeholder="Pengarang" value="" required>
+                                    <input type="text" class="form-control mb-3" name="penerbit" id="penerbit" placeholder="Penerbit" value="" required>
                                 </div>
                                 <div class="col-md-6">
                                     <div id="urlGroup" class="mb-3 d-none">
@@ -331,27 +338,27 @@
                         `;
                     setTimeout(() => {
                         const guruSelect = document.getElementById('guruSelect');
-                        const pembuatInput = document.getElementById('pembuat');
+                        const pengarangInput = document.getElementById('pengarang');
                         const jenisSelect = document.getElementById('jenisSelect');
                         const urlGroup = document.getElementById('urlGroup');
                         const fileGroup = document.getElementById('fileGroup');
 
                         if (guruSelect && guruOptions.length > 0) {
-                                guruOptions.forEach(guru => {
-                                    const option = document.createElement('option');
-                                    option.value = guru.nisn;
-                                    option.textContent = `${guru.fullname} (${guru.nisn})`;
-                                    guruSelect.appendChild(option);
-                                });
+                            guruOptions.forEach(guru => {
+                                const option = document.createElement('option');
+                                option.value = guru.nisn;
+                                option.textContent = `${guru.fullname} (${guru.nisn})`;
+                                guruSelect.appendChild(option);
+                            });
 
-                                guruSelect.addEventListener('change', function() {
-                                    const selectedGuru = guruOptions.find(g => g.nisn ===
-                                        this.value);
-                                    if (selectedGuru && pembuatInput) {
-                                        pembuatInput.value = selectedGuru.fullname;
-                                    }
-                                });
-                            }
+                            guruSelect.addEventListener('change', function() {
+                                const selectedGuru = guruOptions.find(g => g.nisn ===
+                                    this.value);
+                                if (selectedGuru && pengarangInput) {
+                                    pengarangInput.value = selectedGuru.fullname;
+                                }
+                            });
+                        }
 
 
                         if (jenisSelect) {

@@ -25,7 +25,8 @@ class KontenDigitalFactory extends Factory
             'url' => fake()->url(),
             'cover' => 'default/default-book.png',
             'file_path' => 'default/default-book.png',
-            'pembuat' => $user->fullname,
+            'pengarang' => $user->fullname,
+            'penerbit' => fake()->company(),
             'dilihat' => fake()->randomNumber(2),
         ];
     }

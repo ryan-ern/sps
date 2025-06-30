@@ -248,7 +248,8 @@
                                             <thead class="bg-dark text-white">
                                                 <tr>
                                                     <th scope="col">No</th>
-                                                    <th scope="col">Nama</th>
+                                                    <th scope="col">Pengarang</th>
+                                                    <th scope="col">Penerbit</th>
                                                     <th scope="col">Nama Konten</th>
                                                     <th scope="col">Jenis Konten</th>
                                                     <th scope="col">Tanggal</th>
@@ -260,7 +261,8 @@
                                                 @foreach ($konten as $data)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td class="text-capitalize">{{ $data->pembuat }}</td>
+                                                        <td class="text-capitalize">{{ $data->pengarang }}</td>
+                                                        <td class="text-capitalize">{{ $data->penerbit }}</td>
                                                         <td class="truncate">{{ $data->judul }}</td>
                                                         <td class="truncate text-capitalize">{{ $data->jenis }}</td>
                                                         <td class="text-uppercase">
@@ -271,7 +273,8 @@
                                                             <button class="mx-2 btn btn-primary editBtn"
                                                                 data-id="{{ $data->id }}"
                                                                 data-judul="{{ $data->judul }}"
-                                                                data-pembuat="{{ $data->pembuat }}"
+                                                                data-pengarang="{{ $data->pengarang }}"
+                                                                data-penerbit="{{ $data->penerbit }}"
                                                                 data-jenis="{{ $data->jenis }}"
                                                                 data-url="{{ $data->url }}"
                                                                 data-nuptk="{{ $data->nuptk }}"
@@ -389,7 +392,8 @@
 
                         let jenis = button.getAttribute('data-jenis');
                         const judul = button.getAttribute('data-judul');
-                        const pembuat = button.getAttribute('data-pembuat');
+                        const pengarang = button.getAttribute('data-pengarang');
+                        const penerbit = button.getAttribute('data-penerbit');
                         const nuptk = button.getAttribute('data-nuptk');
                         const url = button.getAttribute('data-url');
                         const cover = button.getAttribute('data-cover');
@@ -409,7 +413,8 @@
                                     <select name="nuptk" required class="form-select mb-3" id="guruSelect">
                                         <option value="" disabled>Pilih Guru (NUPTK)</option>
                                     </select>
-                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" value="${pembuat}" required>
+                                    <input type="text" class="form-control mb-3" name="pengarang" id="pengarang" placeholder="Pengarang" value="${pengarang}" required>
+                                    <input type="text" class="form-control mb-3" name="penerbit" id="penerbit" placeholder="Penerbit" value="${penerbit}" required>
                                 </div>
                                  <div class="col-md-6">
                                     <div id="urlGroup" class="mb-3 ${jenis === 'video' ? '' : 'd-none'}">
@@ -417,14 +422,16 @@
                                         <input type="text" class="form-control" name="url" placeholder="Link URL Youtube" value="${url ?? ''}">
                                     </div>
                                     <div id="coverGroup" class="mb-3>
-                                        <label class="form-label">Cover Preview</label>
+                                        <label class="form-label">Cover Preview (jpg, jpeg, png)</label>
                                         <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
                                         ${cover ? `<a href="/storage/${cover}" target="_blank" class="d-block mt-2 text-info">Lihat File Cover</a>` : ''}
+                                        <span class="text-danger">*Ukuran maksimal file cover 2MB</span>
                                     </div>
                                     <div id="fileGroup" class="mb-3 ${jenis === 'buku digital' ? '' : 'd-none'}">
-                                        <label class="form-label">Buku Digital</label>
+                                        <label class="form-label">Buku Digital (pdf)</label>
                                         <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
                                         ${file ? `<a href="/storage/${file}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
+                                         <span class="text-danger">*Ukuran maksimal file buku 30MB</span>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">
@@ -435,7 +442,7 @@
                         `;
                         setTimeout(() => {
                             const guruSelect = document.getElementById('guruSelect');
-                            const pembuatInput = document.getElementById('pembuat');
+                            const pengarangInput = document.getElementById('pengarang');
                             const jenisSelect = document.getElementById('jenisSelect');
                             const urlGroup = document.getElementById('urlGroup');
                             const fileGroup = document.getElementById('fileGroup');
@@ -453,8 +460,8 @@
                                 guruSelect.addEventListener('change', function() {
                                     const selectedGuru = guruOptions.find(g => g.nisn ===
                                         this.value);
-                                    if (selectedGuru && pembuatInput) {
-                                        pembuatInput.value = selectedGuru.fullname;
+                                    if (selectedGuru && pengarangInput) {
+                                        pengarangInput.value = selectedGuru.fullname;
                                     }
                                 });
                             }
@@ -518,8 +525,10 @@
                                     <input type="text" class="form-control mb-3" name="judul" placeholder="Judul" required>
                                     <select name="nuptk" required class="form-select mb-3" id="guruSelect">
                                         <option value="" disabled selected>Pilih Guru (NUPTK)</option>
+                                        <option value="lainnya">Lainnya</option>
                                     </select>
-                                    <input type="text" class="form-control mb-3" name="pembuat" id="pembuat" placeholder="Pembuat" required>
+                                    <input type="text" class="form-control mb-3" name="pengarang" id="pengarang" placeholder="Pengarang" required>
+                                    <input type="text" class="form-control mb-3" name="penerbit" id="penerbit" placeholder="Penerbit" required>
                                 </div>
                                 <div class="col-md-6">
                                     <div id="urlGroup" class="mb-3 d-none">
@@ -527,12 +536,14 @@
                                         <input type="text" class="form-control" name="url" placeholder="Link URL Youtube">
                                     </div>
                                     <div id="fileGroup" class="mb-3 d-none">
-                                        <label for="file_path" class="form-label">Buku Digital</label>
+                                        <label for="file_path" class="form-label">Buku Digital (pdf)</label>
                                         <input type="file" class="form-control" name="file_path" placeholder="Buku Digital">
+                                         <span class="text-danger">*Ukuran maksimal file buku 30MB</span>
                                     </div>
                                     <div id="coverGroup" class="mb-3>
-                                        <label for="cover" class="form-label">Cover Preview</label>
+                                        <label for="cover" class="form-label">Cover Preview (jpg, jpeg, png)</label>
                                         <input type="file" class="form-control" name="cover" accept=".jpg, .jpeg, .png"  placeholder="File Cover">
+                                         <span class="text-danger">*Ukuran maksimal file cover 2MB</span>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-3">
@@ -543,7 +554,7 @@
                         `;
                         setTimeout(() => {
                             const guruSelect = document.getElementById('guruSelect');
-                            const pembuatInput = document.getElementById('pembuat');
+                            const pengarangInput = document.getElementById('pengarang');
                             const jenisSelect = document.getElementById('jenisSelect');
                             const urlGroup = document.getElementById('urlGroup');
                             const fileGroup = document.getElementById('fileGroup');
@@ -559,8 +570,8 @@
                                 guruSelect.addEventListener('change', function() {
                                     const selectedGuru = guruOptions.find(g => g.nisn ===
                                         this.value);
-                                    if (selectedGuru && pembuatInput) {
-                                        pembuatInput.value = selectedGuru.fullname;
+                                    if (selectedGuru && pengarangInput) {
+                                        pengarangInput.value = selectedGuru.fullname;
                                     }
                                 });
                             }
@@ -636,6 +647,7 @@
                     <label for="fileBuku" class="form-label" id="fileBukuLabel">Pilih File Buku</label>
                     <input type="file" class="form-control" accept=".pdf"  id="fileBuku" name="file_buku">
                     ${bukuData.file_buku != '-' ? `<a href="/storage/${bukuData.file_buku}" target="_blank" class="d-block mt-2 text-info">Lihat File Buku</a>` : ''}
+                     <span class="text-danger">*Ukuran maksimal file buku 30MB</span>
                     </div>
                     <div class="mb-3">
                     <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih File Cover</label>
@@ -643,9 +655,10 @@
                     </div>
                     ${bukuData.file_cover != '-' ?
                         `<a href="/storage/${bukuData.file_cover}" target="_blank">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </a>`
+            <img src="/storage/${bukuData.file_cover}" class="d-block mt-2 text-info" style="max-height: 150px; max-width: auto; cursor: pointer;" alt="Cover Buku">
+            </a>`
                     : ''}
+                     <span class="text-danger">*Ukuran maksimal file cover 2MB</span>
             </div>
         </div>
 
@@ -722,12 +735,14 @@
                                                     File Buku (PDF)</label>
                                                 <input type="file" class="form-control" accept=".pdf" id="fileBuku"
                                                     name="file_buku">
+                                                     <span class="text-danger">*Ukuran maksimal file buku 30MB</span>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="fileCover" class="form-label" id="fileCoverLabel">Pilih
                                                     File Cover (JPG, JPEG, PNG)</label>
                                                     <input type="file" class="form-control" accept=".jpg, .jpeg, .png"  id="fileCover"
                                                     name="file_cover">
+                                                     <span class="text-danger">*Ukuran maksimal file cover 2MB</span>
                                             </div>
 
                                             <input type="number" class="form-control mb-3" name="tahun"
