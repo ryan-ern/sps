@@ -211,9 +211,9 @@ class PeminjamanController extends Controller
         $user = auth()->user();
 
         // Validasi untuk buku referensi
-        if ($buku->jenis_buku === 'referensi') {
-            $peminjamanReferensi = Peminjaman::where('nisn', $user->nisn)
-                ->whereHas('buku', fn($q) => $q->where('jenis_buku', 'referensi'))
+        if ($buku->jenis === 'referensi') {
+            $peminjamanReferensi = Peminjaman::where('nisn', $user->nisn)->where('kembali', '-')
+                ->whereHas('buku', fn($q) => $q->where('jenis', 'referensi'))
                 ->pluck('judul')
                 ->unique();
 
@@ -262,6 +262,21 @@ class PeminjamanController extends Controller
                 'Data peminjaman ' . $request->fullname . ' dengan no_regis ' . $request->no_regis . ' tidak ditemukan.',
                 [],
                 'Terima Peminjaman Gagal'
+            );
+            return redirect()->route('peminjaman.read');
+        }
+
+        $bataspinjam = Peminjaman::where('nisn', $peminjaman->nisn)->where('kembali', '-')->whereHas('buku', fn($q) => $q->where('jenis', 'referensi'))
+            ->pluck('judul')
+            ->unique();
+
+        // Cek batasan jumlah peminjaman referensi (misal: max 2 buku referensi)
+        if ($bataspinjam->count() >= 2) {
+            flash()->flash(
+                'warning',
+                'Siswa ini sudah mencapai batas maksimal peminjaman 2 buku referensi. dan belum dikembalikan',
+                [],
+                'Peminjaman Ditolak'
             );
             return redirect()->route('peminjaman.read');
         }

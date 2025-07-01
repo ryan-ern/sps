@@ -386,6 +386,60 @@
 
             // Modal Konten
             const kontenCards = document.querySelectorAll('.konten-card');
+            const kontenModal = document.getElementById('kontenModal');
+
+            kontenModal.addEventListener('hidden.bs.modal', function() {
+                location.reload(); // Refresh halaman
+            });
+
+            // Fungsi untuk tambah dilihat
+            function tambahDilihat(kontenId) {
+                if (!kontenId) return;
+
+                fetch(`/konten-digital/${kontenId}/tambah-dilihat`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('modalDilihat').textContent = data
+                                .dilihat;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Gagal memperbarui jumlah dilihat:', error);
+                    });
+            }
+
+            let ytPlayer = null;
+            let ytPlayed = false;
+
+            // Fungsi ini dipanggil otomatis oleh YouTube API saat iframe tersedia
+            function onYouTubeIframeAPIReady() {
+                const iframe = document.querySelector('#kontenPreview iframe');
+                if (iframe) {
+                    ytPlayer = new YT.Player(iframe, {
+                        events: {
+                            'onStateChange': onPlayerStateChange
+                        }
+                    });
+                }
+            }
+
+            // Trigger tambah dilihat saat video mulai diputar
+            function onPlayerStateChange(event) {
+                if (event.data == YT.PlayerState.PLAYING && !ytPlayed) {
+                    ytPlayed = true;
+                    const kontenId = document.querySelector('[data-id-konten-video]').getAttribute(
+                        'data-id-konten-video');
+                    tambahDilihat(kontenId);
+                }
+            }
 
             kontenCards.forEach(card => {
                 card.addEventListener('click', function() {
@@ -404,29 +458,15 @@
                     document.getElementById('modalPenerbit').textContent = penerbit;
                     document.getElementById('modalDilihat').textContent = dilihat;
 
-                    // Tambah jumlah dilihat
-                    if (kontenId) {
-                        fetch(`/konten-digital/${kontenId}/tambah-dilihat`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    dilihat = data.dilihat;
-                                    document.getElementById('modalDilihat').textContent =
-                                        dilihat;
-                                    this.setAttribute('data-dilihat', dilihat);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Gagal memperbarui jumlah dilihat:', error);
-                            });
-                    }
+                    const modalBuka = document.getElementById('modalBuka');
+                    const kontenPreview = document.getElementById('kontenPreview');
+
+
+
+                    // Event saat klik "Klik di sini"
+                    modalBuka.addEventListener('click', function() {
+                        tambahDilihat(kontenId);
+                    });
 
 
                     const bukaLink = document.getElementById('modalBuka');
@@ -451,9 +491,24 @@
                             }
 
                             preview.innerHTML = `
-                                <div class="ratio ratio-16x9">
-                                    <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
-                                </div>`;
+        <div class="ratio ratio-16x9">
+            <iframe id="yt-player" src="${embedUrl}?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
+        </div>`;
+
+                            preview.setAttribute('data-id-konten-video', kontenId);
+                            ytPlayed = false; // Reset flag
+
+                            // Delay sedikit agar iframe sempat masuk ke DOM sebelum buat YT.Player
+                            setTimeout(() => {
+                                const iframe = document.getElementById('yt-player');
+                                if (iframe) {
+                                    ytPlayer = new YT.Player(iframe, {
+                                        events: {
+                                            'onStateChange': onPlayerStateChange
+                                        }
+                                    });
+                                }
+                            }, 500);
                         }
                     } else if (jenis === 'buku digital' && file) {
                         preview.innerHTML = `

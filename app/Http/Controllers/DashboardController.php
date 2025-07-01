@@ -19,7 +19,7 @@ class DashboardController extends Controller
         {
             if ($targetKemarin > 0) {
                 $persen = round(($hariIni / $targetKemarin) * 100);
-                return $persen; // Maksimal 100%
+                return min($persen, 100); // Maksimal 100%
             }
             return ($hariIni > 0) ? 100 : 0; // Jika target 0, tapi hari ini ada data, maka 100%
         }
@@ -283,6 +283,7 @@ class DashboardController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return (object)[
+                        'id' => $item->id ?? '-',
                         'nuptk' => $item->nuptk ?? '-',
                         'judul' => $item->judul ?? '-',
                         'jenis' => $item->jenis ?? '-',
@@ -320,11 +321,11 @@ class DashboardController extends Controller
             $wajibDilihat = collect();
 
             // Selang-seling buku dan konten
-            $maxLength = max($allBuku->count(), $allKonten->count());
+            $maxLength = $allKonten->count();
             for ($i = 0; $i < $maxLength; $i++) {
-                if (isset($allBuku[$i])) {
-                    $wajibDilihat->push($allBuku[$i]);
-                }
+                // if (isset($allBuku[$i])) {
+                //     $wajibDilihat->push($allBuku[$i]);
+                // }
                 if (isset($allKonten[$i])) {
                     $wajibDilihat->push($allKonten[$i]);
                 }
@@ -344,6 +345,10 @@ class DashboardController extends Controller
         } elseif ($roles == 'admin') {  //DASHBOARD ADMIN
             $today = Carbon::today();
             $yesterday = Carbon::yesterday();
+            $month = Carbon::now()->month;
+            $year = Carbon::now()->year;
+            $lastMonth = Carbon::now()->subMonth()->month;
+            $lastYear = Carbon::now()->subYear()->year;
 
             // Statistik harian
             // Pengunjung
@@ -358,6 +363,13 @@ class DashboardController extends Controller
             $dataKembali = Peminjaman::whereDate('tgl_kembali', $today)->count();
             $dataKembaliKemarin = Peminjaman::whereDate('tgl_kembali', $yesterday)->count();
 
+            $denda = Peminjaman::whereDate('tgl_pinjam', $today)->sum('denda');
+            $dendabulan = Peminjaman::whereMonth('tgl_pinjam', $month)->sum('denda');
+            $dendatahun = Peminjaman::whereYear('tgl_pinjam', $year)->sum('denda');
+
+            $dendaKemarin = Peminjaman::whereDate('tgl_pinjam', $yesterday)->sum('denda');
+            $dendabulanKemarin = Peminjaman::whereMonth('tgl_pinjam', $lastMonth)->sum('denda');
+            $dendatahunKemarin = Peminjaman::whereYear('tgl_pinjam', $lastYear)->sum('denda');
 
             $persenPengunjung = hitungProgres($dataPengunjung, $dataPengunjungKemarin);
             $persenPeminjam   = hitungProgres($dataPeminjam, $dataPeminjamKemarin);
@@ -483,7 +495,13 @@ class DashboardController extends Controller
                 'persenKembali',
                 'bukuFavorit',
                 'wajibDilihat',
-                'kontenSeringDilihat'
+                'kontenSeringDilihat',
+                'denda',
+                'dendaKemarin',
+                'dendabulan',
+                'dendabulanKemarin',
+                'dendatahun',
+                'dendatahunKemarin',
             ));
         } else {
             return view('auth.signin');

@@ -111,6 +111,86 @@
                         </div>
 
                         <div class="border-5 border-bottom border-dark my-3"></div>
+                        <h5>
+                            Rekapan Denda
+                        </h5>
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-4  mb-md-0 mb-4">
+                                <div class="bg-dark text-white px-4 py-2 rounded">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <small class="fs-5">Hari Ini</small>
+                                                </div>
+                                            </div>
+                                            <div class="border-2 border-bottom border-light my-3"></div>
+                                            Rp {{ number_format($denda, 0, ',', '.') }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <small class="fs-5">Kemarin</small>
+                                                </div>
+                                            </div>
+                                            <div class="border-2 border-bottom border-light my-3"></div>
+                                            Rp {{ number_format($dendaKemarin, 0, ',', '.') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4  mb-md-0 mb-4">
+                                <div class="bg-dark text-white px-4 py-2 rounded">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <small class="fs-5">Bulan Ini</small>
+                                                </div>
+                                            </div>
+                                            <div class="border-2 border-bottom border-light my-3"></div>
+                                            Rp {{ number_format($dendabulan, 0, ',', '.') }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <small class="fs-5">Bulan Kemarin</small>
+                                                </div>
+                                            </div>
+                                            <div class="border-2 border-bottom border-light my-3"></div>
+                                            Rp {{ number_format($dendabulanKemarin, 0, ',', '.') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4  mb-md-0 mb-4">
+                                <div class="bg-dark text-white px-4 py-2 rounded">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <small class="fs-5">Tahun Ini</small>
+                                                </div>
+                                            </div>
+                                            <div class="border-2 border-bottom border-light my-3"></div>
+                                            Rp {{ number_format($dendatahun, 0, ',', '.') }}
+
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <small class="fs-5">Tahun Kemarin</small>
+                                                </div>
+                                            </div>
+                                            <div class="border-2 border-bottom border-light my-3"></div>
+                                            Rp {{ number_format($dendatahunKemarin, 0, ',', '.') }}
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-5 border-bottom border-dark my-3"></div>
 
                         {{-- Buku Terfavorit --}}
                         <h6>Buku Terfavorit</h6>
@@ -168,9 +248,11 @@
                                     <div class="bg-dark text-white p-3 text-center rounded buku-card"
                                         style="width: 215px; cursor: pointer;" data-bs-toggle="modal"
                                         data-bs-target="#globalBukuModal" data-judul="{{ $item->judul }}"
-                                        data-no_regis="{{ $item->no_regis }}" data-pengarang="{{ $item->pengarang }}"
+                                        data-no_regis="{{ $item->no_regis }}"
+                                        data-pengarang="{{ $item->pengarang }}"
                                         data-penerbit="{{ $item->penerbit }}" data-tahun="{{ $item->tahun }}"
-                                        data-stok="{{ $item->stok }}" data-total_pinjam="{{ $item->total_pinjam }}"
+                                        data-stok="{{ $item->stok }}"
+                                        data-total_pinjam="{{ $item->total_pinjam }}"
                                         data-keterangan="{{ $item->keterangan }}"
                                         data-cover="{{ asset('storage/' . $item->file_cover) }}"
                                         data-file="{{ asset('storage/' . $item->file_buku) }}"
