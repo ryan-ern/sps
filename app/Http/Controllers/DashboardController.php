@@ -401,7 +401,10 @@ class DashboardController extends Controller
                         'tahun' => $data->tahun ?? '-',
                         'created_at' => $data->created_at ?? now()->subYears(10)
                     ];
-                })->sortByDesc(function ($item) {
+                })->filter(function ($item) {
+                    return $item->total_pinjam > 0;
+                })
+                ->sortByDesc(function ($item) {
                     return [$item->total_pinjam, $item->created_at]; // Urutkan berdasarkan total_pinjam dan created_at
                 })
                 ->take(5)
