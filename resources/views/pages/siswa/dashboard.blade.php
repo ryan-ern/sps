@@ -388,10 +388,6 @@
             const kontenCards = document.querySelectorAll('.konten-card');
             const kontenModal = document.getElementById('kontenModal');
 
-            kontenModal.addEventListener('hidden.bs.modal', function() {
-                location.reload(); // Refresh halaman
-            });
-
             // Fungsi untuk tambah dilihat
             function tambahDilihat(kontenId) {
                 if (!kontenId) return;
@@ -438,6 +434,7 @@
                     const kontenId = document.querySelector('[data-id-konten-video]').getAttribute(
                         'data-id-konten-video');
                     tambahDilihat(kontenId);
+                    console.log(ytPlayed);
                 }
             }
 
@@ -482,11 +479,14 @@
                         const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
 
                         if (isYoutube) {
+                            kontenModal.addEventListener('hidden.bs.modal', function() {
+                                location.reload(); // Refresh halaman
+                            });
                             let embedUrl = url;
                             if (url.includes('watch?v=')) {
                                 embedUrl = url.replace('watch?v=', 'embed/');
                             } else if (url.includes('youtu.be/')) {
-                                const videoId = url.split('youtu.be/')[1];
+                                const videoId = url.split('youtu.be/')[1].split('?')[0];
                                 embedUrl = `https://www.youtube.com/embed/${videoId}`;
                             }
 
@@ -512,9 +512,30 @@
                         }
                     } else if (jenis === 'buku digital' && file) {
                         preview.innerHTML = `
-                            <iframe src="${file}" width="100%" height="500px" frameborder="0">
+                            <iframe id="bukuDigitalFrame" src="${file}" width="100%" height="600px" frameborder="0">
                                 File tidak dapat ditampilkan.
-                            </iframe>`;
+                            </iframe>
+                        `;
+
+                        const iframe = document.getElementById('bukuDigitalFrame');
+                        let sudahDitambahDilihat = false;
+
+                        // Observer untuk cek apakah iframe benar-benar tampil di layar
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting && !sudahDitambahDilihat) {
+                                    tambahDilihat(kontenId);
+                                    sudahDitambahDilihat =
+                                        true; // Agar hanya sekali
+                                    observer
+                                        .disconnect(); // Stop observing setelah terpanggil
+                                }
+                            });
+                        }, {
+                            threshold: 0.8 // minimal 80% terlihat di layar
+                        });
+
+                        observer.observe(iframe);
                     } else {
                         preview.innerHTML =
                             `<p class="text-muted">Konten tidak tersedia untuk ditampilkan.</p>`;

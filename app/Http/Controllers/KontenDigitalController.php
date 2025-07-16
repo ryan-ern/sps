@@ -175,7 +175,7 @@ class KontenDigitalController extends Controller
 
         if ($request->hasFile('file_path')) {
             // Hapus file lama jika ada
-            if ($konten->file_path && Storage::disk('public')->exists($konten->file_path)) {
+            if (($konten->file_path && Storage::disk('public')->exists($konten->file_path) && $konten->file_path != 'default/default-book.png')) {
                 Storage::disk('public')->delete($konten->file_path);
             }
 
@@ -217,7 +217,7 @@ class KontenDigitalController extends Controller
     {
         $konten = KontenDigital::findOrFail($id);
 
-        if ($konten->file_path && Storage::disk('public')->exists($konten->file_path)) {
+        if (($konten->file_path && Storage::disk('public')->exists($konten->file_path)) && $konten->file_path != 'default/default-book.png') {
             Storage::disk('public')->delete($konten->file_path);
         }
 

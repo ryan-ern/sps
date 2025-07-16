@@ -285,6 +285,10 @@ class BukuController extends Controller
         $fileCoverPath = Buku::where('judul', $buku->judul)->where('stok', $buku->stok)->first()->file_cover ?? '-';
 
         if ($request->hasFile('file_buku')) {
+            // Hapus file lama jika ada
+            if (($bukuYangSama->first()->file_buku && Storage::disk('public')->exists($bukuYangSama->first()->file_buku) && $bukuYangSama->first()->file_buku != 'default/default-book.png')) {
+                Storage::disk('public')->delete($bukuYangSama->first()->file_buku);
+            }
             $fileBuku = $request->file('file_buku');
             $fileBukuName = time() . '_buku_' . $fileBuku->getClientOriginalName();
             $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $fileBukuName);
