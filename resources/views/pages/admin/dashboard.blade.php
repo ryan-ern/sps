@@ -412,7 +412,7 @@
                             if (url.includes('watch?v=')) {
                                 embedUrl = url.replace('watch?v=', 'embed/');
                             } else if (url.includes('youtu.be/')) {
-                                const videoId = url.split('youtu.be/')[1];
+                                const videoId = url.split('youtu.be/')[1].split('?')[0];
                                 embedUrl = `https://www.youtube.com/embed/${videoId}`;
                             }
 

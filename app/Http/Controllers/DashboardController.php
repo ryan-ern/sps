@@ -44,8 +44,14 @@ class DashboardController extends Controller
             }
 
             if ($search) {
-                $bukuQuery->where('judul', 'like', '%' . $search . '%')->orWhere('no_regis', 'like', '%' . $search . '%')->orWhere('pengarang', 'like', '%' . $search . '%')->orWhere('penerbit', 'like', '%' . $search . '%');
+                $bukuQuery->where(function ($query) use ($search) {
+                    $query->where('judul', 'like', "%{$search}%")
+                        ->orWhere('no_regis', 'like', "%{$search}%")
+                        ->orWhere('pengarang', 'like', "%{$search}%")
+                        ->orWhere('penerbit', 'like', "%{$search}%");
+                });
             }
+
 
             $bukuFavorit = $bukuQuery->select('judul', DB::raw('MIN(no_regis) as regis_terendah'), DB::raw('CAST(SUM(stok) AS UNSIGNED) as total_stok'))
                 ->groupBy('judul')
@@ -84,7 +90,10 @@ class DashboardController extends Controller
                     $query->where('jenis', $filterJenis);
                 })
                 ->when($search, function ($query) use ($search) {
-                    $query->where('judul', 'like', '%' . $search . '%');
+                    $query->where('judul', 'like', "%{$search}%")
+                        ->orWhere('no_regis', 'like', "%{$search}%")
+                        ->orWhere('pengarang', 'like', "%{$search}%")
+                        ->orWhere('penerbit', 'like', "%{$search}%");
                 })
                 ->get()
                 ->map(function ($data) {
@@ -112,7 +121,7 @@ class DashboardController extends Controller
             $kontenQuery = KontenDigital::query();
 
             if ($search) {
-                $kontenQuery->where('judul', 'like', '%' . $search . '%');
+                $kontenQuery->where('judul', 'like', "%{$search}%");
             }
 
             $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat') //untuk mengambil dan menampilkan konten digital yang paling sering dilihat oleh pengguna
@@ -135,7 +144,9 @@ class DashboardController extends Controller
 
             $kontenTerbaru = KontenDigital::orderByDesc('created_at')
                 ->when($search, function ($query) use ($search) {
-                    $query->where('judul', 'like', '%' . $search . '%');
+                    $query->where('judul', 'like', "%{$search}%")
+                        ->orWhere('pengarang', 'like', "%{$search}%")
+                        ->orWhere('penerbit', 'like', "%{$search}%");
                 })
                 ->take(10)
                 ->get()
@@ -263,7 +274,7 @@ class DashboardController extends Controller
                 ->values();
 
             // ---------- KONTEN DIGITAL ----------
-            $kontenQuery = KontenDigital::where('judul', 'like', '%' . $search . '%')->orWhere('jenis', 'like', '%' . $search . '%')->orWhere('url', 'like', '%' . $search . '%')->orWhere('pengarang', 'like', '%' . $search . '%');
+            $kontenQuery = KontenDigital::where('judul', 'like', "%{$search}%")->orWhere('jenis', 'like', "%{$search}%")->orWhere('url', 'like', "%{$search}%")->orWhere('pengarang', 'like', "%{$search}%");
 
             $kontenSeringDilihat = (clone $kontenQuery)->orderByDesc('dilihat')
                 ->take(5)

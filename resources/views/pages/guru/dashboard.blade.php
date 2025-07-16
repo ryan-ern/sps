@@ -42,8 +42,8 @@
                                 <form method="GET">
                                     <div class="input-group border border-dark">
                                         <input type="text" class="form-control"
-                                            placeholder="Ketik Judul Buku Disini, Untuk Pencarian"
-                                            aria-label="Ketik Judul Buku Disini, Untuk Pencarian"
+                                            placeholder="Ketik Judul Disini, Untuk Pencarian"
+                                            aria-label="Ketik Judul Disini, Untuk Pencarian"
                                             aria-describedby="button-addon2" name="search">
                                         <button class="btn btn-success m-1 px-5">Cari</button>
                                     </div>
@@ -306,7 +306,7 @@
                             if (url.includes('watch?v=')) {
                                 embedUrl = url.replace('watch?v=', 'embed/');
                             } else if (url.includes('youtu.be/')) {
-                                const videoId = url.split('youtu.be/')[1];
+                                const videoId = url.split('youtu.be/')[1].split('?')[0];
                                 embedUrl = `https://www.youtube.com/embed/${videoId}`;
                             }
 
